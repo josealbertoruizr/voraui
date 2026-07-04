@@ -20,8 +20,8 @@ It lives in its own repository (`voraui`) and is hosted free on Vercel.
 ## v1 Components
 
 1. **Fear & Greed gauge** - data from the free alternative.me API.
-2. **Altseason index gauge** - data from the free CoinGecko API.
-3. **BTC Rainbow chart** - CoinGecko historical BTC prices plus the band math already extracted in Vora's `rainbowBandsPrimitive.ts`.
+2. **Altseason index gauge** - data from the free CoinPaprika API (top-50 alts vs BTC, blockchaincenter.net convention); the score computation moves from Vora's backend into the shipped hook.
+3. **BTC Rainbow chart** - Binance daily klines from 2017-08-17 onward plus a bundled 2010-2017 daily close seed (52 KB CSV from Vora's backend), with the band math from Vora's `rainbowBandsPrimitive.ts` and `market.py`.
 4. **Trading chart** (flagship) - candlestick chart built on lightweight-charts with:
    - B/S trade markers with clustering (`3B` when trades stack on one candle).
    - Hover to see trade details.
@@ -29,8 +29,8 @@ It lives in its own repository (`voraui`) and is hosted free on Vercel.
    - Live candle updates from Binance public klines (`api.binance.com/api/v3/klines`, keyless and CORS-enabled).
    - Trades supplied via a documented `trades` prop; they are inherently the user's own data.
 
-Source components are extracted from the Vora app repo:
-`components/market/AltseasonGauge.tsx`, `components/market/BtcRainbowChart.tsx`, `components/market/rainbowBandsPrimitive.ts`, the fear & greed section of `app/(pages)/market/page.tsx`, and `components/performance/OhlcvChart.tsx`.
+Source components are extracted from the Vora app repo.
+Full snapshots of every source file, plus backend computation context and data source notes, live in `docs/vora-reference/` (see its `INDEX.md`), so development never needs the Vora repo.
 
 Explicitly out of v1: liquidation heatmap (no free data source), market treemap (CoinGecko already ships a free widget), funding rates card, npm package distribution, sector grouping.
 
@@ -57,7 +57,7 @@ Each registry item declares its own npm dependencies (`lightweight-charts`, `fra
 These rules apply to every component copied from Vora.
 
 - No Vora backend imports.
-  Bundled hooks fetch public APIs directly (alternative.me, CoinGecko, Binance klines).
+  Bundled hooks fetch public APIs directly (alternative.me, CoinPaprika, Binance klines).
 - Hooks are plain `fetch` with `useState`/`useEffect`.
   No TanStack Query dependency; users who want caching wrap the component themselves.
 - Every component accepts `data` as a prop override.

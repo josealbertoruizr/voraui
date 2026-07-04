@@ -14,7 +14,7 @@ npx shadcn@latest add @voraui/trading-chart
 - BTC Rainbow chart
 - Trading chart with trade markers (flagship)
 
-Every component renders live data out of the box from free public APIs (alternative.me, CoinGecko, Binance), and accepts your own data via props.
+Every component renders live data out of the box from free public APIs (alternative.me, CoinPaprika, Binance), and accepts your own data via props.
 
 ## Status
 
