@@ -66,20 +66,22 @@ export function useBtcHistory(options: { enabled?: boolean } = {}) {
   React.useEffect(() => {
     if (!enabled) return;
     const controller = new AbortController();
-    setLoading(true);
-    setError(null);
 
-    fetchBinanceDailyCloses(controller.signal)
-      .then((binance) => {
+    const load = async () => {
+      try {
+        const binance = await fetchBinanceDailyCloses(controller.signal);
         if (controller.signal.aborted) return;
         setData(mergeBtcHistory(BTC_DAILY_SEED, binance));
+        setError(null);
         setLoading(false);
-      })
-      .catch((err: Error) => {
-        if (controller.signal.aborted || err.name === "AbortError") return;
-        setError(err.message);
+      } catch (err) {
+        if (controller.signal.aborted || (err as Error).name === "AbortError") return;
+        setError(err instanceof Error ? err.message : "Binance klines request failed");
         setLoading(false);
-      });
+      }
+    };
+
+    load();
 
     return () => controller.abort();
   }, [enabled]);

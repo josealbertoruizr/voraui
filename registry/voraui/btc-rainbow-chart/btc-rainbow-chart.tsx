@@ -287,8 +287,12 @@ export function BtcRainbowChart({ data, bands: bandsProp, className }: BtcRainbo
 
   if (loading) {
     return (
-      <div className={cn("flex h-[360px] items-center justify-center sm:h-[420px]", className)}>
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      <div
+        role="status"
+        className={cn("flex h-[360px] items-center justify-center sm:h-[420px]", className)}
+      >
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" aria-hidden="true" />
+        <span className="sr-only">Loading BTC price history</span>
       </div>
     );
   }
@@ -296,6 +300,7 @@ export function BtcRainbowChart({ data, bands: bandsProp, className }: BtcRainbo
   if (!hasLineData) {
     return (
       <div
+        role="alert"
         className={cn(
           "flex h-[220px] items-center justify-center rounded-md border border-dashed border-border text-xs text-muted-foreground",
           className,
