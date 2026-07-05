@@ -21,7 +21,7 @@ export function FearGreedGauge({ data, className }: FearGreedGaugeProps) {
 
   return (
     <div className={cn("relative flex flex-col items-center pt-2", className)}>
-      <svg viewBox="0 0 200 110" className="w-full max-w-[260px]">
+      <svg viewBox="0 0 200 110" className="w-full max-w-[260px]" aria-hidden="true">
         <defs>
           <linearGradient id="voraui-fg-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="#f43f5e" />
@@ -54,7 +54,10 @@ export function FearGreedGauge({ data, className }: FearGreedGaugeProps) {
       </svg>
       <div className="-mt-3 text-center">
         {loading ? (
-          <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" />
+          <div role="status">
+            <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" aria-hidden="true" />
+            <span className="sr-only">Loading Fear &amp; Greed Index</span>
+          </div>
         ) : (
           <>
             <p className="text-3xl font-bold tabular-nums text-foreground">{value ?? "—"}</p>
