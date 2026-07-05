@@ -13,12 +13,22 @@ const MANAGERS = [
 
 export function InstallTabs({ name }: { name: string }) {
   const [copied, setCopied] = React.useState<string | null>(null);
+  const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const copy = async (text: string, id: string) => {
-    await navigator.clipboard.writeText(text);
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      return;
+    }
+    if (timerRef.current) clearTimeout(timerRef.current);
     setCopied(id);
-    setTimeout(() => setCopied(null), 1500);
+    timerRef.current = setTimeout(() => setCopied(null), 1500);
   };
+
+  React.useEffect(() => () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+  }, []);
 
   return (
     <Tabs defaultValue="pnpm">
