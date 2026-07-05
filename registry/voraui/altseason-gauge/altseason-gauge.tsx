@@ -23,9 +23,12 @@ export function AltseasonGauge({ data, window: windowProp = "30d", className }: 
     return (
       <div className={cn("flex h-[180px] items-center justify-center", className)}>
         {fetched.error ? (
-          <p className="text-xs text-muted-foreground">Altseason data is unavailable.</p>
+          <p role="alert" className="text-xs text-muted-foreground">Altseason data is unavailable.</p>
         ) : (
-          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+          <div role="status">
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" aria-hidden="true" />
+            <span className="sr-only">Loading Altseason Index</span>
+          </div>
         )}
       </div>
     );
@@ -122,7 +125,7 @@ export function AltseasonGauge({ data, window: windowProp = "30d", className }: 
         </>
       ) : (
         <div className="flex h-[120px] items-center justify-center">
-          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+          <p className="text-xs text-muted-foreground">Altseason score is unavailable.</p>
         </div>
       )}
     </div>
