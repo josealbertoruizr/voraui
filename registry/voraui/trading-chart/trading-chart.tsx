@@ -266,6 +266,7 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
 
   const [showNoMoreData, setShowNoMoreData] = React.useState(false);
   const noMoreDataTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [chartEpoch, setChartEpoch] = React.useState(0);
 
   // Brief notification when the user hits the historical data boundary.
   React.useEffect(() => {
@@ -599,6 +600,9 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
 
       chart.subscribeCrosshairMove(crosshairHandler);
       chart.subscribeClick(clickHandler);
+
+      // Signal effects that a freshly initialized chart instance is ready for data.
+      setChartEpoch((epoch) => epoch + 1);
     };
 
     if (containerRef.current) {
@@ -635,6 +639,7 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
       }
       updateGlowRef.current = null;
       if (glowTimeoutRef.current) clearTimeout(glowTimeoutRef.current);
+      highlightedTradeRef.current = null;
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
       if (chartRef.current) {
         chartRef.current.remove();
@@ -642,6 +647,8 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
       }
       seriesRef.current = null;
       markersPluginRef.current = null;
+      lastCandlesLengthRef.current = 0;
+      isAutoFitDoneRef.current = false;
     };
     // Only reinitialize if height changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -726,7 +733,7 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
     if (sanitized.length > 0) {
       oldestTimestampRef.current = sanitized[0].time;
     }
-  }, [effectiveCandles, symbol, timeframe]);
+  }, [effectiveCandles, symbol, timeframe, chartEpoch]);
 
   // Update markers.
   React.useEffect(() => {
@@ -734,7 +741,7 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
     const aligned = alignSignalsToBars(trades, effectiveCandles, timeframe);
     const markers = buildSeriesMarkers(aligned);
     markersPluginRef.current.setMarkers(markers);
-  }, [effectiveCandles, trades, timeframe]);
+  }, [effectiveCandles, trades, timeframe, chartEpoch]);
 
   // Merge live candles from polling.
   const handleNewCandle = React.useCallback(
