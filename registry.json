@@ -1,0 +1,117 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "voraui",
+  "homepage": "https://voraui.vercel.app",
+  "items": [
+    {
+      "name": "fear-greed-gauge",
+      "type": "registry:block",
+      "title": "Fear & Greed Gauge",
+      "description": "Crypto Fear & Greed index dial with live data from alternative.me.",
+      "dependencies": ["lucide-react"],
+      "registryDependencies": ["utils"],
+      "files": [
+        {
+          "path": "registry/voraui/fear-greed-gauge/fear-greed-gauge.tsx",
+          "type": "registry:component",
+          "target": "components/voraui/fear-greed-gauge.tsx"
+        },
+        {
+          "path": "registry/voraui/fear-greed-gauge/use-fear-greed.ts",
+          "type": "registry:hook",
+          "target": "components/voraui/use-fear-greed.ts"
+        }
+      ]
+    },
+    {
+      "name": "altseason-gauge",
+      "type": "registry:block",
+      "title": "Altseason Gauge",
+      "description": "Altcoin Season index gauge computed client-side from CoinPaprika data.",
+      "dependencies": ["framer-motion", "lucide-react"],
+      "registryDependencies": ["utils"],
+      "files": [
+        {
+          "path": "registry/voraui/altseason-gauge/altseason-gauge.tsx",
+          "type": "registry:component",
+          "target": "components/voraui/altseason-gauge.tsx"
+        },
+        {
+          "path": "registry/voraui/altseason-gauge/use-altseason.ts",
+          "type": "registry:hook",
+          "target": "components/voraui/use-altseason.ts"
+        },
+        {
+          "path": "registry/voraui/altseason-gauge/altseason.ts",
+          "type": "registry:lib",
+          "target": "components/voraui/altseason.ts"
+        }
+      ]
+    },
+    {
+      "name": "btc-rainbow-chart",
+      "type": "registry:block",
+      "title": "BTC Rainbow Chart",
+      "description": "Bitcoin rainbow log-regression chart with Binance history and a bundled 2010-2017 seed.",
+      "dependencies": ["lightweight-charts", "next-themes", "lucide-react"],
+      "registryDependencies": ["button", "utils"],
+      "files": [
+        {
+          "path": "registry/voraui/btc-rainbow-chart/btc-rainbow-chart.tsx",
+          "type": "registry:component",
+          "target": "components/voraui/btc-rainbow-chart.tsx"
+        },
+        {
+          "path": "registry/voraui/btc-rainbow-chart/rainbow-bands.ts",
+          "type": "registry:lib",
+          "target": "components/voraui/rainbow-bands.ts"
+        },
+        {
+          "path": "registry/voraui/btc-rainbow-chart/use-btc-history.ts",
+          "type": "registry:hook",
+          "target": "components/voraui/use-btc-history.ts"
+        },
+        {
+          "path": "registry/voraui/btc-rainbow-chart/btc-seed.ts",
+          "type": "registry:lib",
+          "target": "components/voraui/btc-seed.ts"
+        }
+      ]
+    },
+    {
+      "name": "trading-chart",
+      "type": "registry:block",
+      "title": "Trading Chart",
+      "description": "Candlestick chart with trade markers, clustering, live Binance updates, and an imperative highlight API.",
+      "dependencies": ["lightweight-charts", "next-themes", "lucide-react"],
+      "registryDependencies": ["utils"],
+      "files": [
+        {
+          "path": "registry/voraui/trading-chart/trading-chart.tsx",
+          "type": "registry:component",
+          "target": "components/voraui/trading-chart.tsx"
+        },
+        {
+          "path": "registry/voraui/trading-chart/use-klines.ts",
+          "type": "registry:hook",
+          "target": "components/voraui/use-klines.ts"
+        },
+        {
+          "path": "registry/voraui/trading-chart/markers.ts",
+          "type": "registry:lib",
+          "target": "components/voraui/markers.ts"
+        },
+        {
+          "path": "registry/voraui/trading-chart/candle-validation.ts",
+          "type": "registry:lib",
+          "target": "components/voraui/candle-validation.ts"
+        },
+        {
+          "path": "registry/voraui/trading-chart/types.ts",
+          "type": "registry:lib",
+          "target": "components/voraui/types.ts"
+        }
+      ]
+    }
+  ]
+}
