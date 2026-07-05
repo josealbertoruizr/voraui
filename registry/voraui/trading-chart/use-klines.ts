@@ -123,7 +123,8 @@ export function useKlines(
     return () => controller.abort();
   }, [symbol, timeframe, limit, enabled]);
 
-  return { candles, setCandles, loading, error, fetchMore, hasMoreHistory };
+  // Loading is forced false while disabled so a mid-fetch enabled->false toggle cannot leave it stuck.
+  return { candles, setCandles, loading: enabled ? loading : false, error, fetchMore, hasMoreHistory };
 }
 
 /** Poll Binance for the latest (closed + forming) candles and push them to the chart. */
