@@ -13,7 +13,7 @@ import {
 const TICKERS_URL = "https://api.coinpaprika.com/v1/tickers?quotes=USD";
 
 export function useAltseason(
-  window: AltseasonWindow = "30d",
+  window: AltseasonWindow = "7d",
   options: { enabled?: boolean; refreshInterval?: number } = {},
 ) {
   const { enabled = true, refreshInterval = 1_800_000 } = options;

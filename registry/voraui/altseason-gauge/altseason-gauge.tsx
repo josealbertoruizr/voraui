@@ -15,7 +15,7 @@ export interface AltseasonGaugeProps {
   className?: string;
 }
 
-export function AltseasonGauge({ data, window: windowProp = "30d", className }: AltseasonGaugeProps) {
+export function AltseasonGauge({ data, window: windowProp = "7d", className }: AltseasonGaugeProps) {
   const fetched = useAltseason(windowProp, { enabled: data === undefined });
   const resolved = data ?? fetched.data;
 

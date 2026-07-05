@@ -47,7 +47,7 @@ export const ALTSEASON_EXCLUDED_SYMBOLS = new Set([
  */
 export function computeAltseason(
   tickers: PaprikaTicker[],
-  window: AltseasonWindow = "30d",
+  window: AltseasonWindow = "7d",
 ): AltseasonData {
   const key = WINDOW_KEYS[window];
   const rows = [...tickers].sort((a, b) => (a.rank ?? 1_000_000) - (b.rank ?? 1_000_000));
@@ -75,6 +75,15 @@ export function computeAltseason(
       return symbol !== "BTC" && !ALTSEASON_EXCLUDED_SYMBOLS.has(symbol) && changeOf(row) !== null;
     })
     .slice(0, 50);
+
+  // CoinPaprika's bulk tickers endpoint occasionally serves a dead column:
+  // every ticker (including BTC) reports exactly 0 for a given window (seen
+  // in practice for 30d/1y). That is upstream data unavailability, not a
+  // real market reading where every asset happened to be flat, so treat an
+  // all-zero column as unknown rather than scoring it as "Bitcoin Season".
+  if (btcChange === 0 && clean.every((row) => changeOf(row) === 0)) {
+    return { score: null, label: "Unknown", btcChangePct: null, window, compared: 0, outperforming: 0 };
+  }
 
   const outperforming = clean.filter((row) => (changeOf(row) as number) > (btcChange as number)).length;
   const compared = clean.length;

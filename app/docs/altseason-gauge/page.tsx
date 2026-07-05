@@ -38,7 +38,7 @@ export default function Page() {
             {
               name: "window",
               type: '"24h" | "7d" | "30d" | "1y"',
-              defaultValue: '"30d"',
+              defaultValue: '"7d"',
               description: "Comparison window for the bundled fetcher. Ignored when data is set.",
             },
             { name: "className", type: "string", description: "Extra classes for the wrapper." },
@@ -53,7 +53,9 @@ export default function Page() {
           computed client-side following the blockchaincenter.net convention: take the top-50 alts
           by rank (stablecoins and wrapped BTC/ETH derivatives excluded), count how many outperform
           BTC over the window, and score it as a percentage. The exported computeAltseason function
-          is pure if you want to run it on your own ticker data.
+          is pure if you want to run it on your own ticker data. Note: CoinPaprika&apos;s bulk tickers
+          endpoint currently only populates the 24h and 7d change columns; when a window&apos;s column is
+          dead the gauge reports the score as unavailable instead of a misleading 0.
         </p>
       </section>
     </main>
