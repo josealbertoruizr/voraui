@@ -26,6 +26,10 @@ type Preset = "1Y" | "5Y" | "10Y" | "ALL";
 const PRESETS: Preset[] = ["1Y", "5Y", "10Y", "ALL"];
 type ChartPoint = { time: UTCTimestamp; value: number };
 
+function escapeHtml(value: string): string {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 function compactUsd(n: number): string {
   if (!Number.isFinite(n) || n === 0) return "-";
   if (n >= 1e9) return `$${(n / 1e9).toFixed(2)}B`;
@@ -234,7 +238,7 @@ export function BtcRainbowChart({ data, bands: bandsProp, className }: BtcRainbo
           ${band
             ? `<div class="mt-1.5 flex items-center gap-1.5">
                  <span class="h-2 w-2 shrink-0 rounded-full" style="background-color:${band.color}"></span>
-                 <span class="text-[11px] text-zinc-300">${band.label}</span>
+                 <span class="text-[11px] text-zinc-300">${escapeHtml(band.label)}</span>
                </div>`
             : ""}
         `;
