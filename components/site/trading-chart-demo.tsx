@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { TradingChart } from "@/registry/voraui/trading-chart/trading-chart";
-import type { TradeSignal, TradingChartHandle } from "@/registry/voraui/trading-chart/types";
+import type { TradeSignal, TradingChartHandle } from "@/registry/voraui/trading-chart/trading-chart-types";
 
 export function TradingChartDemo() {
   const ref = React.useRef<TradingChartHandle>(null);

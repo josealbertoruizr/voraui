@@ -58,7 +58,8 @@ export default function Page() {
           Two sources spliced client-side: a bundled Coin Metrics seed for 2010-2017 (historical
           closes never change, so it ships with the component) and Binance daily klines from
           2017-08-17 onward, fetched keyless from api.binance.com. Bands are computed analytically
-          from the log-regression, so no band data is ever fetched.
+          from the log-regression, so no band data is ever fetched. Dark mode styling requires a
+          next-themes ThemeProvider; without one the chart renders with its light theme.
         </p>
       </section>
     </main>

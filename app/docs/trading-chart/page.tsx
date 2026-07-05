@@ -78,7 +78,8 @@ export default function Page() {
         <h2 className="text-xl font-semibold">Data source</h2>
         <p className="text-sm text-muted-foreground">
           GET https://api.binance.com/api/v3/klines. Free, keyless, CORS-enabled. Trades are always
-          your own data, passed via the trades prop.
+          your own data, passed via the trades prop. Dark mode styling requires a next-themes
+          ThemeProvider; without one the chart renders with its light theme.
         </p>
       </section>
     </main>
