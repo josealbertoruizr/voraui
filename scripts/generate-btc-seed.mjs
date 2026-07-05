@@ -3,7 +3,7 @@
 // registry item. Run: node scripts/generate-btc-seed.mjs
 import { readFileSync, writeFileSync } from "node:fs";
 
-const CSV_PATH = "docs/vora-reference/backend/data/btc_daily_2010_2017.csv";
+const CSV_PATH = "scripts/btc_daily_2010_2017.csv";
 const OUT_PATH = "registry/voraui/btc-rainbow-chart/btc-seed.ts";
 
 const csv = readFileSync(CSV_PATH, "utf8");

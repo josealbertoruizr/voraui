@@ -30,7 +30,7 @@ It lives in its own repository (`voraui`) and is hosted free on Vercel.
    - Trades supplied via a documented `trades` prop; they are inherently the user's own data.
 
 Source components are extracted from the Vora app repo.
-Full snapshots of every source file, plus backend computation context and data source notes, live in `docs/vora-reference/` (see its `INDEX.md`), so development never needs the Vora repo.
+Full snapshots of every source file, plus backend computation context and data source notes, were kept in a local `docs/vora-reference/` folder during development; the snapshots were extraction material from the private Vora app and are not part of the public repository.
 
 Explicitly out of v1: liquidation heatmap (no free data source), market treemap (CoinGecko already ships a free widget), funding rates card, npm package distribution, sector grouping.
 
