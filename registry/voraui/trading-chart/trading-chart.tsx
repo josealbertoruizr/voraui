@@ -11,7 +11,7 @@ import type {
   TradeSignal,
   TradingChartHandle,
   TradingChartProps,
-} from "./types";
+} from "./trading-chart-types";
 import { sanitizeCandles, isValidCandle } from "./candle-validation";
 import { useKlines, useLatestCandlePolling } from "./use-klines";
 import {
@@ -22,6 +22,10 @@ import {
   INDICATOR_COLOR,
   type AlignedSignal,
 } from "./markers";
+
+function escapeHtml(value: string): string {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
 
 const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function TradingChart(
   {
@@ -189,10 +193,10 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
 
     const renderSignal = (s: AlignedSignal) => {
       if (s.category === "indicator") {
-        const indicatorLabel = s.indicator || "Indicator";
+        const indicatorLabel = escapeHtml(s.indicator || "Indicator");
         const indicatorValue =
           typeof s.value === "number" && Number.isFinite(s.value) ? ` (${s.value.toFixed(2)})` : "";
-        const note = s.note ? `<div style="font-size:10px;opacity:0.7;">${s.note}</div>` : "";
+        const note = s.note ? `<div style="font-size:10px;opacity:0.7;">${escapeHtml(s.note)}</div>` : "";
         return `
           <div style="display:flex;flex-direction:column;margin-top:4px;gap:2px;">
             <div style="display:flex;justify-content:space-between;gap:12px;font-size:11px;">
@@ -205,19 +209,16 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
 
       const price = Number(s.price);
       const qty = Number(s.quantity || 0);
-      const totalAmount = price < 5000 ? price : price * qty;
-
-      // Use the note as asset price if it is a valid number (e.g. BTC price at buy).
-      const notePrice = Number(s.note);
-      const assetPrice = !isNaN(notePrice) && notePrice > 0 ? notePrice : price < 5000 ? 0 : price;
-
-      const priceDisplay = assetPrice > 0 ? ` at ${assetPrice.toLocaleString()}` : "";
+      const amount = qty > 0 ? price * qty : price;
+      const qtySuffix = qty > 0 ? ` (${qty} @ ${price.toLocaleString()})` : "";
+      const note = s.note ? `<div style="font-size:10px;opacity:0.7;">${escapeHtml(s.note)}</div>` : "";
 
       return `
         <div style="display:flex;flex-direction:column;margin-top:4px;gap:1px;">
           <div style="display:flex;justify-content:space-between;gap:12px;font-size:11px;">
-            <b style="color:${s.side === "BUY" ? BUY_COLOR : SELL_COLOR}">${totalAmount.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })} usd${priceDisplay}</b>
+            <b style="color:${s.side === "BUY" ? BUY_COLOR : SELL_COLOR}">${amount.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })} usd${qtySuffix}</b>
           </div>
+          ${note}
         </div>
       `;
     };
@@ -686,7 +687,8 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
     // Only use setData for full resets or history injection.
     // Streaming updates go through handleNewCandle -> series.update().
     const numCandlesAdded = sanitized.length - lastCandlesLengthRef.current;
-    const isMajorChange = keyChanged || Math.abs(numCandlesAdded) > 2;
+    const isMajorChange =
+      keyChanged || lastCandlesLengthRef.current === 0 || Math.abs(numCandlesAdded) > 2;
 
     if (isMajorChange) {
       isResettingRef.current = false;
@@ -864,4 +866,3 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
 TradingChart.displayName = "TradingChart";
 
 export { TradingChart };
-export default TradingChart;

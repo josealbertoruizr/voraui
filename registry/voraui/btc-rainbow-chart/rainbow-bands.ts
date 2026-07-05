@@ -22,7 +22,6 @@ import type {
   IPrimitivePaneView,
   ISeriesApi,
   ISeriesPrimitive,
-  Logical,
   SeriesAttachedParameter,
   SeriesType,
   Time,
@@ -234,7 +233,7 @@ export class RainbowBandsPrimitive implements ISeriesPrimitive<Time> {
     return [this.paneView];
   }
 
-  autoscaleInfo(_startTimePoint: Logical, _endTimePoint: Logical): AutoscaleInfo | null {
+  autoscaleInfo(): AutoscaleInfo | null {
     if (!this.chart || this.bands.length === 0) return null;
 
     const range = this.chart.timeScale().getVisibleRange();
