@@ -87,4 +87,33 @@ describe("computeAltseason", () => {
     expect(result.score).toBe(33.3);
     expect(result.btcChangePct).toBe(10.13);
   });
+
+  it("returns Unknown when the window column is dead (all zeros)", () => {
+    const tickers = [
+      ticker("BTC", 1, 0),
+      ticker("AAA", 2, 0),
+      ticker("BBB", 3, 0),
+      ticker("CCC", 4, 0),
+      ticker("DDD", 5, 0),
+      ticker("EEE", 6, 0),
+    ];
+    const result = computeAltseason(tickers, "30d");
+    expect(result.score).toBeNull();
+    expect(result.label).toBe("Unknown");
+    expect(result.btcChangePct).toBeNull();
+    expect(result.compared).toBe(0);
+  });
+
+  it("still counts a genuine all-zero-alts market when BTC moved", () => {
+    const tickers = [
+      ticker("BTC", 1, 5),
+      ticker("AAA", 2, 0),
+      ticker("BBB", 3, 0),
+      ticker("CCC", 4, 0),
+    ];
+    const result = computeAltseason(tickers, "30d");
+    expect(result.score).toBe(0);
+    expect(result.label).toBe("Bitcoin Season");
+    expect(result.btcChangePct).toBe(5);
+  });
 });
