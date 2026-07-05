@@ -107,9 +107,9 @@
           "target": "components/voraui/candle-validation.ts"
         },
         {
-          "path": "registry/voraui/trading-chart/types.ts",
+          "path": "registry/voraui/trading-chart/trading-chart-types.ts",
           "type": "registry:lib",
-          "target": "components/voraui/types.ts"
+          "target": "components/voraui/trading-chart-types.ts"
         }
       ]
     }

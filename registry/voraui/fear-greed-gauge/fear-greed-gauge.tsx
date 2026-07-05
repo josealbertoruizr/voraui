@@ -16,7 +16,8 @@ export function FearGreedGauge({ data, className }: FearGreedGaugeProps) {
   const resolved = data ?? fetched.data;
   const loading = data === undefined && fetched.loading;
   const value = resolved?.value ?? null;
-  const label = resolved?.label ?? (fetched.error ? "Data unavailable" : "Unknown");
+  const label = resolved?.label ?? "Unknown";
+  const hasError = data === undefined && Boolean(fetched.error);
   const angle = ((value ?? 50) / 100) * 180 - 90;
 
   return (
@@ -60,8 +61,14 @@ export function FearGreedGauge({ data, className }: FearGreedGaugeProps) {
           </div>
         ) : (
           <>
-            <p className="text-3xl font-bold tabular-nums text-foreground">{value ?? "—"}</p>
-            <p className="text-xs font-medium text-muted-foreground">{label}</p>
+            <p className="text-3xl font-bold tabular-nums text-foreground">{value ?? "-"}</p>
+            {hasError ? (
+              <p role="alert" className="text-xs font-medium text-muted-foreground">
+                Fear &amp; Greed data is unavailable.
+              </p>
+            ) : (
+              <p className="text-xs font-medium text-muted-foreground">{label}</p>
+            )}
           </>
         )}
       </div>

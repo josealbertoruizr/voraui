@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { TradingChart } from "@/registry/voraui/trading-chart/trading-chart";
-import type { TradeSignal } from "@/registry/voraui/trading-chart/types";
+import type { TradeSignal } from "@/registry/voraui/trading-chart/trading-chart-types";
 
 export function HeroDemo() {
   // Three buys on one candle demonstrate the "3B" cluster marker.

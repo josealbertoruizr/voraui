@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import type { OhlcvCandle, Timeframe } from "./types";
+import type { OhlcvCandle, Timeframe } from "./trading-chart-types";
 import { sanitizeCandles } from "./candle-validation";
 
 // Binance public spot klines. No API key, CORS-enabled, ~1200 weight/min/IP.

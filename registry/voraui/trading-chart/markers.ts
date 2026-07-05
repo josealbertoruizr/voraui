@@ -1,5 +1,5 @@
 import type { SeriesMarker, UTCTimestamp } from "lightweight-charts";
-import type { OhlcvCandle, TradeSignal } from "./types";
+import type { OhlcvCandle, TradeSignal } from "./trading-chart-types";
 
 export const BUY_COLOR = "#00c176";
 export const SELL_COLOR = "#cf304a";
