@@ -449,10 +449,14 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
         // Place glow near the marker: belowBar for BUY (low), aboveBar for SELL (high).
         const glowPrice = ht.side === "BUY" ? (closest?.low ?? ht.price) : (closest?.high ?? ht.price);
 
+        // Use the closest bar's open time for the x lookup: timeToCoordinate only
+        // resolves times that exist on the scale, and real trade timestamps
+        // rarely land exactly on a bar open.
+        const barSec = closest ? closest.time : normalizedSec;
         const isDailyPlus = ["1d", "1w", "1M"].includes(timeframeRef.current);
         const chartTime = isDailyPlus
-          ? new Date(normalizedSec * 1000).toISOString().split("T")[0]
-          : normalizedSec;
+          ? new Date(barSec * 1000).toISOString().split("T")[0]
+          : barSec;
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- chartTime is a number or business-day string depending on timeframe; see chartRef above.
         const x = chartRef.current.timeScale().timeToCoordinate(chartTime as any);
