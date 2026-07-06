@@ -346,7 +346,12 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
           horzLines: { color: gridColor },
         },
         rightPriceScale: { borderVisible: false },
-        timeScale: { borderVisible: false, timeVisible: true },
+        timeScale: {
+          borderVisible: false,
+          timeVisible: true,
+          fixLeftEdge: true,
+          fixRightEdge: true,
+        },
         crosshair: { mode: 0 },
       });
 
