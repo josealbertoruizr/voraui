@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { HeroDemo } from "@/components/site/hero-demo";
 import { ShowcaseTile } from "@/components/site/showcase-tile";
@@ -19,24 +18,11 @@ export default function Home() {
           Open source, install-and-go market components. Real data out of the box from free public
           APIs, full control via props in production.
         </p>
-        <div className="mx-auto w-fit rounded-lg border border-border bg-muted/40 px-4 py-2 font-mono text-sm">
-          pnpm dlx shadcn@latest add @voraui/trading-chart
-        </div>
-        <p className="text-xs text-muted-foreground">
-          Requires the @voraui registry entry in components.json -{" "}
-          <Link href="/docs" className="underline hover:text-foreground">
-            see Installation
-          </Link>
-        </p>
         <div className="flex justify-center">
           <Button render={<a href="#showcase" />} nativeButton={false} size="lg" className="rounded-full">
             Browse Components
           </Button>
         </div>
-      </section>
-
-      <section className="mt-12 rounded-xl border border-border bg-card p-2 sm:p-4">
-        <HeroDemo />
       </section>
 
       <section id="showcase" className="mt-20 scroll-mt-20">
