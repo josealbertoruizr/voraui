@@ -4,7 +4,7 @@ import * as React from "react";
 import { TradingChart } from "@/registry/voraui/trading-chart/trading-chart";
 import type { TradeSignal } from "@/registry/voraui/trading-chart/trading-chart-types";
 
-export function HeroDemo() {
+export function HeroDemo({ height = 480 }: { height?: number }) {
   // Three buys on one candle demonstrate the "3B" cluster marker.
   const trades = React.useMemo<TradeSignal[]>(() => {
     // eslint-disable-next-line react-hooks/purity -- Date.now() is needed to create timestamps relative to now
@@ -19,5 +19,5 @@ export function HeroDemo() {
     ];
   }, []);
 
-  return <TradingChart symbol="BTCUSDT" timeframe="1h" trades={trades} height={480} />;
+  return <TradingChart symbol="BTCUSDT" timeframe="1h" trades={trades} height={height} />;
 }

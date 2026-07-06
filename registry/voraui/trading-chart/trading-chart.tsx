@@ -163,6 +163,11 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
     hasOverrideCandlesRef.current = candlesProp !== undefined;
   }, [candlesProp]);
 
+  const loadingRef = React.useRef(loading);
+  React.useEffect(() => {
+    loadingRef.current = loading;
+  }, [loading]);
+
   React.useEffect(() => {
     candlesRef.current = effectiveCandles;
   }, [effectiveCandles]);
@@ -759,6 +764,12 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
       // mixing live "now" candles into historical data produces a stray
       // disconnected cluster on the chart.
       if (hasOverrideCandlesRef.current) return;
+
+      // Skip live ticks until the initial historical fetch resolves. A poll
+      // response landing first would otherwise seed the chart with 1-2
+      // candles, causing the initial fitContent() to zoom in on that stub
+      // and never widen once the real history arrives.
+      if (loadingRef.current) return;
 
       if (!isValidCandle(candle)) return;
 
