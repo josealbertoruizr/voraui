@@ -1,29 +1,10 @@
 import Link from "next/link";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { HeroDemo } from "@/components/site/hero-demo";
-
-const components = [
-  {
-    name: "trading-chart",
-    title: "Trading Chart",
-    description: "Candlesticks, trade markers with clustering, live Binance updates, and a highlight API.",
-  },
-  {
-    name: "btc-rainbow-chart",
-    title: "BTC Rainbow Chart",
-    description: "The classic log-regression rainbow with full history back to 2010.",
-  },
-  {
-    name: "fear-greed-gauge",
-    title: "Fear & Greed Gauge",
-    description: "Market sentiment dial powered by alternative.me.",
-  },
-  {
-    name: "altseason-gauge",
-    title: "Altseason Gauge",
-    description: "Altcoin Season index computed client-side from CoinPaprika data.",
-  },
-];
+import { ShowcaseTile } from "@/components/site/showcase-tile";
+import { BtcRainbowChart } from "@/registry/voraui/btc-rainbow-chart/btc-rainbow-chart";
+import { FearGreedGauge } from "@/registry/voraui/fear-greed-gauge/fear-greed-gauge";
+import { AltseasonGauge } from "@/registry/voraui/altseason-gauge/altseason-gauge";
 
 export default function Home() {
   return (
@@ -47,23 +28,60 @@ export default function Home() {
             see Installation
           </Link>
         </p>
+        <div className="flex justify-center">
+          <Button render={<a href="#showcase" />} nativeButton={false} size="lg" className="rounded-full">
+            Browse Components
+          </Button>
+        </div>
       </section>
 
       <section className="mt-12 rounded-xl border border-border bg-card p-2 sm:p-4">
         <HeroDemo />
       </section>
 
-      <section className="mt-12 grid gap-4 sm:grid-cols-2">
-        {components.map((c) => (
-          <Link key={c.name} href={`/docs/${c.name}`}>
-            <Card className="h-full transition-colors hover:border-violet-500/50">
-              <CardHeader>
-                <CardTitle>{c.title}</CardTitle>
-                <CardDescription>{c.description}</CardDescription>
-              </CardHeader>
-            </Card>
-          </Link>
-        ))}
+      <section id="showcase" className="mt-20 scroll-mt-20">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Showcase</h2>
+          <p className="mt-2 text-muted-foreground">Every component, running on real data.</p>
+        </div>
+
+        <div className="mt-8 grid gap-4">
+          <ShowcaseTile
+            href="/docs/trading-chart"
+            title="Trading Chart"
+            description="Candlesticks, trade markers with clustering, live Binance updates, and a highlight API."
+          >
+            <HeroDemo height={380} />
+          </ShowcaseTile>
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            <ShowcaseTile
+              className="sm:col-span-2"
+              href="/docs/btc-rainbow-chart"
+              title="BTC Rainbow Chart"
+              description="The classic log-regression rainbow with full history back to 2010."
+            >
+              <BtcRainbowChart />
+            </ShowcaseTile>
+
+            <div className="grid h-full grid-rows-2 gap-4">
+              <ShowcaseTile
+                href="/docs/fear-greed-gauge"
+                title="Fear & Greed Gauge"
+                description="Market sentiment dial powered by alternative.me."
+              >
+                <FearGreedGauge />
+              </ShowcaseTile>
+              <ShowcaseTile
+                href="/docs/altseason-gauge"
+                title="Altseason Gauge"
+                description="Altcoin Season index computed client-side from CoinPaprika data."
+              >
+                <AltseasonGauge />
+              </ShowcaseTile>
+            </div>
+          </div>
+        </div>
       </section>
     </main>
   );
