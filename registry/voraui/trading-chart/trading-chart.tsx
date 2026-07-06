@@ -294,6 +294,15 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
   }, [fetchMore]);
 
   const isLoadingMoreRef = React.useRef(false);
+  // Set alongside isLoadingMoreRef, but consumed (and cleared) by the "Update
+  // chart data" effect instead of the pagination handler's `finally` block.
+  // isLoadingMoreRef flips back to false as soon as the fetch settles, which
+  // happens before React has re-rendered with the prepended candles - by the
+  // time that effect runs, isLoadingMoreRef is already false again, so the
+  // view-shift correction below silently never fired. This ref's lifetime is
+  // tied to "the next major-change update is a history-prepend that needs a
+  // shift" instead of "a fetch is in flight", so it survives until read.
+  const isPrependingHistoryRef = React.useRef(false);
   const hasMoreHistoryRef = React.useRef(hasMoreHistory);
   React.useEffect(() => {
     // With prop-supplied candles there is no more history to fetch.
@@ -532,7 +541,12 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
         if (range.from < 50) {
           isLoadingMoreRef.current = true;
           try {
-            await fetchMoreRef.current(oldestTimestampRef.current);
+            const older = await fetchMoreRef.current(oldestTimestampRef.current);
+            // Only flag the upcoming data-update effect run as a history-prepend
+            // when candles were actually fetched (and therefore setCandles was
+            // called). Otherwise there's no pending update to consume the flag,
+            // and leaving it set would misattribute a later, unrelated change.
+            isPrependingHistoryRef.current = Array.isArray(older) && older.length > 0;
           } finally {
             isLoadingMoreRef.current = false;
           }
@@ -726,7 +740,9 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
         chartRef.current.timeScale().fitContent();
         isAutoFitDoneRef.current = true;
       }
-      if (prevLogicalRange && isLoadingMoreRef.current) {
+      const isHistoryPrepend = isPrependingHistoryRef.current;
+      isPrependingHistoryRef.current = false;
+      if (prevLogicalRange && isHistoryPrepend) {
         let shift = 0;
         if (oldestTimestampRef.current) {
           const prependedCandlesCount = sanitized.findIndex((c) => c.time === oldestTimestampRef.current);
