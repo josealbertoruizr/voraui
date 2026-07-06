@@ -12,6 +12,38 @@ import {
 // large (5000+ tickers) but a single request every refresh interval is fine.
 const TICKERS_URL = "https://api.coinpaprika.com/v1/tickers?quotes=USD";
 
+async function fetchTickersFromCoinPaprika(): Promise<PaprikaTicker[]> {
+  const res = await fetch(TICKERS_URL);
+  if (!res.ok) throw new Error(`CoinPaprika request failed: ${res.status}`);
+  const raw = (await res.json()) as PaprikaTicker[];
+  return Array.isArray(raw) ? raw : [];
+}
+
+/**
+ * CoinPaprika's bulk tickers endpoint occasionally has a transient failure
+ * (network hiccup, upstream 5xx). Retrying a couple of times before giving
+ * up gets real data in front of users far more often than a single attempt,
+ * without resorting to a synthetic fallback value.
+ */
+export async function fetchTickersWithRetry(
+  fetchTickers: () => Promise<PaprikaTicker[]> = fetchTickersFromCoinPaprika,
+  attempts = 3,
+  retryDelayMs = 1000,
+): Promise<PaprikaTicker[]> {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      return await fetchTickers();
+    } catch (err) {
+      lastError = err;
+      if (attempt < attempts) {
+        await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+      }
+    }
+  }
+  throw lastError;
+}
+
 export function useAltseason(
   window: AltseasonWindow = "7d",
   options: { enabled?: boolean; refreshInterval?: number } = {},
@@ -27,11 +59,9 @@ export function useAltseason(
 
     const load = async () => {
       try {
-        const res = await fetch(TICKERS_URL);
-        if (!res.ok) throw new Error(`CoinPaprika request failed: ${res.status}`);
-        const raw = (await res.json()) as PaprikaTicker[];
+        const raw = await fetchTickersWithRetry();
         if (cancelled) return;
-        setData(computeAltseason(Array.isArray(raw) ? raw : [], window));
+        setData(computeAltseason(raw, window));
         setError(null);
         setLoading(false);
       } catch (err) {
