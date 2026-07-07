@@ -1,5 +1,7 @@
 import { ComponentPreview } from "@/components/site/component-preview";
 import { InstallTabs } from "@/components/site/install-tabs";
+import { ManualInstall } from "@/components/site/manual-install";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PropsTable } from "@/components/site/props-table";
 import { AltseasonGauge } from "@/registry/voraui/altseason-gauge/altseason-gauge";
 
@@ -22,7 +24,18 @@ export default function Page() {
 
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">Installation</h2>
-        <InstallTabs name="altseason-gauge" />
+        <Tabs defaultValue="cli">
+          <TabsList>
+            <TabsTrigger value="cli">CLI</TabsTrigger>
+            <TabsTrigger value="manual">Manual</TabsTrigger>
+          </TabsList>
+          <TabsContent value="cli">
+            <InstallTabs name="altseason-gauge" />
+          </TabsContent>
+          <TabsContent value="manual">
+            <ManualInstall name="altseason-gauge" />
+          </TabsContent>
+        </Tabs>
       </section>
 
       <section className="space-y-3">

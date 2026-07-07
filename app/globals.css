@@ -128,3 +128,16 @@
     @apply bg-background text-foreground font-sans;
   }
 }
+
+.shiki {
+  margin: 0;
+  background-color: transparent !important;
+}
+.shiki,
+.shiki span {
+  color: var(--shiki-light);
+}
+.dark .shiki,
+.dark .shiki span {
+  color: var(--shiki-dark);
+}
