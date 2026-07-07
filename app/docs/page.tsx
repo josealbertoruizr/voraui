@@ -1,57 +1,60 @@
-export const metadata = { title: "Installation" };
+import Link from "next/link";
 
-const registryConfig = `{
-  "registries": {
-    "@voraui": "https://voraui.vercel.app/r/{name}.json"
-  }
-}`;
+export const metadata = { title: "Introduction" };
 
-export default function InstallationPage() {
+export default function IntroductionPage() {
   return (
-    <main className="max-w-3xl space-y-6">
+    <main className="max-w-3xl space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Installation</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Introduction</h1>
         <p className="mt-2 text-muted-foreground">
-          Vora UI is a shadcn registry. Components install as source code into your project.
+          Vora UI is a set of open source crypto market analytics components for shadcn/ui.
+          Components install as source code into your project, so you own every line and can
+          change anything.
         </p>
       </div>
 
-      <section className="space-y-2">
-        <h2 className="text-xl font-semibold">1. Add the registry</h2>
-        <p className="text-sm text-muted-foreground">
-          Add the @voraui namespace to the registries key of your components.json:
-        </p>
-        <pre className="overflow-x-auto rounded-lg border border-border bg-muted/40 p-4 font-mono text-sm">
-          {registryConfig}
-        </pre>
+      <section className="space-y-3">
+        <h2 className="text-xl font-semibold">What&apos;s included</h2>
+        <ul className="space-y-2 text-sm text-muted-foreground">
+          <li>
+            <span className="font-medium text-foreground">Trading Chart</span> (flagship):
+            candlesticks with trade markers, same-candle clustering, hover tooltips, infinite
+            scroll history, and live Binance updates.
+          </li>
+          <li>
+            <span className="font-medium text-foreground">BTC Rainbow Chart</span>: the classic
+            log-regression rainbow with full daily history back to 2010.
+          </li>
+          <li>
+            <span className="font-medium text-foreground">Fear &amp; Greed Gauge</span>: the
+            crypto Fear &amp; Greed index as a live SVG dial.
+          </li>
+          <li>
+            <span className="font-medium text-foreground">Altseason Gauge</span>: the Altcoin
+            Season index computed client-side from CoinPaprika data.
+          </li>
+        </ul>
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-xl font-semibold">2. Add components</h2>
-        <pre className="overflow-x-auto rounded-lg border border-border bg-muted/40 p-4 font-mono text-sm">
-          pnpm dlx shadcn@latest add @voraui/trading-chart
-        </pre>
+        <h2 className="text-xl font-semibold">Real data, zero config</h2>
         <p className="text-sm text-muted-foreground">
-          Files land in components/voraui/ and npm dependencies are installed automatically.
+          Every component fetches from free, keyless public APIs out of the box, so it renders
+          real data the moment you drop it in. For production, pass your own data through props
+          and the bundled fetcher is skipped entirely.
         </p>
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-xl font-semibold">Zero-config alternative</h2>
+        <h2 className="text-xl font-semibold">Next steps</h2>
         <p className="text-sm text-muted-foreground">
-          The full URL form always works without touching components.json:
-        </p>
-        <pre className="overflow-x-auto rounded-lg border border-border bg-muted/40 p-4 font-mono text-sm">
-          npx shadcn@latest add https://voraui.vercel.app/r/trading-chart.json
-        </pre>
-      </section>
-
-      <section className="space-y-2">
-        <h2 className="text-xl font-semibold">Data out of the box</h2>
-        <p className="text-sm text-muted-foreground">
-          Every component ships with a hook that fetches free, keyless public APIs
-          (alternative.me, CoinPaprika, Binance), so it renders real data immediately.
-          For production you can pass your own data via props and the bundled fetcher is skipped.
+          See the{" "}
+          <Link href="/docs/installation" className="underline hover:text-foreground">
+            Installation guide
+          </Link>{" "}
+          to add the registry and your first component, or browse each component&apos;s docs page
+          for props and data source notes.
         </p>
       </section>
     </main>
