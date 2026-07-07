@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  outputFileTracingIncludes: {
+    "/docs/**": ["./registry/voraui/**/*", "./registry.json"],
+  },
 };
 
 export default nextConfig;
