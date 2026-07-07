@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { TechStack } from "@/components/site/tech-stack";
 import { HeroDemo } from "@/components/site/hero-demo";
 import { ShowcaseTile } from "@/components/site/showcase-tile";
 import { BtcRainbowChart } from "@/registry/voraui/btc-rainbow-chart/btc-rainbow-chart";
@@ -23,6 +24,7 @@ export default function Home() {
             Browse Components
           </Button>
         </div>
+        <TechStack />
       </section>
 
       <section id="showcase" className="mt-20 scroll-mt-20">
