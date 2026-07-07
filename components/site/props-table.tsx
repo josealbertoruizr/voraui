@@ -8,7 +8,7 @@ export interface PropRow {
 export function PropsTable({ rows }: { rows: PropRow[] }) {
   return (
     <div className="overflow-x-auto rounded-lg border border-border">
-      <table className="w-full text-left text-sm">
+      <table className="hidden w-full text-left text-sm sm:table">
         <thead className="border-b border-border bg-muted/40">
           <tr>
             <th className="px-3 py-2 font-medium">Prop</th>
@@ -28,6 +28,19 @@ export function PropsTable({ rows }: { rows: PropRow[] }) {
           ))}
         </tbody>
       </table>
+
+      <dl className="divide-y divide-border sm:hidden">
+        {rows.map((row) => (
+          <div key={row.name} className="space-y-1.5 px-3 py-3">
+            <dt className="flex flex-wrap items-baseline gap-x-2 gap-y-1 font-mono text-xs">
+              <span>{row.name}</span>
+              <span className="text-muted-foreground">{row.type}</span>
+              <span className="text-muted-foreground">default: {row.defaultValue ?? "-"}</span>
+            </dt>
+            <dd className="text-sm text-muted-foreground">{row.description}</dd>
+          </div>
+        ))}
+      </dl>
     </div>
   );
 }
