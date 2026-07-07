@@ -39,7 +39,7 @@ Or use the zero-config full URL form:
 npx shadcn@latest add https://voraui.vercel.app/r/trading-chart.json
 ```
 
-See the [installation guide](https://voraui.vercel.app/docs) for details, and each component's docs page for props and data source notes.
+See the [installation guide](https://voraui.vercel.app/docs/installation) for details, and each component's docs page for props and data source notes.
 
 ## Development
 
