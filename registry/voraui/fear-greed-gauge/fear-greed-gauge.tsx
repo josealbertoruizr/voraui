@@ -110,11 +110,16 @@ export function FearGreedGauge({ data, variant = "full", className }: FearGreedG
             })}
             {TICKS_MAJOR_VALUES.map((v) => {
               const p = arcPoint(118, v);
+              // At the 0/100 endpoints the tick is perfectly horizontal, so a
+              // wide label like "100" extends backward right over the tick
+              // instead of past it (unlike the angled major ticks in between).
+              // Push those two down onto their own line instead.
+              const isEdge = v === 0 || v === 100;
               return (
                 <text
                   key={`num-${v}`}
                   x={p.x}
-                  y={p.y}
+                  y={isEdge ? p.y + 14 : p.y}
                   textAnchor={labelAnchor(v)}
                   dominantBaseline="middle"
                   className="fill-muted-foreground text-[9px] font-medium tabular-nums"
@@ -163,17 +168,12 @@ export function FearGreedGauge({ data, variant = "full", className }: FearGreedG
 
         {value !== null && !loading && (
           <g transform={`rotate(${needleRotation} ${GAUGE_CENTER_X} ${GAUGE_CENTER_Y})`}>
-            <line
-              x1={GAUGE_CENTER_X}
-              y1={GAUGE_CENTER_Y}
-              x2={GAUGE_CENTER_X}
-              y2={GAUGE_CENTER_Y - 72}
-              stroke="currentColor"
-              strokeWidth={2}
-              strokeLinecap="round"
-              className="text-foreground"
+            <polygon
+              points={`${GAUGE_CENTER_X - 2.5},${GAUGE_CENTER_Y - 9} ${GAUGE_CENTER_X + 2.5},${GAUGE_CENTER_Y - 9} ${GAUGE_CENTER_X},${GAUGE_CENTER_Y - 72}`}
+              className="fill-foreground"
             />
-            <circle cx={GAUGE_CENTER_X} cy={GAUGE_CENTER_Y} r={4} className="fill-foreground" />
+            <circle cx={GAUGE_CENTER_X} cy={GAUGE_CENTER_Y} r={5.5} className="fill-foreground" />
+            <circle cx={GAUGE_CENTER_X} cy={GAUGE_CENTER_Y} r={2} className="fill-background" />
           </g>
         )}
       </svg>
