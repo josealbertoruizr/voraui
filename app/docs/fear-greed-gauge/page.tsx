@@ -23,6 +23,18 @@ export default function Page() {
       </ComponentPreview>
 
       <section className="space-y-3">
+        <h2 className="text-xl font-semibold">Variants</h2>
+        <p className="text-sm text-muted-foreground">
+          The default full variant shown above includes tick numbers and zone labels around the
+          dial. Pass variant=&quot;minimal&quot; for a smaller footprint with just the dial,
+          needle, and number.
+        </p>
+        <ComponentPreview>
+          <FearGreedGauge variant="minimal" />
+        </ComponentPreview>
+      </section>
+
+      <section className="space-y-3">
         <h2 className="text-xl font-semibold">Installation</h2>
         <Tabs defaultValue="cli">
           <TabsList>
@@ -47,6 +59,13 @@ export default function Page() {
               type: "FearGreedData",
               description:
                 "Your own data ({ value, label, updatedAt }). When set, the bundled fetcher is skipped entirely.",
+            },
+            {
+              name: "variant",
+              type: '"full" | "minimal"',
+              defaultValue: '"full"',
+              description:
+                "\"full\" shows tick numbers and zone labels; \"minimal\" shows just the dial, needle, and number.",
             },
             { name: "className", type: "string", description: "Extra classes for the wrapper." },
           ]}
