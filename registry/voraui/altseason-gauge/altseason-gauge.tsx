@@ -49,7 +49,7 @@ export function AltseasonGauge({ data, window: windowProp = "7d", className }: A
     <div className={cn("flex flex-col gap-4", className)}>
       <div className="flex items-end gap-3">
         <p className="text-4xl font-bold leading-none tabular-nums text-foreground">
-          {hasScore ? <NumberFlow value={Math.round(resolved.score as number)} /> : "—"}
+          {hasScore ? <NumberFlow value={Math.round(resolved.score as number)} /> : "-"}
         </p>
         <p className="pb-1 text-xs text-muted-foreground">/ 100</p>
         <span

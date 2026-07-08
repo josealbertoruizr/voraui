@@ -18,6 +18,11 @@ describe("getRegistryItem", () => {
         type: "registry:hook",
         target: "components/voraui/use-fear-greed.ts",
       },
+      {
+        path: "registry/voraui/fear-greed-gauge/fear-greed-bands.ts",
+        type: "registry:lib",
+        target: "components/voraui/fear-greed-bands.ts",
+      },
     ]);
   });
 
