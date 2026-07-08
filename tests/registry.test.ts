@@ -5,7 +5,7 @@ describe("getRegistryItem", () => {
   it("returns the fear-greed-gauge item with its real files, dependencies, and registry dependencies", () => {
     const item = getRegistryItem("fear-greed-gauge");
     expect(item.title).toBe("Fear & Greed Gauge");
-    expect(item.dependencies).toEqual(["lucide-react"]);
+    expect(item.dependencies).toEqual(["lucide-react", "@number-flow/react"]);
     expect(item.registryDependencies).toEqual(["utils"]);
     expect(item.files).toEqual([
       {
