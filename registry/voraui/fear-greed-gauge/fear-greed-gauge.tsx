@@ -21,26 +21,10 @@ import {
 export interface FearGreedGaugeProps {
   /** Provide your own data to bypass the bundled alternative.me fetcher. */
   data?: FearGreedData;
-  /** "full" shows the zone labels around the dial with 5 discrete color bands; "minimal" shows just the dial, needle, and number; "ticks" swaps the solid arc for 100 individual gradient tick marks; "gradient" is "minimal" with one continuous color blend instead of discrete bands; "wedges" shows pie-slice zone sectors with the current zone highlighted. */
-  variant?: "full" | "minimal" | "ticks" | "gradient" | "wedges";
+  /** "gradient" (default) is a smooth continuous color blend with just the dial, needle, and number; "minimal" shows the same layout with 5 discrete color bands instead; "ticks" swaps the solid arc for 100 individual gradient tick marks; "wedges" shows pie-slice zone sectors with the current zone highlighted. */
+  variant?: "minimal" | "ticks" | "gradient" | "wedges";
   className?: string;
 }
-
-const EDGE_ZONE_LABELS: Array<{ value: number; text: string }> = [
-  { value: 0, text: "EXTREME FEAR" },
-  { value: 100, text: "EXTREME GREED" },
-];
-// The short single-word labels curve along the arc's gentle upper section
-// (value 15-85) via textPath. The two-word EXTREME labels sit near the ends,
-// where that same arc is nearly vertical, so curving them would tip them
-// almost sideways - they stay as plain horizontal text instead.
-const CURVE_PATH_FROM = 15;
-const CURVE_PATH_TO = 85;
-const CURVED_ZONE_LABELS: Array<{ text: string; startOffset: string }> = [
-  { text: "FEAR", startOffset: "10%" },
-  { text: "NEUTRAL", startOffset: "50%" },
-  { text: "GREED", startOffset: "90%" },
-];
 
 // "ticks" variant: 100 individual gradient tick marks (one per index value)
 // instead of a solid colored arc, plus the same 0/20/40/50/60/80/100 numeric
@@ -67,8 +51,7 @@ function labelAnchor(value: number): "start" | "middle" | "end" {
   return "middle";
 }
 
-export function FearGreedGauge({ data, variant = "full", className }: FearGreedGaugeProps) {
-  const curveId = React.useId();
+export function FearGreedGauge({ data, variant = "gradient", className }: FearGreedGaugeProps) {
   const gradientId = React.useId();
   const fetched = useFearGreed({ enabled: data === undefined });
   const resolved = data ?? fetched.data;
@@ -86,7 +69,7 @@ export function FearGreedGauge({ data, variant = "full", className }: FearGreedG
         className="w-full max-w-[300px]"
         aria-hidden="true"
       >
-        {(variant === "full" || variant === "minimal") &&
+        {variant === "minimal" &&
           DEFAULT_FEAR_GREED_BANDS.map((band) => (
             <path
               key={band.key}
@@ -234,41 +217,6 @@ export function FearGreedGauge({ data, variant = "full", className }: FearGreedG
                   className="fill-muted-foreground text-[8px] font-medium tabular-nums"
                 >
                   {v}
-                </text>
-              );
-            })}
-          </>
-        )}
-
-        {variant === "full" && (
-          <>
-            <path id={curveId} d={describeArc(126, CURVE_PATH_FROM, CURVE_PATH_TO)} fill="none" stroke="none" />
-            {CURVED_ZONE_LABELS.map((zone) => (
-              <text
-                key={zone.text}
-                textAnchor="middle"
-                className="fill-muted-foreground text-[8px] font-semibold uppercase tracking-wider"
-              >
-                <textPath href={`#${curveId}`} startOffset={zone.startOffset}>
-                  {zone.text}
-                </textPath>
-              </text>
-            ))}
-            {EDGE_ZONE_LABELS.map((zone) => {
-              const p = arcPoint(126, zone.value);
-              // These sit on the same baseline as the "0"/"100" numeric ticks
-              // (both endpoints have the same y at this radius), so push them
-              // down onto their own line to avoid overlapping.
-              return (
-                <text
-                  key={zone.text}
-                  x={p.x}
-                  y={p.y + 16}
-                  textAnchor={labelAnchor(zone.value)}
-                  dominantBaseline="middle"
-                  className="fill-muted-foreground text-[8px] font-semibold uppercase tracking-wider"
-                >
-                  {zone.text}
                 </text>
               );
             })}

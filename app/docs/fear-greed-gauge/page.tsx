@@ -25,9 +25,9 @@ export default function Page() {
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">Variants</h2>
         <p className="text-sm text-muted-foreground">
-          The default full variant shown above includes zone labels around the dial. Pass
-          variant=&quot;minimal&quot; for a smaller footprint with just the dial, needle, and
-          number.
+          The default gradient variant shown above is a smooth continuous color blend with just
+          the dial, needle, and number. Pass variant=&quot;minimal&quot; for the same layout with
+          5 discrete color bands instead.
         </p>
         <ComponentPreview>
           <FearGreedGauge variant="minimal" />
@@ -38,14 +38,6 @@ export default function Page() {
         </p>
         <ComponentPreview>
           <FearGreedGauge variant="ticks" />
-        </ComponentPreview>
-        <p className="text-sm text-muted-foreground">
-          variant=&quot;gradient&quot; is the minimal variant with one continuous color blend
-          instead of 5 discrete bands - no zone labels needed since the blend itself
-          reads as the spectrum.
-        </p>
-        <ComponentPreview>
-          <FearGreedGauge variant="gradient" />
         </ComponentPreview>
         <p className="text-sm text-muted-foreground">
           variant=&quot;wedges&quot; shows pie-slice zone sectors with numeric dial ticks; the
@@ -84,10 +76,10 @@ export default function Page() {
             },
             {
               name: "variant",
-              type: '"full" | "minimal" | "ticks" | "gradient" | "wedges"',
-              defaultValue: '"full"',
+              type: '"minimal" | "ticks" | "gradient" | "wedges"',
+              defaultValue: '"gradient"',
               description:
-                "\"full\" shows the zone labels around the dial with 5 discrete color bands; \"minimal\" shows just the dial, needle, and number; \"ticks\" swaps the solid arc for 100 individual gradient tick marks; \"gradient\" is \"minimal\" with one continuous color blend instead of discrete bands; \"wedges\" shows pie-slice zone sectors with the current zone highlighted.",
+                "\"gradient\" is a smooth continuous color blend with just the dial, needle, and number; \"minimal\" shows the same layout with 5 discrete color bands instead; \"ticks\" swaps the solid arc for 100 individual gradient tick marks; \"wedges\" shows pie-slice zone sectors with the current zone highlighted.",
             },
             { name: "className", type: "string", description: "Extra classes for the wrapper." },
           ]}
