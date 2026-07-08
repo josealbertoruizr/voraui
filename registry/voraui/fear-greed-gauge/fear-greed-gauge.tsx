@@ -169,11 +169,11 @@ export function FearGreedGauge({ data, variant = "full", className }: FearGreedG
         {value !== null && !loading && (
           <g transform={`rotate(${needleRotation} ${GAUGE_CENTER_X} ${GAUGE_CENTER_Y})`}>
             <polygon
-              points={`${GAUGE_CENTER_X - 2.5},${GAUGE_CENTER_Y - 9} ${GAUGE_CENTER_X + 2.5},${GAUGE_CENTER_Y - 9} ${GAUGE_CENTER_X},${GAUGE_CENTER_Y - 72}`}
+              points={`${GAUGE_CENTER_X - 2.2},${GAUGE_CENTER_Y - 66} ${GAUGE_CENTER_X},${GAUGE_CENTER_Y - 72} ${GAUGE_CENTER_X + 2.2},${GAUGE_CENTER_Y - 66} ${GAUGE_CENTER_X + 2.2},${GAUGE_CENTER_Y + 15} ${GAUGE_CENTER_X - 2.2},${GAUGE_CENTER_Y + 15}`}
               className="fill-foreground"
             />
-            <circle cx={GAUGE_CENTER_X} cy={GAUGE_CENTER_Y} r={5.5} className="fill-foreground" />
-            <circle cx={GAUGE_CENTER_X} cy={GAUGE_CENTER_Y} r={2} className="fill-background" />
+            <circle cx={GAUGE_CENTER_X} cy={GAUGE_CENTER_Y} r={6} className="fill-foreground" />
+            <circle cx={GAUGE_CENTER_X} cy={GAUGE_CENTER_Y} r={2.5} className="fill-background" />
           </g>
         )}
       </svg>
