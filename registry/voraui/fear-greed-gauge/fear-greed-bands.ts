@@ -77,6 +77,23 @@ export function findFearGreedBand(
   return bands.find((band) => clamped >= band.min && clamped <= band.max) ?? bands[bands.length - 1];
 }
 
+/** Remaps a 0-100 value onto a dial where every band covers an equal angular
+ *  share, the way CNN's Fear & Greed gauge draws its zones: narrow bands like
+ *  neutral (45-55) get the same wedge width as wide ones, so every zone label
+ *  fits inside its wedge. The "wedges" variant runs its needle, dots, and
+ *  scale numbers through this same mapping, keeping the needle inside the
+ *  highlighted wedge (which a linear needle over equal wedges would not). */
+export function equalizedValue(
+  value: number,
+  bands: FearGreedBand[] = DEFAULT_FEAR_GREED_BANDS,
+): number {
+  const clamped = Math.min(Math.max(value, 0), 100);
+  const band = findFearGreedBand(clamped, bands);
+  const index = bands.indexOf(band);
+  const share = 100 / bands.length;
+  return index * share + ((clamped - band.min) / (band.max - band.min)) * share;
+}
+
 export interface GradientStop {
   value: number;
   color: string;
