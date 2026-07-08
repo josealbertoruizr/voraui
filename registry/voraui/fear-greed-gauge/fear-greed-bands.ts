@@ -9,11 +9,11 @@ export interface FearGreedBand {
 /** Boundaries mirror alternative.me's own value_classification thresholds,
  *  so the arc's coloring lines up with the label the bundled fetcher returns. */
 export const DEFAULT_FEAR_GREED_BANDS: FearGreedBand[] = [
-  { key: "extreme-fear", label: "Extreme Fear", min: 0, max: 24, color: "#b91c1c" },
-  { key: "fear", label: "Fear", min: 25, max: 44, color: "#ea580c" },
-  { key: "neutral", label: "Neutral", min: 45, max: 55, color: "#a16207" },
-  { key: "greed", label: "Greed", min: 56, max: 75, color: "#65a30d" },
-  { key: "extreme-greed", label: "Extreme Greed", min: 76, max: 100, color: "#15803d" },
+  { key: "extreme-fear", label: "Extreme Fear", min: 0, max: 24, color: "#c0392b" },
+  { key: "fear", label: "Fear", min: 25, max: 44, color: "#e0672b" },
+  { key: "neutral", label: "Neutral", min: 45, max: 55, color: "#f0c929" },
+  { key: "greed", label: "Greed", min: 56, max: 75, color: "#4caf50" },
+  { key: "extreme-greed", label: "Extreme Greed", min: 76, max: 100, color: "#2e7d32" },
 ];
 
 export const GAUGE_CENTER_X = 130;
