@@ -2,58 +2,149 @@
 
 import * as React from "react";
 import { Loader2 } from "lucide-react";
+import NumberFlow from "@number-flow/react";
 import { cn } from "@/lib/utils";
 import { useFearGreed, type FearGreedData } from "./use-fear-greed";
+import {
+  DEFAULT_FEAR_GREED_BANDS,
+  GAUGE_CENTER_X,
+  GAUGE_CENTER_Y,
+  angleForValue,
+  arcPoint,
+  describeArc,
+} from "./fear-greed-bands";
 
 export interface FearGreedGaugeProps {
   /** Provide your own data to bypass the bundled alternative.me fetcher. */
   data?: FearGreedData;
+  /** "full" shows tick numbers and zone labels; "minimal" shows just the dial, needle, and number. */
+  variant?: "full" | "minimal";
   className?: string;
 }
 
-export function FearGreedGauge({ data, className }: FearGreedGaugeProps) {
+const NUMERIC_TICKS = [0, 20, 40, 50, 60, 80, 100];
+const MINOR_TICKS = Array.from({ length: 21 }, (_, i) => i * 5).filter(
+  (v) => !NUMERIC_TICKS.includes(v),
+);
+const ZONE_LABELS: Array<{ value: number; text: string }> = [
+  { value: 0, text: "EXTREME FEAR" },
+  { value: 22, text: "FEAR" },
+  { value: 50, text: "NEUTRAL" },
+  { value: 78, text: "GREED" },
+  { value: 100, text: "EXTREME GREED" },
+];
+
+function labelAnchor(value: number): "start" | "middle" | "end" {
+  if (value < 45) return "start";
+  if (value > 55) return "end";
+  return "middle";
+}
+
+export function FearGreedGauge({ data, variant = "full", className }: FearGreedGaugeProps) {
   const fetched = useFearGreed({ enabled: data === undefined });
   const resolved = data ?? fetched.data;
   const loading = data === undefined && fetched.loading;
   const value = resolved?.value ?? null;
   const label = resolved?.label ?? "Unknown";
   const hasError = data === undefined && Boolean(fetched.error);
-  const angle = ((value ?? 50) / 100) * 180 - 90;
+  const needleRotation = value !== null ? 90 - angleForValue(value) : 0;
 
   return (
-    <div className={cn("relative flex flex-col items-center pt-2", className)}>
-      <svg viewBox="0 0 200 110" className="w-full max-w-[260px]" aria-hidden="true">
-        <defs>
-          <linearGradient id="voraui-fg-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#f43f5e" />
-            <stop offset="50%" stopColor="#f59e0b" />
-            <stop offset="100%" stopColor="#10b981" />
-          </linearGradient>
-        </defs>
-        <path
-          d="M 20 100 A 80 80 0 0 1 180 100"
-          fill="none"
-          stroke="url(#voraui-fg-gradient)"
-          strokeWidth="10"
-          strokeLinecap="round"
-        />
+    <div className={cn("relative flex flex-col items-center", className)}>
+      <svg viewBox="0 0 260 158" className="w-full max-w-[300px]" aria-hidden="true">
+        {DEFAULT_FEAR_GREED_BANDS.map((band) => (
+          <path
+            key={band.key}
+            d={describeArc(90, band.min, band.max)}
+            fill="none"
+            stroke={band.color}
+            strokeWidth={12}
+            strokeLinecap="round"
+          />
+        ))}
+
+        {variant === "full" && (
+          <>
+            {MINOR_TICKS.map((v) => {
+              const inner = arcPoint(98, v);
+              const outer = arcPoint(103, v);
+              return (
+                <line
+                  key={`minor-${v}`}
+                  x1={inner.x}
+                  y1={inner.y}
+                  x2={outer.x}
+                  y2={outer.y}
+                  strokeWidth={1}
+                  className="stroke-muted-foreground/30"
+                />
+              );
+            })}
+            {NUMERIC_TICKS.map((v) => {
+              const inner = arcPoint(96, v);
+              const outer = arcPoint(106, v);
+              return (
+                <line
+                  key={`major-${v}`}
+                  x1={inner.x}
+                  y1={inner.y}
+                  x2={outer.x}
+                  y2={outer.y}
+                  strokeWidth={1.5}
+                  className="stroke-muted-foreground/60"
+                />
+              );
+            })}
+            {NUMERIC_TICKS.map((v) => {
+              const p = arcPoint(114, v);
+              return (
+                <text
+                  key={`num-${v}`}
+                  x={p.x}
+                  y={p.y}
+                  textAnchor={labelAnchor(v)}
+                  dominantBaseline="middle"
+                  className="fill-muted-foreground text-[9px] font-medium tabular-nums"
+                >
+                  {v}
+                </text>
+              );
+            })}
+            {ZONE_LABELS.map((zone) => {
+              const p = arcPoint(126, zone.value);
+              return (
+                <text
+                  key={zone.text}
+                  x={p.x}
+                  y={p.y}
+                  textAnchor={labelAnchor(zone.value)}
+                  dominantBaseline="middle"
+                  className="fill-muted-foreground text-[8px] font-semibold uppercase tracking-wider"
+                >
+                  {zone.text}
+                </text>
+              );
+            })}
+          </>
+        )}
+
         {value !== null && !loading && (
-          <g transform={`rotate(${angle} 100 100)`}>
+          <g transform={`rotate(${needleRotation} ${GAUGE_CENTER_X} ${GAUGE_CENTER_Y})`}>
             <line
-              x1="100"
-              y1="100"
-              x2="100"
-              y2="34"
+              x1={GAUGE_CENTER_X}
+              y1={GAUGE_CENTER_Y}
+              x2={GAUGE_CENTER_X}
+              y2={GAUGE_CENTER_Y - 72}
               stroke="currentColor"
-              strokeWidth="2.5"
+              strokeWidth={2}
               strokeLinecap="round"
               className="text-foreground"
             />
-            <circle cx="100" cy="100" r="5" className="fill-foreground" />
+            <circle cx={GAUGE_CENTER_X} cy={GAUGE_CENTER_Y} r={4} className="fill-foreground" />
           </g>
         )}
       </svg>
-      <div className="-mt-3 text-center">
+      <div className="-mt-10 text-center">
         {loading ? (
           <div role="status">
             <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" aria-hidden="true" />
@@ -61,7 +152,9 @@ export function FearGreedGauge({ data, className }: FearGreedGaugeProps) {
           </div>
         ) : (
           <>
-            <p className="text-3xl font-bold tabular-nums text-foreground">{value ?? "-"}</p>
+            <p className="text-3xl font-bold tabular-nums text-foreground">
+              {value !== null ? <NumberFlow value={value} /> : "-"}
+            </p>
             {hasError ? (
               <p role="alert" className="text-xs font-medium text-muted-foreground">
                 Fear &amp; Greed data is unavailable.
@@ -71,10 +164,6 @@ export function FearGreedGauge({ data, className }: FearGreedGaugeProps) {
             )}
           </>
         )}
-      </div>
-      <div className="mt-3 flex w-full max-w-[260px] justify-between text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-        <span>Fear</span>
-        <span>Greed</span>
       </div>
     </div>
   );
