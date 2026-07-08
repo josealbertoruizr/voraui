@@ -14,15 +14,13 @@ import {
   arcPoint,
   colorForValue,
   describeArc,
-  describeWedge,
-  findFearGreedBand,
 } from "./fear-greed-bands";
 
 export interface FearGreedGaugeProps {
   /** Provide your own data to bypass the bundled alternative.me fetcher. */
   data?: FearGreedData;
-  /** "full" shows the zone labels around the dial with 5 discrete color bands; "minimal" shows just the dial, needle, and number; "ticks" swaps the solid arc for 100 individual gradient tick marks; "gradient" is "minimal" with one continuous color blend instead of discrete bands; "wedges" shows pie-slice zone sectors with the current zone highlighted. */
-  variant?: "full" | "minimal" | "ticks" | "gradient" | "wedges";
+  /** "full" shows the zone labels around the dial with 5 discrete color bands; "minimal" shows just the dial, needle, and number; "ticks" swaps the solid arc for 100 individual gradient tick marks; "gradient" is "minimal" with one continuous color blend instead of discrete bands. */
+  variant?: "full" | "minimal" | "ticks" | "gradient";
   className?: string;
 }
 
@@ -48,19 +46,6 @@ const CURVED_ZONE_LABELS: Array<{ text: string; startOffset: string }> = [
 const TICKS_MAJOR_VALUES = [0, 20, 40, 50, 60, 80, 100];
 const TICKS_FINE_VALUES = Array.from({ length: 100 }, (_, i) => i + 1);
 
-// "wedges" variant: pie-slice zone sectors instead of a thin arc, with the
-// zone matching the current value highlighted and the rest neutral gray.
-const WEDGE_OUTER_RADIUS = 100;
-const WEDGE_INNER_RADIUS = 62;
-const WEDGE_GAP = 0.8;
-const WEDGE_LABEL_INNER_RADIUS = 70;
-const WEDGE_LABEL_OUTER_RADIUS = 94;
-const WEDGE_SCALE_NUMBER_VALUES = [0, 25, 50, 75, 100];
-const WEDGE_SCALE_DOT_VALUES = Array.from({ length: 21 }, (_, i) => i * 5);
-const WEDGE_SCALE_DOT_RADIUS = 48;
-const WEDGE_SCALE_NUMBER_RADIUS = 56;
-const WEDGE_HUB_RADIUS = 40;
-
 function labelAnchor(value: number): "start" | "middle" | "end" {
   if (value < 45) return "start";
   if (value > 55) return "end";
@@ -77,15 +62,10 @@ export function FearGreedGauge({ data, variant = "full", className }: FearGreedG
   const label = resolved?.label ?? "Unknown";
   const hasError = data === undefined && Boolean(fetched.error);
   const needleRotation = value !== null ? 90 - angleForValue(value) : 0;
-  const activeBand = variant === "wedges" && value !== null ? findFearGreedBand(value) : null;
 
   return (
     <div className={cn("relative flex flex-col items-center", className)}>
-      <svg
-        viewBox={variant === "wedges" ? "0 0 260 190" : "0 0 260 158"}
-        className="w-full max-w-[300px]"
-        aria-hidden="true"
-      >
+      <svg viewBox="0 0 260 158" className="w-full max-w-[300px]" aria-hidden="true">
         {(variant === "full" || variant === "minimal") &&
           DEFAULT_FEAR_GREED_BANDS.map((band) => (
             <path
@@ -172,74 +152,6 @@ export function FearGreedGauge({ data, variant = "full", className }: FearGreedG
           </>
         )}
 
-        {variant === "wedges" && (
-          <>
-            {DEFAULT_FEAR_GREED_BANDS.map((band) => {
-              const isActive = activeBand?.key === band.key;
-              return (
-                <path
-                  key={band.key}
-                  d={describeWedge(
-                    WEDGE_OUTER_RADIUS,
-                    WEDGE_INNER_RADIUS,
-                    band.min + WEDGE_GAP,
-                    band.max - WEDGE_GAP,
-                  )}
-                  fill={isActive ? band.color : undefined}
-                  fillOpacity={isActive ? 0.25 : undefined}
-                  stroke={isActive ? band.color : undefined}
-                  strokeWidth={isActive ? 1.5 : undefined}
-                  className={isActive ? undefined : "fill-muted stroke-border"}
-                />
-              );
-            })}
-            {DEFAULT_FEAR_GREED_BANDS.map((band) => {
-              const mid = (band.min + band.max) / 2;
-              // A radial textPath clips text past its (short) path length -
-              // fine for "FEAR"/"GREED" but drops characters from "NEUTRAL"
-              // and the two-word EXTREME labels. Plain rotated text with
-              // tspans has no such limit, so split multi-word labels onto
-              // their own stacked lines instead.
-              const rotation = 90 - angleForValue(mid);
-              const p = arcPoint((WEDGE_LABEL_INNER_RADIUS + WEDGE_LABEL_OUTER_RADIUS) / 2, mid);
-              const words = band.label.toUpperCase().split(" ");
-              return (
-                <text
-                  key={band.key}
-                  textAnchor="middle"
-                  transform={`rotate(${rotation} ${p.x} ${p.y})`}
-                  className="fill-foreground text-[7px] font-bold uppercase tracking-wider"
-                >
-                  {words.map((word, i) => (
-                    <tspan key={word} x={p.x} y={p.y} dy={`${(i - (words.length - 1) / 2) * 1.1}em`}>
-                      {word}
-                    </tspan>
-                  ))}
-                </text>
-              );
-            })}
-            {WEDGE_SCALE_DOT_VALUES.map((v) => {
-              const p = arcPoint(WEDGE_SCALE_DOT_RADIUS, v);
-              return <circle key={`dot-${v}`} cx={p.x} cy={p.y} r={1} className="fill-muted-foreground/50" />;
-            })}
-            {WEDGE_SCALE_NUMBER_VALUES.map((v) => {
-              const p = arcPoint(WEDGE_SCALE_NUMBER_RADIUS, v);
-              return (
-                <text
-                  key={`scale-${v}`}
-                  x={p.x}
-                  y={p.y}
-                  textAnchor={labelAnchor(v)}
-                  dominantBaseline="middle"
-                  className="fill-muted-foreground text-[8px] font-medium tabular-nums"
-                >
-                  {v}
-                </text>
-              );
-            })}
-          </>
-        )}
-
         {variant === "full" && (
           <>
             <path id={curveId} d={describeArc(126, CURVE_PATH_FROM, CURVE_PATH_TO)} fill="none" stroke="none" />
@@ -277,35 +189,16 @@ export function FearGreedGauge({ data, variant = "full", className }: FearGreedG
 
         {value !== null && !loading && (
           <g transform={`rotate(${needleRotation} ${GAUGE_CENTER_X} ${GAUGE_CENTER_Y})`}>
-            {variant === "wedges" ? (
-              <polygon
-                points={`${GAUGE_CENTER_X - 3},${GAUGE_CENTER_Y - 50} ${GAUGE_CENTER_X},${GAUGE_CENTER_Y - 56} ${GAUGE_CENTER_X + 3},${GAUGE_CENTER_Y - 50} ${GAUGE_CENTER_X + 3},${GAUGE_CENTER_Y + 18} ${GAUGE_CENTER_X - 3},${GAUGE_CENTER_Y + 18}`}
-                className="fill-foreground"
-              />
-            ) : (
-              <polygon
-                points={`${GAUGE_CENTER_X - 2.2},${GAUGE_CENTER_Y - 66} ${GAUGE_CENTER_X},${GAUGE_CENTER_Y - 72} ${GAUGE_CENTER_X + 2.2},${GAUGE_CENTER_Y - 66} ${GAUGE_CENTER_X + 2.2},${GAUGE_CENTER_Y + 15} ${GAUGE_CENTER_X - 2.2},${GAUGE_CENTER_Y + 15}`}
-                className="fill-foreground"
-              />
-            )}
-            {variant === "wedges" ? (
-              <circle
-                cx={GAUGE_CENTER_X}
-                cy={GAUGE_CENTER_Y}
-                r={WEDGE_HUB_RADIUS}
-                strokeWidth={1}
-                className="fill-background stroke-border"
-              />
-            ) : (
-              <>
-                <circle cx={GAUGE_CENTER_X} cy={GAUGE_CENTER_Y} r={6} className="fill-foreground" />
-                <circle cx={GAUGE_CENTER_X} cy={GAUGE_CENTER_Y} r={2.5} className="fill-background" />
-              </>
-            )}
+            <polygon
+              points={`${GAUGE_CENTER_X - 2.2},${GAUGE_CENTER_Y - 66} ${GAUGE_CENTER_X},${GAUGE_CENTER_Y - 72} ${GAUGE_CENTER_X + 2.2},${GAUGE_CENTER_Y - 66} ${GAUGE_CENTER_X + 2.2},${GAUGE_CENTER_Y + 15} ${GAUGE_CENTER_X - 2.2},${GAUGE_CENTER_Y + 15}`}
+              className="fill-foreground"
+            />
+            <circle cx={GAUGE_CENTER_X} cy={GAUGE_CENTER_Y} r={6} className="fill-foreground" />
+            <circle cx={GAUGE_CENTER_X} cy={GAUGE_CENTER_Y} r={2.5} className="fill-background" />
           </g>
         )}
       </svg>
-      <div className={cn("text-center", variant === "wedges" ? "-mt-16" : "-mt-4")}>
+      <div className="-mt-4 text-center">
         {loading ? (
           <div role="status">
             <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" aria-hidden="true" />
