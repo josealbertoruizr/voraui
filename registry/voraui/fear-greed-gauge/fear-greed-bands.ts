@@ -48,6 +48,35 @@ export function describeArc(radius: number, fromValue: number, toValue: number):
   return `M ${start.x} ${start.y} A ${radius} ${radius} 0 0 1 ${end.x} ${end.y}`;
 }
 
+/** SVG path `d` for a filled annular wedge (a pie-slice ring segment) between
+ *  two radii and two values, for the "wedges" variant's zone sectors. */
+export function describeWedge(
+  outerRadius: number,
+  innerRadius: number,
+  fromValue: number,
+  toValue: number,
+): string {
+  const outerStart = arcPoint(outerRadius, fromValue);
+  const outerEnd = arcPoint(outerRadius, toValue);
+  const innerEnd = arcPoint(innerRadius, toValue);
+  const innerStart = arcPoint(innerRadius, fromValue);
+  return (
+    `M ${outerStart.x} ${outerStart.y} A ${outerRadius} ${outerRadius} 0 0 1 ${outerEnd.x} ${outerEnd.y} ` +
+    `L ${innerEnd.x} ${innerEnd.y} A ${innerRadius} ${innerRadius} 0 0 0 ${innerStart.x} ${innerStart.y} Z`
+  );
+}
+
+/** Which band a 0-100 value falls into, for the "wedges" variant's
+ *  active-zone highlight. Clamps out-of-range values into the nearest edge
+ *  band instead of returning undefined. */
+export function findFearGreedBand(
+  value: number,
+  bands: FearGreedBand[] = DEFAULT_FEAR_GREED_BANDS,
+): FearGreedBand {
+  const clamped = Math.min(Math.max(value, 0), 100);
+  return bands.find((band) => clamped >= band.min && clamped <= band.max) ?? bands[bands.length - 1];
+}
+
 export interface GradientStop {
   value: number;
   color: string;
