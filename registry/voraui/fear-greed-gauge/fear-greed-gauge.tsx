@@ -26,12 +26,20 @@ const NUMERIC_TICKS = [0, 20, 40, 50, 60, 80, 100];
 const MINOR_TICKS = Array.from({ length: 21 }, (_, i) => i * 5).filter(
   (v) => !NUMERIC_TICKS.includes(v),
 );
-const ZONE_LABELS: Array<{ value: number; text: string }> = [
+const EDGE_ZONE_LABELS: Array<{ value: number; text: string }> = [
   { value: 0, text: "EXTREME FEAR" },
-  { value: 22, text: "FEAR" },
-  { value: 50, text: "NEUTRAL" },
-  { value: 78, text: "GREED" },
   { value: 100, text: "EXTREME GREED" },
+];
+// The short single-word labels curve along the arc's gentle upper section
+// (value 15-85) via textPath. The two-word EXTREME labels sit near the ends,
+// where that same arc is nearly vertical, so curving them would tip them
+// almost sideways - they stay as plain horizontal text instead.
+const CURVE_PATH_FROM = 15;
+const CURVE_PATH_TO = 85;
+const CURVED_ZONE_LABELS: Array<{ text: string; startOffset: string }> = [
+  { text: "FEAR", startOffset: "10%" },
+  { text: "NEUTRAL", startOffset: "50%" },
+  { text: "GREED", startOffset: "90%" },
 ];
 
 function labelAnchor(value: number): "start" | "middle" | "end" {
@@ -41,6 +49,7 @@ function labelAnchor(value: number): "start" | "middle" | "end" {
 }
 
 export function FearGreedGauge({ data, variant = "full", className }: FearGreedGaugeProps) {
+  const curveId = React.useId();
   const fetched = useFearGreed({ enabled: data === undefined });
   const resolved = data ?? fetched.data;
   const loading = data === undefined && fetched.loading;
@@ -110,17 +119,28 @@ export function FearGreedGauge({ data, variant = "full", className }: FearGreedG
                 </text>
               );
             })}
-            {ZONE_LABELS.map((zone) => {
+            <path id={curveId} d={describeArc(126, CURVE_PATH_FROM, CURVE_PATH_TO)} fill="none" stroke="none" />
+            {CURVED_ZONE_LABELS.map((zone) => (
+              <text
+                key={zone.text}
+                textAnchor="middle"
+                className="fill-muted-foreground text-[8px] font-semibold uppercase tracking-wider"
+              >
+                <textPath href={`#${curveId}`} startOffset={zone.startOffset}>
+                  {zone.text}
+                </textPath>
+              </text>
+            ))}
+            {EDGE_ZONE_LABELS.map((zone) => {
               const p = arcPoint(126, zone.value);
-              // The 0/100 zone labels sit on the same baseline as the "0"/"100"
-              // numeric ticks (both endpoints have the same y at this radius),
-              // so push them down onto their own line to avoid overlapping.
-              const isEdge = zone.value === 0 || zone.value === 100;
+              // These sit on the same baseline as the "0"/"100" numeric ticks
+              // (both endpoints have the same y at this radius), so push them
+              // down onto their own line to avoid overlapping.
               return (
                 <text
                   key={zone.text}
                   x={p.x}
-                  y={isEdge ? p.y + 16 : p.y}
+                  y={p.y + 16}
                   textAnchor={labelAnchor(zone.value)}
                   dominantBaseline="middle"
                   className="fill-muted-foreground text-[8px] font-semibold uppercase tracking-wider"
