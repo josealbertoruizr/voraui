@@ -9,6 +9,7 @@ import {
   colorForValue,
   describeArc,
   describeWedge,
+  equalizedValue,
   findFearGreedBand,
 } from "@/registry/voraui/fear-greed-gauge/fear-greed-bands";
 
@@ -98,6 +99,39 @@ describe("findFearGreedBand", () => {
   it("clamps out-of-range values into the nearest edge band", () => {
     expect(findFearGreedBand(-5).key).toBe("extreme-fear");
     expect(findFearGreedBand(120).key).toBe("extreme-greed");
+  });
+});
+
+describe("equalizedValue", () => {
+  it("maps every band's endpoints onto equal 20-unit display segments", () => {
+    const share = 100 / DEFAULT_FEAR_GREED_BANDS.length;
+    DEFAULT_FEAR_GREED_BANDS.forEach((band, i) => {
+      expect(equalizedValue(band.min)).toBeCloseTo(i * share, 6);
+      expect(equalizedValue(band.max)).toBeCloseTo((i + 1) * share, 6);
+    });
+  });
+
+  it("keeps the neutral midpoint at the top of the dial", () => {
+    expect(equalizedValue(50)).toBe(50);
+  });
+
+  it("stretches the narrow neutral band and compresses wide bands", () => {
+    // 46 is 10% into neutral's 45-55 range, so it lands 10% into the
+    // third display segment (40-60) instead of near the dial's center.
+    expect(equalizedValue(46)).toBeCloseTo(42, 6);
+    // 10 is ~42% into extreme fear's 0-24 range.
+    expect(equalizedValue(10)).toBeCloseTo((10 / 24) * 20, 6);
+  });
+
+  it("is monotonically non-decreasing across the whole scale", () => {
+    for (let v = 1; v <= 100; v++) {
+      expect(equalizedValue(v)).toBeGreaterThanOrEqual(equalizedValue(v - 1));
+    }
+  });
+
+  it("clamps out-of-range values", () => {
+    expect(equalizedValue(-10)).toBe(0);
+    expect(equalizedValue(150)).toBe(100);
   });
 });
 

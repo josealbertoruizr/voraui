@@ -40,8 +40,8 @@ export default function Page() {
           <FearGreedGauge variant="ticks" />
         </ComponentPreview>
         <p className="text-sm text-muted-foreground">
-          variant=&quot;wedges&quot; shows pie-slice zone sectors with numeric dial ticks; the
-          zone matching the current value is highlighted, the rest stay neutral gray.
+          variant=&quot;wedges&quot; shows equal-width pie-slice zone sectors with numeric dial
+          ticks; the zone matching the current value is highlighted, the rest stay neutral gray.
         </p>
         <ComponentPreview>
           <FearGreedGauge variant="wedges" />
