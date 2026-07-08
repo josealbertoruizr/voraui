@@ -17,15 +17,11 @@ import {
 export interface FearGreedGaugeProps {
   /** Provide your own data to bypass the bundled alternative.me fetcher. */
   data?: FearGreedData;
-  /** "full" shows tick numbers and zone labels; "minimal" shows just the dial, needle, and number. */
+  /** "full" shows the zone labels around the dial; "minimal" shows just the dial, needle, and number. */
   variant?: "full" | "minimal";
   className?: string;
 }
 
-const NUMERIC_TICKS = [0, 20, 40, 50, 60, 80, 100];
-const MINOR_TICKS = Array.from({ length: 21 }, (_, i) => i * 5).filter(
-  (v) => !NUMERIC_TICKS.includes(v),
-);
 const EDGE_ZONE_LABELS: Array<{ value: number; text: string }> = [
   { value: 0, text: "EXTREME FEAR" },
   { value: 100, text: "EXTREME GREED" },
@@ -74,51 +70,6 @@ export function FearGreedGauge({ data, variant = "full", className }: FearGreedG
 
         {variant === "full" && (
           <>
-            {MINOR_TICKS.map((v) => {
-              const inner = arcPoint(98, v);
-              const outer = arcPoint(103, v);
-              return (
-                <line
-                  key={`minor-${v}`}
-                  x1={inner.x}
-                  y1={inner.y}
-                  x2={outer.x}
-                  y2={outer.y}
-                  strokeWidth={1}
-                  className="stroke-muted-foreground/30"
-                />
-              );
-            })}
-            {NUMERIC_TICKS.map((v) => {
-              const inner = arcPoint(96, v);
-              const outer = arcPoint(106, v);
-              return (
-                <line
-                  key={`major-${v}`}
-                  x1={inner.x}
-                  y1={inner.y}
-                  x2={outer.x}
-                  y2={outer.y}
-                  strokeWidth={1.5}
-                  className="stroke-muted-foreground/60"
-                />
-              );
-            })}
-            {NUMERIC_TICKS.map((v) => {
-              const p = arcPoint(114, v);
-              return (
-                <text
-                  key={`num-${v}`}
-                  x={p.x}
-                  y={p.y}
-                  textAnchor={labelAnchor(v)}
-                  dominantBaseline="middle"
-                  className="fill-muted-foreground text-[9px] font-medium tabular-nums"
-                >
-                  {v}
-                </text>
-              );
-            })}
             <path id={curveId} d={describeArc(126, CURVE_PATH_FROM, CURVE_PATH_TO)} fill="none" stroke="none" />
             {CURVED_ZONE_LABELS.map((zone) => (
               <text

@@ -25,9 +25,9 @@ export default function Page() {
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">Variants</h2>
         <p className="text-sm text-muted-foreground">
-          The default full variant shown above includes tick numbers and zone labels around the
-          dial. Pass variant=&quot;minimal&quot; for a smaller footprint with just the dial,
-          needle, and number.
+          The default full variant shown above includes zone labels around the dial. Pass
+          variant=&quot;minimal&quot; for a smaller footprint with just the dial, needle, and
+          number.
         </p>
         <ComponentPreview>
           <FearGreedGauge variant="minimal" />
@@ -65,7 +65,7 @@ export default function Page() {
               type: '"full" | "minimal"',
               defaultValue: '"full"',
               description:
-                "\"full\" shows tick numbers and zone labels; \"minimal\" shows just the dial, needle, and number.",
+                "\"full\" shows the zone labels around the dial; \"minimal\" shows just the dial, needle, and number.",
             },
             { name: "className", type: "string", description: "Extra classes for the wrapper." },
           ]}
