@@ -191,7 +191,7 @@ export function FearGreedGauge({ data, variant = "gradient", className }: FearGr
                   key={band.key}
                   textAnchor="middle"
                   transform={`rotate(${rotation} ${p.x} ${p.y})`}
-                  className="fill-foreground text-[7px] font-bold uppercase tracking-wider"
+                  className="fill-foreground text-[8px] font-extrabold uppercase tracking-wider"
                 >
                   {words.map((word, i) => (
                     <tspan key={word} x={p.x} y={p.y} dy={`${(i - (words.length - 1) / 2) * 1.1}em`}>
@@ -201,17 +201,24 @@ export function FearGreedGauge({ data, variant = "gradient", className }: FearGr
                 </text>
               );
             })}
-            {WEDGE_SCALE_DOT_VALUES.map((v) => {
+            {WEDGE_SCALE_DOT_VALUES.filter(
+              (v) => !WEDGE_SCALE_NUMBER_VALUES.some((n) => Math.abs(v - n) <= 5),
+            ).map((v) => {
+              // Dots within one tick step of a numeric label sit close enough
+              // to read as a stray decimal point glued onto the number (e.g.
+              // "25." or ".75") - skip them here since the number itself
+              // already marks that position.
               const p = arcPoint(WEDGE_SCALE_DOT_RADIUS, v);
               return <circle key={`dot-${v}`} cx={p.x} cy={p.y} r={1} className="fill-muted-foreground/50" />;
             })}
             {WEDGE_SCALE_NUMBER_VALUES.map((v) => {
+              const isEdge = v === 0 || v === 100;
               const p = arcPoint(WEDGE_SCALE_NUMBER_RADIUS, v);
               return (
                 <text
                   key={`scale-${v}`}
                   x={p.x}
-                  y={p.y}
+                  y={isEdge ? p.y - 3 : p.y}
                   textAnchor={labelAnchor(v)}
                   dominantBaseline="middle"
                   className="fill-muted-foreground text-[8px] font-medium tabular-nums"
@@ -227,8 +234,9 @@ export function FearGreedGauge({ data, variant = "gradient", className }: FearGr
           <g transform={`rotate(${needleRotation} ${GAUGE_CENTER_X} ${GAUGE_CENTER_Y})`}>
             {variant === "wedges" ? (
               <polygon
-                points={`${GAUGE_CENTER_X - 3},${GAUGE_CENTER_Y - 50} ${GAUGE_CENTER_X},${GAUGE_CENTER_Y - 56} ${GAUGE_CENTER_X + 3},${GAUGE_CENTER_Y - 50} ${GAUGE_CENTER_X + 3},${GAUGE_CENTER_Y + 18} ${GAUGE_CENTER_X - 3},${GAUGE_CENTER_Y + 18}`}
-                className="fill-foreground"
+                points={`${GAUGE_CENTER_X - 4},${GAUGE_CENTER_Y - 58} ${GAUGE_CENTER_X},${GAUGE_CENTER_Y - 66} ${GAUGE_CENTER_X + 4},${GAUGE_CENTER_Y - 58} ${GAUGE_CENTER_X + 4},${GAUGE_CENTER_Y + 20} ${GAUGE_CENTER_X - 4},${GAUGE_CENTER_Y + 20}`}
+                fill={activeBand?.color}
+                className={activeBand ? undefined : "fill-foreground"}
               />
             ) : (
               <polygon
