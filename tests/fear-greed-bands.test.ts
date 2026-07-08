@@ -8,6 +8,8 @@ import {
   arcPoint,
   colorForValue,
   describeArc,
+  describeWedge,
+  findFearGreedBand,
 } from "@/registry/voraui/fear-greed-gauge/fear-greed-bands";
 
 describe("angleForValue", () => {
@@ -71,6 +73,31 @@ describe("colorForValue", () => {
   it("clamps out-of-range values to the nearest edge stop's color", () => {
     expect(colorForValue(-10)).toBe(GRADIENT_STOPS[0].color);
     expect(colorForValue(150)).toBe(GRADIENT_STOPS.at(-1)!.color);
+  });
+});
+
+describe("describeWedge", () => {
+  it("builds a closed annular sector path between two radii and values", () => {
+    const d = describeWedge(100, 60, 0, 50);
+    expect(d).toBe(
+      `M ${GAUGE_CENTER_X - 100} ${GAUGE_CENTER_Y} A 100 100 0 0 1 ${GAUGE_CENTER_X} ${GAUGE_CENTER_Y - 100} ` +
+        `L ${GAUGE_CENTER_X} ${GAUGE_CENTER_Y - 60} A 60 60 0 0 0 ${GAUGE_CENTER_X - 60} ${GAUGE_CENTER_Y} Z`,
+    );
+  });
+});
+
+describe("findFearGreedBand", () => {
+  it("returns the matching band for a value inside each range", () => {
+    expect(findFearGreedBand(10).key).toBe("extreme-fear");
+    expect(findFearGreedBand(30).key).toBe("fear");
+    expect(findFearGreedBand(50).key).toBe("neutral");
+    expect(findFearGreedBand(65).key).toBe("greed");
+    expect(findFearGreedBand(90).key).toBe("extreme-greed");
+  });
+
+  it("clamps out-of-range values into the nearest edge band", () => {
+    expect(findFearGreedBand(-5).key).toBe("extreme-fear");
+    expect(findFearGreedBand(120).key).toBe("extreme-greed");
   });
 });
 
