@@ -8,7 +8,7 @@
       "type": "registry:block",
       "title": "Fear & Greed Gauge",
       "description": "Crypto Fear & Greed index dial with live data from alternative.me.",
-      "dependencies": ["lucide-react"],
+      "dependencies": ["lucide-react", "@number-flow/react"],
       "registryDependencies": ["utils"],
       "files": [
         {
@@ -28,7 +28,7 @@
       "type": "registry:block",
       "title": "Altseason Gauge",
       "description": "Altcoin Season index gauge computed client-side from CoinPaprika data.",
-      "dependencies": ["framer-motion", "lucide-react"],
+      "dependencies": ["framer-motion", "lucide-react", "@number-flow/react"],
       "registryDependencies": ["utils"],
       "files": [
         {
