@@ -47,13 +47,6 @@ export default function Page() {
         <ComponentPreview>
           <FearGreedGauge variant="gradient" />
         </ComponentPreview>
-        <p className="text-sm text-muted-foreground">
-          variant=&quot;wedges&quot; shows pie-slice zone sectors with numeric dial ticks; the
-          zone matching the current value is highlighted, the rest stay neutral gray.
-        </p>
-        <ComponentPreview>
-          <FearGreedGauge variant="wedges" />
-        </ComponentPreview>
       </section>
 
       <section className="space-y-3">
@@ -84,10 +77,10 @@ export default function Page() {
             },
             {
               name: "variant",
-              type: '"full" | "minimal" | "ticks" | "gradient" | "wedges"',
+              type: '"full" | "minimal" | "ticks" | "gradient"',
               defaultValue: '"full"',
               description:
-                "\"full\" shows the zone labels around the dial with 5 discrete color bands; \"minimal\" shows just the dial, needle, and number; \"ticks\" swaps the solid arc for 100 individual gradient tick marks; \"gradient\" is \"minimal\" with one continuous color blend instead of discrete bands; \"wedges\" shows pie-slice zone sectors with the current zone highlighted.",
+                "\"full\" shows the zone labels around the dial with 5 discrete color bands; \"minimal\" shows just the dial, needle, and number; \"ticks\" swaps the solid arc for 100 individual gradient tick marks; \"gradient\" is \"minimal\" with one continuous color blend instead of discrete bands.",
             },
             { name: "className", type: "string", description: "Extra classes for the wrapper." },
           ]}
