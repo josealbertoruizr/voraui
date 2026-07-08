@@ -112,11 +112,15 @@ export function FearGreedGauge({ data, variant = "full", className }: FearGreedG
             })}
             {ZONE_LABELS.map((zone) => {
               const p = arcPoint(126, zone.value);
+              // The 0/100 zone labels sit on the same baseline as the "0"/"100"
+              // numeric ticks (both endpoints have the same y at this radius),
+              // so push them down onto their own line to avoid overlapping.
+              const isEdge = zone.value === 0 || zone.value === 100;
               return (
                 <text
                   key={zone.text}
                   x={p.x}
-                  y={p.y}
+                  y={isEdge ? p.y + 16 : p.y}
                   textAnchor={labelAnchor(zone.value)}
                   dominantBaseline="middle"
                   className="fill-muted-foreground text-[8px] font-semibold uppercase tracking-wider"

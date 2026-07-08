@@ -27,12 +27,16 @@ export function angleForValue(value: number): number {
   return 180 - (clamped / 100) * 180;
 }
 
-/** Point on the gauge's circle at the given radius for a 0-100 value. */
+/** Point on the gauge's circle at the given radius for a 0-100 value.
+ *  Coordinates are rounded to 4 decimal places: Math.cos/Math.sin can differ
+ *  in their last bit between the server's and browser's JS engine builds,
+ *  which otherwise surfaces as a React hydration mismatch on these SVG
+ *  attributes. */
 export function arcPoint(radius: number, value: number): { x: number; y: number } {
   const rad = (angleForValue(value) * Math.PI) / 180;
   return {
-    x: GAUGE_CENTER_X + radius * Math.cos(rad),
-    y: GAUGE_CENTER_Y - radius * Math.sin(rad),
+    x: Math.round((GAUGE_CENTER_X + radius * Math.cos(rad)) * 10000) / 10000,
+    y: Math.round((GAUGE_CENTER_Y - radius * Math.sin(rad)) * 10000) / 10000,
   };
 }
 
