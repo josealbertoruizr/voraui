@@ -3,8 +3,10 @@ import {
   DEFAULT_FEAR_GREED_BANDS,
   GAUGE_CENTER_X,
   GAUGE_CENTER_Y,
+  GRADIENT_STOPS,
   angleForValue,
   arcPoint,
+  colorForValue,
   describeArc,
 } from "@/registry/voraui/fear-greed-gauge/fear-greed-bands";
 
@@ -50,6 +52,25 @@ describe("describeArc", () => {
     expect(d).toBe(
       `M ${GAUGE_CENTER_X - 90} ${GAUGE_CENTER_Y} A 90 90 0 0 1 ${GAUGE_CENTER_X + 90} ${GAUGE_CENTER_Y}`,
     );
+  });
+});
+
+describe("colorForValue", () => {
+  it("returns each stop's exact color at its own value", () => {
+    for (const stop of GRADIENT_STOPS) {
+      expect(colorForValue(stop.value)).toBe(stop.color);
+    }
+  });
+
+  it("interpolates linearly between two adjacent stops", () => {
+    // Midpoint between #c0392b (192,57,43) and #e0672b (224,103,43):
+    // (208, 80, 43) -> #d0502b.
+    expect(colorForValue(12.5)).toBe("#d0502b");
+  });
+
+  it("clamps out-of-range values to the nearest edge stop's color", () => {
+    expect(colorForValue(-10)).toBe(GRADIENT_STOPS[0].color);
+    expect(colorForValue(150)).toBe(GRADIENT_STOPS.at(-1)!.color);
   });
 });
 

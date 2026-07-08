@@ -47,3 +47,45 @@ export function describeArc(radius: number, fromValue: number, toValue: number):
   const end = arcPoint(radius, toValue);
   return `M ${start.x} ${start.y} A ${radius} ${radius} 0 0 1 ${end.x} ${end.y}`;
 }
+
+export interface GradientStop {
+  value: number;
+  color: string;
+}
+
+/** Evenly-spaced version of DEFAULT_FEAR_GREED_BANDS's 5 colors, used to
+ *  interpolate a smooth per-tick gradient for the "ticks" variant. */
+export const GRADIENT_STOPS: GradientStop[] = [
+  { value: 0, color: "#c0392b" },
+  { value: 25, color: "#e0672b" },
+  { value: 50, color: "#f0c929" },
+  { value: 75, color: "#4caf50" },
+  { value: 100, color: "#2e7d32" },
+];
+
+function hexToRgb(hex: string): [number, number, number] {
+  const clean = hex.replace("#", "");
+  const num = parseInt(clean, 16);
+  return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+}
+
+function rgbToHex(r: number, g: number, b: number): string {
+  return `#${[r, g, b].map((c) => Math.round(c).toString(16).padStart(2, "0")).join("")}`;
+}
+
+/** Interpolated hex color for a 0-100 value, walking linearly between
+ *  whichever pair of GRADIENT_STOPS the value falls between. */
+export function colorForValue(value: number, stops: GradientStop[] = GRADIENT_STOPS): string {
+  const clamped = Math.min(Math.max(value, 0), 100);
+  for (let i = 0; i < stops.length - 1; i++) {
+    const from = stops[i];
+    const to = stops[i + 1];
+    if (clamped >= from.value && clamped <= to.value) {
+      const t = (clamped - from.value) / (to.value - from.value);
+      const [r1, g1, b1] = hexToRgb(from.color);
+      const [r2, g2, b2] = hexToRgb(to.color);
+      return rgbToHex(r1 + (r2 - r1) * t, g1 + (g2 - g1) * t, b1 + (b2 - b1) * t);
+    }
+  }
+  return stops[stops.length - 1].color;
+}
