@@ -9,6 +9,7 @@ import {
   DEFAULT_FEAR_GREED_BANDS,
   GAUGE_CENTER_X,
   GAUGE_CENTER_Y,
+  GRADIENT_STOPS,
   angleForValue,
   arcPoint,
   colorForValue,
@@ -18,8 +19,8 @@ import {
 export interface FearGreedGaugeProps {
   /** Provide your own data to bypass the bundled alternative.me fetcher. */
   data?: FearGreedData;
-  /** "full" shows the zone labels around the dial; "minimal" shows just the dial, needle, and number; "ticks" swaps the solid arc for 100 individual gradient tick marks. */
-  variant?: "full" | "minimal" | "ticks";
+  /** "full" shows the zone labels around the dial with 5 discrete color bands; "minimal" shows just the dial, needle, and number; "ticks" swaps the solid arc for 100 individual gradient tick marks; "gradient" is "full" with one continuous color blend instead of discrete bands. */
+  variant?: "full" | "minimal" | "ticks" | "gradient";
   className?: string;
 }
 
@@ -53,6 +54,7 @@ function labelAnchor(value: number): "start" | "middle" | "end" {
 
 export function FearGreedGauge({ data, variant = "full", className }: FearGreedGaugeProps) {
   const curveId = React.useId();
+  const gradientId = React.useId();
   const fetched = useFearGreed({ enabled: data === undefined });
   const resolved = data ?? fetched.data;
   const loading = data === undefined && fetched.loading;
@@ -64,7 +66,7 @@ export function FearGreedGauge({ data, variant = "full", className }: FearGreedG
   return (
     <div className={cn("relative flex flex-col items-center", className)}>
       <svg viewBox="0 0 260 158" className="w-full max-w-[300px]" aria-hidden="true">
-        {variant !== "ticks" &&
+        {(variant === "full" || variant === "minimal") &&
           DEFAULT_FEAR_GREED_BANDS.map((band) => (
             <path
               key={band.key}
@@ -75,6 +77,25 @@ export function FearGreedGauge({ data, variant = "full", className }: FearGreedG
               strokeLinecap="round"
             />
           ))}
+
+        {variant === "gradient" && (
+          <>
+            <defs>
+              <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+                {GRADIENT_STOPS.map((stop) => (
+                  <stop key={stop.value} offset={`${stop.value}%`} stopColor={stop.color} />
+                ))}
+              </linearGradient>
+            </defs>
+            <path
+              d={describeArc(90, 0, 100)}
+              fill="none"
+              stroke={`url(#${gradientId})`}
+              strokeWidth={12}
+              strokeLinecap="round"
+            />
+          </>
+        )}
 
         {variant === "ticks" && (
           <>
@@ -131,7 +152,7 @@ export function FearGreedGauge({ data, variant = "full", className }: FearGreedG
           </>
         )}
 
-        {variant === "full" && (
+        {(variant === "full" || variant === "gradient") && (
           <>
             <path id={curveId} d={describeArc(126, CURVE_PATH_FROM, CURVE_PATH_TO)} fill="none" stroke="none" />
             {CURVED_ZONE_LABELS.map((zone) => (
