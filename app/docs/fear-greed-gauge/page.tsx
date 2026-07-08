@@ -32,6 +32,13 @@ export default function Page() {
         <ComponentPreview>
           <FearGreedGauge variant="minimal" />
         </ComponentPreview>
+        <p className="text-sm text-muted-foreground">
+          variant=&quot;ticks&quot; swaps the solid arc for 100 individual gradient tick marks
+          (one per index value) plus numeric labels, speedometer-style.
+        </p>
+        <ComponentPreview>
+          <FearGreedGauge variant="ticks" />
+        </ComponentPreview>
       </section>
 
       <section className="space-y-3">
@@ -62,10 +69,10 @@ export default function Page() {
             },
             {
               name: "variant",
-              type: '"full" | "minimal"',
+              type: '"full" | "minimal" | "ticks"',
               defaultValue: '"full"',
               description:
-                "\"full\" shows the zone labels around the dial; \"minimal\" shows just the dial, needle, and number.",
+                "\"full\" shows the zone labels around the dial; \"minimal\" shows just the dial, needle, and number; \"ticks\" swaps the solid arc for 100 individual gradient tick marks.",
             },
             { name: "className", type: "string", description: "Extra classes for the wrapper." },
           ]}

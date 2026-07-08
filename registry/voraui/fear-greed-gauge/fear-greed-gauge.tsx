@@ -11,14 +11,15 @@ import {
   GAUGE_CENTER_Y,
   angleForValue,
   arcPoint,
+  colorForValue,
   describeArc,
 } from "./fear-greed-bands";
 
 export interface FearGreedGaugeProps {
   /** Provide your own data to bypass the bundled alternative.me fetcher. */
   data?: FearGreedData;
-  /** "full" shows the zone labels around the dial; "minimal" shows just the dial, needle, and number. */
-  variant?: "full" | "minimal";
+  /** "full" shows the zone labels around the dial; "minimal" shows just the dial, needle, and number; "ticks" swaps the solid arc for 100 individual gradient tick marks. */
+  variant?: "full" | "minimal" | "ticks";
   className?: string;
 }
 
@@ -37,6 +38,12 @@ const CURVED_ZONE_LABELS: Array<{ text: string; startOffset: string }> = [
   { text: "NEUTRAL", startOffset: "50%" },
   { text: "GREED", startOffset: "90%" },
 ];
+
+// "ticks" variant: 100 individual gradient tick marks (one per index value)
+// instead of a solid colored arc, plus the same 0/20/40/50/60/80/100 numeric
+// labels as reference speedometer-style gauges.
+const TICKS_MAJOR_VALUES = [0, 20, 40, 50, 60, 80, 100];
+const TICKS_FINE_VALUES = Array.from({ length: 100 }, (_, i) => i + 1);
 
 function labelAnchor(value: number): "start" | "middle" | "end" {
   if (value < 45) return "start";
@@ -57,16 +64,67 @@ export function FearGreedGauge({ data, variant = "full", className }: FearGreedG
   return (
     <div className={cn("relative flex flex-col items-center", className)}>
       <svg viewBox="0 0 260 158" className="w-full max-w-[300px]" aria-hidden="true">
-        {DEFAULT_FEAR_GREED_BANDS.map((band) => (
-          <path
-            key={band.key}
-            d={describeArc(90, band.min, band.max)}
-            fill="none"
-            stroke={band.color}
-            strokeWidth={12}
-            strokeLinecap="round"
-          />
-        ))}
+        {variant !== "ticks" &&
+          DEFAULT_FEAR_GREED_BANDS.map((band) => (
+            <path
+              key={band.key}
+              d={describeArc(90, band.min, band.max)}
+              fill="none"
+              stroke={band.color}
+              strokeWidth={12}
+              strokeLinecap="round"
+            />
+          ))}
+
+        {variant === "ticks" && (
+          <>
+            {TICKS_FINE_VALUES.map((v) => {
+              const inner = arcPoint(96, v);
+              const outer = arcPoint(103, v);
+              return (
+                <line
+                  key={`fine-${v}`}
+                  x1={inner.x}
+                  y1={inner.y}
+                  x2={outer.x}
+                  y2={outer.y}
+                  strokeWidth={1.2}
+                  stroke={colorForValue(v)}
+                />
+              );
+            })}
+            {TICKS_MAJOR_VALUES.map((v) => {
+              const inner = arcPoint(92, v);
+              const outer = arcPoint(107, v);
+              return (
+                <line
+                  key={`major-${v}`}
+                  x1={inner.x}
+                  y1={inner.y}
+                  x2={outer.x}
+                  y2={outer.y}
+                  strokeWidth={2}
+                  stroke={colorForValue(v)}
+                />
+              );
+            })}
+            {TICKS_MAJOR_VALUES.map((v) => {
+              const p = arcPoint(118, v);
+              return (
+                <text
+                  key={`num-${v}`}
+                  x={p.x}
+                  y={p.y}
+                  textAnchor={labelAnchor(v)}
+                  dominantBaseline="middle"
+                  className="fill-muted-foreground text-[9px] font-medium tabular-nums"
+                >
+                  {v}
+                </text>
+              );
+            })}
+          </>
+        )}
 
         {variant === "full" && (
           <>
