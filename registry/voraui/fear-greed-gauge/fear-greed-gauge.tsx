@@ -19,7 +19,7 @@ import {
 export interface FearGreedGaugeProps {
   /** Provide your own data to bypass the bundled alternative.me fetcher. */
   data?: FearGreedData;
-  /** "full" shows the zone labels around the dial with 5 discrete color bands; "minimal" shows just the dial, needle, and number; "ticks" swaps the solid arc for 100 individual gradient tick marks; "gradient" is "full" with one continuous color blend instead of discrete bands. */
+  /** "full" shows the zone labels around the dial with 5 discrete color bands; "minimal" shows just the dial, needle, and number; "ticks" swaps the solid arc for 100 individual gradient tick marks; "gradient" is "minimal" with one continuous color blend instead of discrete bands. */
   variant?: "full" | "minimal" | "ticks" | "gradient";
   className?: string;
 }
@@ -152,7 +152,7 @@ export function FearGreedGauge({ data, variant = "full", className }: FearGreedG
           </>
         )}
 
-        {(variant === "full" || variant === "gradient") && (
+        {variant === "full" && (
           <>
             <path id={curveId} d={describeArc(126, CURVE_PATH_FROM, CURVE_PATH_TO)} fill="none" stroke="none" />
             {CURVED_ZONE_LABELS.map((zone) => (
