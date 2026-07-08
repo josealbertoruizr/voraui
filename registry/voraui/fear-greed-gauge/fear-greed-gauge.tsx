@@ -119,7 +119,7 @@ export function FearGreedGauge({ data, variant = "full", className }: FearGreedG
           </g>
         )}
       </svg>
-      <div className="-mt-10 text-center">
+      <div className="-mt-4 text-center">
         {loading ? (
           <div role="status">
             <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" aria-hidden="true" />
