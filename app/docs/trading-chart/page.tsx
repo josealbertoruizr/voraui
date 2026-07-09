@@ -1,8 +1,10 @@
+import { ComponentPreview } from "@/components/site/component-preview";
 import { InstallTabs } from "@/components/site/install-tabs";
 import { ManualInstall } from "@/components/site/manual-install";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PropsTable } from "@/components/site/props-table";
 import { TradingChartDemo } from "@/components/site/trading-chart-demo";
+import { TradingChartSkeleton } from "@/registry/voraui/trading-chart/trading-chart-skeleton";
 
 export const metadata = { title: "Trading Chart" };
 
@@ -19,6 +21,17 @@ export default function Page() {
       </div>
 
       <TradingChartDemo />
+
+      <section className="space-y-3">
+        <h2 className="text-xl font-semibold">Skeleton</h2>
+        <p className="text-sm text-muted-foreground">
+          TradingChart shows this shaped skeleton automatically while its bundled fetcher loads.
+          Import TradingChartSkeleton directly for a React Suspense fallback or an SSR placeholder.
+        </p>
+        <ComponentPreview className="block min-h-0">
+          <TradingChartSkeleton height={360} />
+        </ComponentPreview>
+      </section>
 
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">Installation</h2>

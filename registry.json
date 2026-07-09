@@ -103,13 +103,18 @@
       "type": "registry:block",
       "title": "Trading Chart",
       "description": "Candlestick chart with trade markers, clustering, live Binance updates, and an imperative highlight API.",
-      "dependencies": ["lightweight-charts", "next-themes", "lucide-react"],
+      "dependencies": ["lightweight-charts", "next-themes"],
       "registryDependencies": ["utils"],
       "files": [
         {
           "path": "registry/voraui/trading-chart/trading-chart.tsx",
           "type": "registry:component",
           "target": "components/voraui/trading-chart.tsx"
+        },
+        {
+          "path": "registry/voraui/trading-chart/trading-chart-skeleton.tsx",
+          "type": "registry:component",
+          "target": "components/voraui/trading-chart-skeleton.tsx"
         },
         {
           "path": "registry/voraui/trading-chart/use-klines.ts",
