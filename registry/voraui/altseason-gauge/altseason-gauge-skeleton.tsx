@@ -37,7 +37,7 @@ export function AltseasonGaugeSkeleton({ variant = "meter", className }: Altseas
       `}</style>
       <div className="flex items-end gap-3">
         <div className="h-9 w-14 rounded-md bg-muted" />
-        <div className="h-3 w-8 rounded bg-muted" />
+        <div className="h-4 pb-1 w-8 rounded bg-muted" />
         <div className="ml-auto h-6 w-24 rounded-full bg-muted" />
       </div>
 
@@ -51,15 +51,15 @@ export function AltseasonGaugeSkeleton({ variant = "meter", className }: Altseas
               />
             ))}
           </div>
-          <div className="h-3 w-40 rounded bg-muted" />
+          <div className="h-4 w-40 rounded bg-muted" />
         </div>
       ) : (
         <div className="flex flex-col gap-3">
           <div className="h-3 w-full rounded-full bg-muted" />
           <div className="flex justify-between">
-            <div className="h-2.5 w-16 rounded bg-muted" />
-            <div className="h-2.5 w-12 rounded bg-muted" />
-            <div className="h-2.5 w-16 rounded bg-muted" />
+            <div className="h-3.5 w-16 rounded bg-muted" />
+            <div className="h-3.5 w-12 rounded bg-muted" />
+            <div className="h-3.5 w-16 rounded bg-muted" />
           </div>
         </div>
       )}
