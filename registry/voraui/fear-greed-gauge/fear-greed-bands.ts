@@ -135,3 +135,13 @@ export function colorForValue(value: number, stops: GradientStop[] = GRADIENT_ST
   }
   return stops[stops.length - 1].color;
 }
+
+// "wedges" variant geometry, shared with FearGreedGaugeSkeleton so the ghost
+// dial lines up exactly with the real one.
+export const WEDGE_OUTER_RADIUS = 104;
+export const WEDGE_INNER_RADIUS = 64;
+export const WEDGE_GAP = 1.2;
+export const WEDGE_HUB_RADIUS = 40;
+// Tall enough for the full hub circle (center y 130 + radius 40) plus a small
+// bottom margin; also the denominator for the centered value overlay's top %.
+export const WEDGES_VIEWBOX_HEIGHT = 180;

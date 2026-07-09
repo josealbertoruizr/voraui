@@ -1,15 +1,20 @@
 "use client";
 
 import * as React from "react";
-import { Loader2 } from "lucide-react";
 import NumberFlow from "@number-flow/react";
 import { cn } from "@/lib/utils";
+import { FearGreedGaugeSkeleton } from "./fear-greed-gauge-skeleton";
 import { useFearGreed, type FearGreedData } from "./use-fear-greed";
 import {
   DEFAULT_FEAR_GREED_BANDS,
   GAUGE_CENTER_X,
   GAUGE_CENTER_Y,
   GRADIENT_STOPS,
+  WEDGE_GAP,
+  WEDGE_HUB_RADIUS,
+  WEDGE_INNER_RADIUS,
+  WEDGE_OUTER_RADIUS,
+  WEDGES_VIEWBOX_HEIGHT,
   angleForValue,
   arcPoint,
   colorForValue,
@@ -35,9 +40,6 @@ const TICKS_FINE_VALUES = Array.from({ length: 100 }, (_, i) => i + 1);
 
 // "wedges" variant: pie-slice zone sectors instead of a thin arc, with the
 // zone matching the current value highlighted and the rest neutral gray.
-const WEDGE_OUTER_RADIUS = 104;
-const WEDGE_INNER_RADIUS = 64;
-const WEDGE_GAP = 1.2;
 const WEDGE_LABEL_RADIUS = (WEDGE_OUTER_RADIUS + WEDGE_INNER_RADIUS) / 2;
 const WEDGE_BAND_SHARE = 100 / DEFAULT_FEAR_GREED_BANDS.length;
 // With equalized wedges every wedge corner is a real band boundary, so the
@@ -53,10 +55,6 @@ const WEDGE_SCALE_DOT_DISPLAY_VALUES = DEFAULT_FEAR_GREED_BANDS.flatMap((_, i) =
 ]);
 const WEDGE_SCALE_DOT_RADIUS = 48;
 const WEDGE_SCALE_NUMBER_RADIUS = 56;
-const WEDGE_HUB_RADIUS = 40;
-// Tall enough for the full hub circle (center y 130 + radius 40) plus a small
-// bottom margin; also the denominator for the centered value overlay's top %.
-const WEDGES_VIEWBOX_HEIGHT = 180;
 
 function labelAnchor(value: number): "start" | "middle" | "end" {
   if (value < 45) return "start";
@@ -78,6 +76,10 @@ export function FearGreedGauge({ data, variant = "gradient", className }: FearGr
   const dialValue = value !== null && variant === "wedges" ? equalizedValue(value) : value;
   const needleRotation = dialValue !== null ? 90 - angleForValue(dialValue) : 0;
   const activeBand = variant === "wedges" && value !== null ? findFearGreedBand(value) : null;
+
+  if (loading) {
+    return <FearGreedGaugeSkeleton variant={variant} className={className} />;
+  }
 
   return (
     <div className={cn("relative flex flex-col items-center", className)}>
@@ -243,7 +245,7 @@ export function FearGreedGauge({ data, variant = "gradient", className }: FearGr
             </>
           )}
 
-          {value !== null && !loading && (
+          {value !== null && (
             <g transform={`rotate(${needleRotation} ${GAUGE_CENTER_X} ${GAUGE_CENTER_Y})`}>
               {variant === "wedges" ? (
                 <polygon
@@ -281,19 +283,12 @@ export function FearGreedGauge({ data, variant = "gradient", className }: FearGr
             className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 text-center"
             style={{ top: `${(GAUGE_CENTER_Y / WEDGES_VIEWBOX_HEIGHT) * 100}%` }}
           >
-            {loading ? (
-              <div role="status">
-                <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" aria-hidden="true" />
-                <span className="sr-only">Loading Fear &amp; Greed Index</span>
-              </div>
-            ) : (
-              <p className="text-3xl font-bold tabular-nums text-foreground">
-                {value !== null ? <NumberFlow value={value} /> : "-"}
-                {/* The zone name is only drawn inside the aria-hidden SVG for
-                    this variant, so repeat it for screen readers. */}
-                {!hasError && <span className="sr-only"> {label}</span>}
-              </p>
-            )}
+            <p className="text-3xl font-bold tabular-nums text-foreground">
+              {value !== null ? <NumberFlow value={value} /> : "-"}
+              {/* The zone name is only drawn inside the aria-hidden SVG for
+                  this variant, so repeat it for screen readers. */}
+              {!hasError && <span className="sr-only"> {label}</span>}
+            </p>
           </div>
         )}
       </div>
@@ -305,24 +300,15 @@ export function FearGreedGauge({ data, variant = "gradient", className }: FearGr
         )
       ) : (
         <div className="-mt-4 text-center">
-          {loading ? (
-            <div role="status">
-              <Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" aria-hidden="true" />
-              <span className="sr-only">Loading Fear &amp; Greed Index</span>
-            </div>
+          <p className="text-3xl font-bold tabular-nums text-foreground">
+            {value !== null ? <NumberFlow value={value} /> : "-"}
+          </p>
+          {hasError ? (
+            <p role="alert" className="text-xs font-medium text-muted-foreground">
+              Fear &amp; Greed data is unavailable.
+            </p>
           ) : (
-            <>
-              <p className="text-3xl font-bold tabular-nums text-foreground">
-                {value !== null ? <NumberFlow value={value} /> : "-"}
-              </p>
-              {hasError ? (
-                <p role="alert" className="text-xs font-medium text-muted-foreground">
-                  Fear &amp; Greed data is unavailable.
-                </p>
-              ) : (
-                <p className="text-xs font-medium text-muted-foreground">{label}</p>
-              )}
-            </>
+            <p className="text-xs font-medium text-muted-foreground">{label}</p>
           )}
         </div>
       )}
