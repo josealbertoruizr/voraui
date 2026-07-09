@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useTheme } from "next-themes";
-import { Loader2 } from "lucide-react";
+import { BtcRainbowChartSkeleton } from "./btc-rainbow-chart-skeleton";
 import type { IChartApi, ISeriesApi, Time, UTCTimestamp } from "lightweight-charts";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -290,15 +290,7 @@ export function BtcRainbowChart({ data, bands: bandsProp, className }: BtcRainbo
   }, [applyLatestData, hasLineData, resolvedTheme]);
 
   if (loading) {
-    return (
-      <div
-        role="status"
-        className={cn("flex h-[360px] items-center justify-center sm:h-[420px]", className)}
-      >
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" aria-hidden="true" />
-        <span className="sr-only">Loading BTC price history</span>
-      </div>
-    );
+    return <BtcRainbowChartSkeleton className={className} />;
   }
 
   if (!hasLineData) {
