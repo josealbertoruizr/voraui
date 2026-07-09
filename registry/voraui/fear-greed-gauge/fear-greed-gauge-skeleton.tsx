@@ -3,6 +3,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import {
+  DEFAULT_FEAR_GREED_BANDS,
   GAUGE_CENTER_X,
   GAUGE_CENTER_Y,
   WEDGE_GAP,
@@ -20,7 +21,7 @@ export interface FearGreedGaugeSkeletonProps {
   className?: string;
 }
 
-const WEDGE_COUNT = 5;
+const WEDGE_COUNT = DEFAULT_FEAR_GREED_BANDS.length;
 
 export function FearGreedGaugeSkeleton({ variant = "gradient", className }: FearGreedGaugeSkeletonProps) {
   const isWedges = variant === "wedges";
@@ -96,14 +97,14 @@ export function FearGreedGaugeSkeleton({ variant = "gradient", className }: Fear
             className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2"
             style={{ top: `${(GAUGE_CENTER_Y / WEDGES_VIEWBOX_HEIGHT) * 100}%` }}
           >
-            <div className="mx-auto h-8 w-14 rounded-md bg-muted" />
+            <div className="mx-auto h-9 w-14 rounded-md bg-muted" />
           </div>
         )}
       </div>
       {!isWedges && (
-        <div className="-mt-4 flex flex-col items-center gap-2 pb-[1px]">
+        <div className="-mt-4 flex flex-col items-center">
           <div className="h-9 w-16 rounded-md bg-muted" />
-          <div className="h-3 w-20 rounded-full bg-muted" />
+          <div className="h-4 w-20 rounded-full bg-muted" />
         </div>
       )}
       <span className="sr-only">Loading Fear &amp; Greed Index</span>
