@@ -68,13 +68,18 @@
       "type": "registry:block",
       "title": "BTC Rainbow Chart",
       "description": "Bitcoin rainbow log-regression chart with Binance history and a bundled 2010-2017 seed.",
-      "dependencies": ["lightweight-charts", "next-themes", "lucide-react"],
+      "dependencies": ["lightweight-charts", "next-themes"],
       "registryDependencies": ["button", "utils"],
       "files": [
         {
           "path": "registry/voraui/btc-rainbow-chart/btc-rainbow-chart.tsx",
           "type": "registry:component",
           "target": "components/voraui/btc-rainbow-chart.tsx"
+        },
+        {
+          "path": "registry/voraui/btc-rainbow-chart/btc-rainbow-chart-skeleton.tsx",
+          "type": "registry:component",
+          "target": "components/voraui/btc-rainbow-chart-skeleton.tsx"
         },
         {
           "path": "registry/voraui/btc-rainbow-chart/rainbow-bands.ts",

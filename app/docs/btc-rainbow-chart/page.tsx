@@ -7,6 +7,7 @@ import {
   BtcRainbowChart,
   BtcRainbowLegend,
 } from "@/registry/voraui/btc-rainbow-chart/btc-rainbow-chart";
+import { BtcRainbowChartSkeleton } from "@/registry/voraui/btc-rainbow-chart/btc-rainbow-chart-skeleton";
 
 export const metadata = { title: "BTC Rainbow Chart" };
 
@@ -27,6 +28,17 @@ export default function Page() {
           <BtcRainbowLegend />
         </div>
       </ComponentPreview>
+
+      <section className="space-y-3">
+        <h2 className="text-xl font-semibold">Skeleton</h2>
+        <p className="text-sm text-muted-foreground">
+          BtcRainbowChart shows this shaped skeleton automatically while its bundled fetcher loads.
+          Import BtcRainbowChartSkeleton directly for a React Suspense fallback or an SSR placeholder.
+        </p>
+        <ComponentPreview className="block min-h-0">
+          <BtcRainbowChartSkeleton />
+        </ComponentPreview>
+      </section>
 
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">Installation</h2>
