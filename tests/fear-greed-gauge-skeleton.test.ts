@@ -22,7 +22,7 @@ describe("FearGreedGaugeSkeleton", () => {
 describe("FearGreedGauge loading state", () => {
   it("renders the skeleton instead of the spinner while data is unresolved", () => {
     const html = renderToStaticMarkup(React.createElement(FearGreedGauge, {}));
-    expect(html).toContain("voraui-skeleton-shimmer");
+    expect(html).toContain("voraui-fear-greed-gauge-skeleton-shimmer");
     expect(html).not.toContain("animate-spin");
   });
 });

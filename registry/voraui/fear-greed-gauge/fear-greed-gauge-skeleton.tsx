@@ -29,22 +29,22 @@ export function FearGreedGaugeSkeleton({ variant = "gradient", className }: Fear
   return (
     <div
       role="status"
-      className={cn("voraui-skeleton-shimmer relative flex flex-col items-center overflow-hidden", className)}
+      className={cn("voraui-fear-greed-gauge-skeleton-shimmer relative flex flex-col items-center overflow-hidden", className)}
     >
       <style href="voraui-fear-greed-gauge-skeleton" precedence="low">{`
-        @keyframes voraui-skeleton-shimmer {
+        @keyframes voraui-fear-greed-gauge-skeleton-shimmer {
           from { transform: translateX(-100%); }
           to { transform: translateX(100%); }
         }
-        .voraui-skeleton-shimmer::after {
+        .voraui-fear-greed-gauge-skeleton-shimmer::after {
           content: "";
           position: absolute;
           inset: 0;
           background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
-          animation: voraui-skeleton-shimmer 1.8s ease-in-out infinite;
+          animation: voraui-fear-greed-gauge-skeleton-shimmer 1.8s ease-in-out infinite;
         }
         @media (prefers-reduced-motion: reduce) {
-          .voraui-skeleton-shimmer::after {
+          .voraui-fear-greed-gauge-skeleton-shimmer::after {
             animation: none;
           }
         }

@@ -22,7 +22,7 @@ describe("AltseasonGaugeSkeleton", () => {
 describe("AltseasonGauge loading state", () => {
   it("renders the skeleton instead of the spinner while data is unresolved", () => {
     const html = renderToStaticMarkup(React.createElement(AltseasonGauge, {}));
-    expect(html).toContain("voraui-skeleton-shimmer");
+    expect(html).toContain("voraui-altseason-gauge-skeleton-shimmer");
     expect(html).not.toContain("animate-spin");
   });
 });
