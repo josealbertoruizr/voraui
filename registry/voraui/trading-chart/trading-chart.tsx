@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { forwardRef, useImperativeHandle } from "react";
-import { Loader2 } from "lucide-react";
+import { TradingChartSkeleton } from "./trading-chart-skeleton";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import type {
@@ -857,18 +857,9 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
 
   return (
     <div className={cn("relative w-full overflow-hidden rounded-xl bg-card", className)}>
-      {/* Loading overlay */}
+      {/* Loading skeleton */}
       {loading && effectiveCandles.length === 0 && (
-        <div
-          role="status"
-          className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background/40 backdrop-blur-sm"
-        >
-          <Loader2 className="mb-2 h-8 w-8 animate-spin text-violet-600" aria-hidden="true" />
-          <p className="text-sm font-medium text-muted-foreground" aria-hidden="true">
-            Loading market data...
-          </p>
-          <span className="sr-only">Loading market data</span>
-        </div>
+        <TradingChartSkeleton height={height} className="absolute inset-0 z-50" />
       )}
 
       {/* Error state */}
