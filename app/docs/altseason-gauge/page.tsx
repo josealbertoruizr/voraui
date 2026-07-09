@@ -4,6 +4,7 @@ import { ManualInstall } from "@/components/site/manual-install";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PropsTable } from "@/components/site/props-table";
 import { AltseasonGauge } from "@/registry/voraui/altseason-gauge/altseason-gauge";
+import { AltseasonGaugeSkeleton } from "@/registry/voraui/altseason-gauge/altseason-gauge-skeleton";
 
 export const metadata = { title: "Altseason Gauge" };
 
@@ -32,6 +33,17 @@ export default function Page() {
         </p>
         <ComponentPreview>
           <AltseasonGauge variant="bars" />
+        </ComponentPreview>
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-xl font-semibold">Skeleton</h2>
+        <p className="text-sm text-muted-foreground">
+          AltseasonGauge shows this shaped skeleton automatically while its bundled fetcher loads.
+          Import AltseasonGaugeSkeleton directly for a React Suspense fallback or an SSR placeholder.
+        </p>
+        <ComponentPreview>
+          <AltseasonGaugeSkeleton />
         </ComponentPreview>
       </section>
 

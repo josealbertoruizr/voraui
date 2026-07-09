@@ -2,9 +2,9 @@
 
 import * as React from "react";
 import { motion } from "framer-motion";
-import { Loader2 } from "lucide-react";
 import NumberFlow from "@number-flow/react";
 import { cn } from "@/lib/utils";
+import { AltseasonGaugeSkeleton } from "./altseason-gauge-skeleton";
 import { useAltseason } from "./use-altseason";
 import type { AltseasonData, AltseasonWindow } from "./altseason";
 
@@ -68,18 +68,14 @@ export function AltseasonGauge({
   const resolved = data ?? fetched.data;
 
   if (!resolved) {
-    return (
-      <div className={cn("flex h-[180px] items-center justify-center", className)}>
-        {fetched.error ? (
+    if (fetched.error) {
+      return (
+        <div className={cn("flex h-[180px] items-center justify-center", className)}>
           <p role="alert" className="text-xs text-muted-foreground">Altseason data is unavailable.</p>
-        ) : (
-          <div role="status">
-            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" aria-hidden="true" />
-            <span className="sr-only">Loading Altseason Index</span>
-          </div>
-        )}
-      </div>
-    );
+        </div>
+      );
+    }
+    return <AltseasonGaugeSkeleton variant={variant} className={className} />;
   }
 
   const hasScore = resolved.score !== null;
