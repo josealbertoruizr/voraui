@@ -23,6 +23,19 @@ export default function Page() {
       </ComponentPreview>
 
       <section className="space-y-3">
+        <h2 className="text-xl font-semibold">Variants</h2>
+        <p className="text-sm text-muted-foreground">
+          variant=&quot;bars&quot; draws one bar per compared altcoin and fills the ones
+          outperforming BTC, so the strip is the computation itself. Bars are colored along the
+          classic altseason spectrum, and the unfilled remainder stays faintly visible so the
+          current position on the scale is always readable.
+        </p>
+        <ComponentPreview>
+          <AltseasonGauge variant="bars" />
+        </ComponentPreview>
+      </section>
+
+      <section className="space-y-3">
         <h2 className="text-xl font-semibold">Installation</h2>
         <Tabs defaultValue="cli">
           <TabsList>
@@ -53,6 +66,13 @@ export default function Page() {
               type: '"24h" | "7d" | "30d" | "1y"',
               defaultValue: '"7d"',
               description: "Comparison window for the bundled fetcher. Ignored when data is set.",
+            },
+            {
+              name: "variant",
+              type: '"meter" | "bars"',
+              defaultValue: '"meter"',
+              description:
+                "\"meter\" is a three-zone track with a position thumb; \"bars\" draws one bar per compared altcoin, filling the alts that outperform BTC.",
             },
             { name: "className", type: "string", description: "Extra classes for the wrapper." },
           ]}
