@@ -8,13 +8,18 @@
       "type": "registry:block",
       "title": "Fear & Greed Gauge",
       "description": "Crypto Fear & Greed index dial with live data from alternative.me.",
-      "dependencies": ["lucide-react", "@number-flow/react"],
+      "dependencies": ["@number-flow/react"],
       "registryDependencies": ["utils"],
       "files": [
         {
           "path": "registry/voraui/fear-greed-gauge/fear-greed-gauge.tsx",
           "type": "registry:component",
           "target": "components/voraui/fear-greed-gauge.tsx"
+        },
+        {
+          "path": "registry/voraui/fear-greed-gauge/fear-greed-gauge-skeleton.tsx",
+          "type": "registry:component",
+          "target": "components/voraui/fear-greed-gauge-skeleton.tsx"
         },
         {
           "path": "registry/voraui/fear-greed-gauge/use-fear-greed.ts",

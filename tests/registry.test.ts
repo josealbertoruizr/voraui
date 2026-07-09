@@ -5,13 +5,18 @@ describe("getRegistryItem", () => {
   it("returns the fear-greed-gauge item with its real files, dependencies, and registry dependencies", () => {
     const item = getRegistryItem("fear-greed-gauge");
     expect(item.title).toBe("Fear & Greed Gauge");
-    expect(item.dependencies).toEqual(["lucide-react", "@number-flow/react"]);
+    expect(item.dependencies).toEqual(["@number-flow/react"]);
     expect(item.registryDependencies).toEqual(["utils"]);
     expect(item.files).toEqual([
       {
         path: "registry/voraui/fear-greed-gauge/fear-greed-gauge.tsx",
         type: "registry:component",
         target: "components/voraui/fear-greed-gauge.tsx",
+      },
+      {
+        path: "registry/voraui/fear-greed-gauge/fear-greed-gauge-skeleton.tsx",
+        type: "registry:component",
+        target: "components/voraui/fear-greed-gauge-skeleton.tsx",
       },
       {
         path: "registry/voraui/fear-greed-gauge/use-fear-greed.ts",
