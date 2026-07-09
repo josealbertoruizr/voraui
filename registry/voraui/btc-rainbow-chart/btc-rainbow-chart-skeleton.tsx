@@ -13,6 +13,7 @@ const STRIPE_COUNT = 6;
 export function BtcRainbowChartSkeleton({ className }: BtcRainbowChartSkeletonProps) {
   return (
     <div className={cn("space-y-2", className)} role="status">
+      <span className="sr-only">Loading BTC price history</span>
       <style href="voraui-btc-rainbow-chart-skeleton" precedence="low">{`
         @keyframes voraui-skeleton-shimmer {
           from { transform: translateX(-100%); }
@@ -59,7 +60,6 @@ export function BtcRainbowChartSkeleton({ className }: BtcRainbowChartSkeletonPr
           />
         </svg>
       </div>
-      <span className="sr-only">Loading BTC price history</span>
     </div>
   );
 }
