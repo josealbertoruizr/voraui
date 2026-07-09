@@ -38,13 +38,18 @@
       "type": "registry:block",
       "title": "Altseason Gauge",
       "description": "Altcoin Season index gauge computed client-side from CoinPaprika data.",
-      "dependencies": ["framer-motion", "lucide-react", "@number-flow/react"],
+      "dependencies": ["framer-motion", "@number-flow/react"],
       "registryDependencies": ["utils"],
       "files": [
         {
           "path": "registry/voraui/altseason-gauge/altseason-gauge.tsx",
           "type": "registry:component",
           "target": "components/voraui/altseason-gauge.tsx"
+        },
+        {
+          "path": "registry/voraui/altseason-gauge/altseason-gauge-skeleton.tsx",
+          "type": "registry:component",
+          "target": "components/voraui/altseason-gauge-skeleton.tsx"
         },
         {
           "path": "registry/voraui/altseason-gauge/use-altseason.ts",
