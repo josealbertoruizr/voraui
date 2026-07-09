@@ -49,8 +49,8 @@ Each skeleton file contains a small internal shimmer treatment:
 
 ### AltseasonGaugeSkeleton
 
-- Variant-aware: `spectrum` | `bars`.
-- Muted spectrum track (or bar row), ghost marker dot, rounded bars for score and caption.
+- Variant-aware: `meter` | `bars` (matches `AltseasonGaugeProps["variant"]`).
+- Muted spectrum-style track for `meter` (or a bar row for `bars`), rounded bars for the score number and caption.
 
 ### BtcRainbowChartSkeleton
 
