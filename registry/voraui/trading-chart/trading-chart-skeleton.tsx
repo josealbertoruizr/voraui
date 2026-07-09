@@ -34,23 +34,23 @@ export function TradingChartSkeleton({ className, height = 500 }: TradingChartSk
   return (
     <div
       role="status"
-      className={cn("voraui-skeleton-shimmer relative w-full overflow-hidden rounded-xl bg-card", className)}
+      className={cn("voraui-trading-chart-skeleton-shimmer relative w-full overflow-hidden rounded-xl bg-card", className)}
       style={{ height }}
     >
       <style href="voraui-trading-chart-skeleton" precedence="low">{`
-        @keyframes voraui-skeleton-shimmer {
+        @keyframes voraui-trading-chart-skeleton-shimmer {
           from { transform: translateX(-100%); }
           to { transform: translateX(100%); }
         }
-        .voraui-skeleton-shimmer::after {
+        .voraui-trading-chart-skeleton-shimmer::after {
           content: "";
           position: absolute;
           inset: 0;
           background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
-          animation: voraui-skeleton-shimmer 1.8s ease-in-out infinite;
+          animation: voraui-trading-chart-skeleton-shimmer 1.8s ease-in-out infinite;
         }
         @media (prefers-reduced-motion: reduce) {
-          .voraui-skeleton-shimmer::after {
+          .voraui-trading-chart-skeleton-shimmer::after {
             animation: none;
           }
         }

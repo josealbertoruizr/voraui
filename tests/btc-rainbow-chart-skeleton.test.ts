@@ -21,7 +21,7 @@ describe("BtcRainbowChartSkeleton", () => {
 describe("BtcRainbowChart loading state", () => {
   it("renders the skeleton instead of the spinner while data is unresolved", () => {
     const html = renderToStaticMarkup(React.createElement(BtcRainbowChart, {}));
-    expect(html).toContain("voraui-skeleton-shimmer");
+    expect(html).toContain("voraui-btc-rainbow-chart-skeleton-shimmer");
     expect(html).not.toContain("animate-spin");
   });
 });

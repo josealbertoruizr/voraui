@@ -15,29 +15,29 @@ export function AltseasonGaugeSkeleton({ variant = "meter", className }: Altseas
   return (
     <div
       role="status"
-      className={cn("voraui-skeleton-shimmer relative flex flex-col gap-4 overflow-hidden", className)}
+      className={cn("voraui-altseason-gauge-skeleton-shimmer relative flex flex-col gap-4 overflow-hidden", className)}
     >
       <style href="voraui-altseason-gauge-skeleton" precedence="low">{`
-        @keyframes voraui-skeleton-shimmer {
+        @keyframes voraui-altseason-gauge-skeleton-shimmer {
           from { transform: translateX(-100%); }
           to { transform: translateX(100%); }
         }
-        .voraui-skeleton-shimmer::after {
+        .voraui-altseason-gauge-skeleton-shimmer::after {
           content: "";
           position: absolute;
           inset: 0;
           background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
-          animation: voraui-skeleton-shimmer 1.8s ease-in-out infinite;
+          animation: voraui-altseason-gauge-skeleton-shimmer 1.8s ease-in-out infinite;
         }
         @media (prefers-reduced-motion: reduce) {
-          .voraui-skeleton-shimmer::after {
+          .voraui-altseason-gauge-skeleton-shimmer::after {
             animation: none;
           }
         }
       `}</style>
       <div className="flex items-end gap-3">
         <div className="h-9 w-14 rounded-md bg-muted" />
-        <div className="h-4 pb-1 w-8 rounded bg-muted" />
+        <div className="h-4 w-8 rounded bg-muted" />
         <div className="ml-auto h-6 w-24 rounded-full bg-muted" />
       </div>
 
@@ -57,9 +57,9 @@ export function AltseasonGaugeSkeleton({ variant = "meter", className }: Altseas
         <div className="flex flex-col gap-3">
           <div className="h-3 w-full rounded-full bg-muted" />
           <div className="flex justify-between">
-            <div className="h-3.5 w-16 rounded bg-muted" />
-            <div className="h-3.5 w-12 rounded bg-muted" />
-            <div className="h-3.5 w-16 rounded bg-muted" />
+            <div className="h-3 w-16 rounded bg-muted" />
+            <div className="h-3 w-12 rounded bg-muted" />
+            <div className="h-3 w-16 rounded bg-muted" />
           </div>
         </div>
       )}

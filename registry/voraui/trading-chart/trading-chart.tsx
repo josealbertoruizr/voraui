@@ -858,6 +858,10 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
   return (
     <div className={cn("relative w-full overflow-hidden rounded-xl bg-card", className)}>
       {/* Loading skeleton */}
+      {/* height is passed alongside inset-0 so the skeleton is correctly sized when
+          used standalone (its primary use case, e.g. a Suspense fallback); here it
+          also happens to match the overlay's box since the wrapper's height comes
+          from the same prop. */}
       {loading && effectiveCandles.length === 0 && (
         <TradingChartSkeleton height={height} className="absolute inset-0 z-50" />
       )}

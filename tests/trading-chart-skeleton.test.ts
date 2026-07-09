@@ -35,7 +35,7 @@ describe("TradingChartSkeleton", () => {
 describe("TradingChart loading state", () => {
   it("renders the skeleton instead of the spinner while data is unresolved", () => {
     const html = renderToStaticMarkup(React.createElement(TradingChart, {}));
-    expect(html).toContain("voraui-skeleton-shimmer");
+    expect(html).toContain("voraui-trading-chart-skeleton-shimmer");
     expect(html).not.toContain("animate-spin");
   });
 });

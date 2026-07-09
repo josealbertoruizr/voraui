@@ -15,19 +15,19 @@ export function BtcRainbowChartSkeleton({ className }: BtcRainbowChartSkeletonPr
     <div className={cn("space-y-2", className)} role="status">
       <span className="sr-only">Loading BTC price history</span>
       <style href="voraui-btc-rainbow-chart-skeleton" precedence="low">{`
-        @keyframes voraui-skeleton-shimmer {
+        @keyframes voraui-btc-rainbow-chart-skeleton-shimmer {
           from { transform: translateX(-100%); }
           to { transform: translateX(100%); }
         }
-        .voraui-skeleton-shimmer::after {
+        .voraui-btc-rainbow-chart-skeleton-shimmer::after {
           content: "";
           position: absolute;
           inset: 0;
           background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
-          animation: voraui-skeleton-shimmer 1.8s ease-in-out infinite;
+          animation: voraui-btc-rainbow-chart-skeleton-shimmer 1.8s ease-in-out infinite;
         }
         @media (prefers-reduced-motion: reduce) {
-          .voraui-skeleton-shimmer::after {
+          .voraui-btc-rainbow-chart-skeleton-shimmer::after {
             animation: none;
           }
         }
@@ -37,7 +37,7 @@ export function BtcRainbowChartSkeleton({ className }: BtcRainbowChartSkeletonPr
           <div key={i} className="h-7 w-10 rounded-md bg-muted" />
         ))}
       </div>
-      <div className="voraui-skeleton-shimmer relative h-[360px] w-full overflow-hidden rounded-md bg-muted/30 sm:h-[420px]">
+      <div className="voraui-btc-rainbow-chart-skeleton-shimmer relative h-[360px] w-full overflow-hidden rounded-md bg-muted/30 sm:h-[420px]">
         {Array.from({ length: STRIPE_COUNT }, (_, i) => (
           <div
             key={i}
