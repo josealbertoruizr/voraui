@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { TechStack } from "@/components/site/tech-stack";
+import { DotPattern } from "@/components/site/dot-pattern";
 import { HeroDemo } from "@/components/site/hero-demo";
 import { ShowcaseTile } from "@/components/site/showcase-tile";
 import { BtcRainbowChart } from "@/registry/voraui/btc-rainbow-chart/btc-rainbow-chart";
@@ -9,22 +10,25 @@ import { AltseasonGauge } from "@/registry/voraui/altseason-gauge/altseason-gaug
 export default function Home() {
   return (
     <main className="mx-auto max-w-6xl px-4 py-12">
-      <section className="space-y-4 text-center">
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-          Crypto analytics components
-          <br />
-          for shadcn/ui
-        </h1>
-        <p className="mx-auto max-w-xl text-muted-foreground">
-          Open source, install-and-go market components. Real data out of the box from free public
-          APIs, full control via props in production.
-        </p>
-        <div className="flex justify-center">
-          <Button render={<a href="#showcase" />} nativeButton={false} size="lg" className="rounded-full">
-            Browse Components
-          </Button>
+      <section className="relative flex min-h-[calc(100vh-3.5rem)] flex-col items-center justify-center">
+        <DotPattern className="absolute inset-y-0 left-1/2 -z-10 w-screen -translate-x-1/2" />
+        <div className="space-y-4 text-center">
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+            Crypto analytics components
+            <br />
+            for shadcn/ui
+          </h1>
+          <p className="mx-auto max-w-xl text-muted-foreground">
+            Open source, install-and-go market components. Real data out of the box from free public
+            APIs, full control via props in production.
+          </p>
+          <div className="flex justify-center">
+            <Button render={<a href="#showcase" />} nativeButton={false} size="lg" className="rounded-full">
+              Browse Components
+            </Button>
+          </div>
+          <TechStack />
         </div>
-        <TechStack />
       </section>
 
       <section id="showcase" className="mt-20 scroll-mt-20">
