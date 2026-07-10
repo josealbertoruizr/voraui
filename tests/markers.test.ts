@@ -66,6 +66,17 @@ describe("alignSignalsToBars", () => {
     expect(alignSignalsToBars([], [candle(1)], "1h")).toEqual([]);
     expect(alignSignalsToBars([signal({})], [], "1h")).toEqual([]);
   });
+
+  it("drops signals whose bar isn't loaded instead of piling them onto the edge bar", () => {
+    const candles = [candle(360_000), candle(363_600)];
+    const signals = [
+      signal({ id: "ancient", ts: 1_000_000 }), // 1000s, ~100 intervals before the oldest bar
+      signal({ id: "in-range", ts: 363_600_000 }),
+    ];
+    const aligned = alignSignalsToBars(signals, candles, "1h");
+    expect(aligned).toHaveLength(1);
+    expect(aligned[0].id).toBe("in-range");
+  });
 });
 
 describe("buildSeriesMarkers", () => {

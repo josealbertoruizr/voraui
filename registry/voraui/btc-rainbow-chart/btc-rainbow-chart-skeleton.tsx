@@ -2,15 +2,71 @@
 
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import { DEFAULT_RAINBOW_BANDS } from "./rainbow-bands";
 
 export interface BtcRainbowChartSkeletonProps {
   className?: string;
 }
 
 const PRESET_COUNT = 4;
-const STRIPE_COUNT = 6;
+const VIEW_WIDTH = 400;
+const VIEW_HEIGHT = 200;
+const CURVE_STEPS = 24;
+const PRICE_LINE_POINTS = 70;
+
+// y at x=0 (compressed near the bottom - early history) and at x=VIEW_WIDTH
+// (spread across the full height - present day), one pair per band ceiling,
+// top (b1, most expensive) to bottom (b9, cheapest). Mirrors the live chart's
+// log-regression shape: steep early growth that flattens as log10(days) grows
+// more slowly, so the bands fan out left-to-right instead of running parallel.
+const BOUNDARY_Y0 = [150, 154, 158, 162, 166, 170, 174, 178, 182];
+const BOUNDARY_Y1 = [14, 36, 58, 80, 102, 124, 146, 168, 190];
+
+function boundaryPoints(index: number): [number, number][] {
+  const points: [number, number][] = [];
+  for (let s = 0; s <= CURVE_STEPS; s++) {
+    const t = s / CURVE_STEPS;
+    const x = t * VIEW_WIDTH;
+    const curve = Math.log10(1 + 9 * t); // 0 at t=0, 1 at t=1
+    const y = BOUNDARY_Y0[index] + (BOUNDARY_Y1[index] - BOUNDARY_Y0[index]) * curve;
+    points.push([x, y]);
+  }
+  return points;
+}
+
+function pointsAttr(points: [number, number][]): string {
+  return points.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
+}
+
+/** Deterministic wavy placeholder "price" line threading through the bands.
+ *  Math.sin here (not Math.random) so server and client renders match exactly -
+ *  a hydration mismatch would otherwise flash a different line on mount. */
+function pricePoints(): [number, number][] {
+  const points: [number, number][] = [];
+  for (let i = 0; i < PRICE_LINE_POINTS; i++) {
+    const t = i / (PRICE_LINE_POINTS - 1);
+    const x = t * VIEW_WIDTH;
+    const curve = Math.log10(1 + 9 * t);
+    // Trend drifts from the b7 boundary up toward the b4 boundary, the same
+    // general path BTC's real price takes through the bands over time.
+    const trend = BOUNDARY_Y0[6] + (BOUNDARY_Y1[3] - BOUNDARY_Y0[6]) * curve;
+    const noise = Math.sin(i * 1.3) * 5 + Math.sin(i * 0.47) * 9 + Math.sin(i * 2.9) * 2.2;
+    points.push([x, trend + noise]);
+  }
+  return points;
+}
 
 export function BtcRainbowChartSkeleton({ className }: BtcRainbowChartSkeletonProps) {
+  const bandFills = React.useMemo(() => {
+    const boundaries = DEFAULT_RAINBOW_BANDS.map((_, i) => boundaryPoints(i));
+    return DEFAULT_RAINBOW_BANDS.slice(0, -1).map((_, i) => ({
+      color: DEFAULT_RAINBOW_BANDS[i + 1].color,
+      points: pointsAttr(boundaries[i].concat([...boundaries[i + 1]].reverse())),
+    }));
+  }, []);
+
+  const pricePath = React.useMemo(() => pointsAttr(pricePoints()), []);
+
   return (
     <div className={cn("space-y-2", className)} role="status">
       <span className="sr-only">Loading BTC price history</span>
@@ -38,25 +94,23 @@ export function BtcRainbowChartSkeleton({ className }: BtcRainbowChartSkeletonPr
         ))}
       </div>
       <div className="voraui-btc-rainbow-chart-skeleton-shimmer relative h-[360px] w-full overflow-hidden rounded-md bg-muted/30 sm:h-[420px]">
-        {Array.from({ length: STRIPE_COUNT }, (_, i) => (
-          <div
-            key={i}
-            className="absolute inset-x-0 bg-muted-foreground/10"
-            style={{ top: `${(i / STRIPE_COUNT) * 100}%`, height: `${100 / STRIPE_COUNT}%` }}
-          />
-        ))}
         <svg
-          viewBox="0 0 400 200"
+          viewBox={`0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`}
           preserveAspectRatio="none"
           className="absolute inset-0 h-full w-full"
           aria-hidden="true"
         >
+          {bandFills.map((band, i) => (
+            <polygon key={i} points={band.points} fill={band.color} opacity={0.22} />
+          ))}
           <polyline
-            points="0,170 40,150 80,158 120,120 160,132 200,90 240,100 280,60 320,72 360,40 400,50"
+            points={pricePath}
             fill="none"
             stroke="currentColor"
             strokeWidth={2}
-            className="text-muted-foreground/30"
+            strokeLinejoin="round"
+            strokeLinecap="round"
+            className="text-muted-foreground/55"
           />
         </svg>
       </div>

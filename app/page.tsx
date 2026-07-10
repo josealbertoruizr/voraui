@@ -23,7 +23,7 @@ export default function Home() {
             APIs, full control via props in production.
           </p>
           <div className="flex justify-center">
-            <Button render={<a href="#showcase" />} nativeButton={false} size="lg" className="rounded-full">
+            <Button render={<a href="#showcase" />} nativeButton={false} size="lg" className="rounded-xl">
               Browse Components
             </Button>
           </div>
@@ -41,7 +41,7 @@ export default function Home() {
           <ShowcaseTile
             href="/docs/trading-chart"
             title="Trading Chart"
-            description="Candlesticks, trade markers with clustering, live Binance updates, and a highlight API."
+            description="Candlesticks, trade markers with clustering, live updates, and a highlight API."
           >
             <HeroDemo height={380} />
           </ShowcaseTile>
@@ -51,7 +51,7 @@ export default function Home() {
               className="sm:col-span-2"
               href="/docs/btc-rainbow-chart"
               title="BTC Rainbow Chart"
-              description="The classic log-regression rainbow with full history back to 2010."
+              description="The classic log-regression rainbow with full history back to 2010. Nine color bands mark valuation zones on a log scale, with range presets and a band-aware tooltip."
             >
               <BtcRainbowChart />
             </ShowcaseTile>
@@ -67,7 +67,7 @@ export default function Home() {
               <ShowcaseTile
                 href="/docs/altseason-gauge"
                 title="Altseason Gauge"
-                description="Altcoin Season index computed client-side from CoinPaprika data."
+                description="Altcoin Season index computed client-side from CoinPaprika data. Tracks how many of the top 50 alts are outperforming BTC over a rolling window."
               >
                 <AltseasonGauge />
               </ShowcaseTile>

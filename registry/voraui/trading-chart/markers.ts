@@ -60,6 +60,19 @@ export function findClosestBarTime(target: number, orderedTimes: number[]): numb
   return closest;
 }
 
+/** Approximate seconds per interval, for the out-of-range tolerance below. */
+const INTERVAL_SECONDS: Record<string, number> = {
+  "1m": 60,
+  "5m": 300,
+  "15m": 900,
+  "1h": 3_600,
+  "4h": 14_400,
+  "8h": 28_800,
+  "1d": 86_400,
+  "1w": 604_800,
+  "1M": 2_678_400,
+};
+
 export function alignSignalsToBars(
   signals: TradeSignal[],
   candles: OhlcvCandle[],
@@ -69,15 +82,23 @@ export function alignSignalsToBars(
 
   const barTimes = candles.map((c) => c.time);
   const barSet = new Set(barTimes);
+  // Snapping to the closest bar papers over a single missing candle, but a
+  // signal whose bar isn't loaded at all (e.g. it predates the fetched
+  // history) would pile up on the edge bar instead. Drop those; they come
+  // back once their bar loads.
+  const tolerance = (INTERVAL_SECONDS[interval] ?? 3_600) * 2;
 
-  return signals.map((signal) => {
+  return signals.flatMap((signal) => {
     const snapped = floorToIntervalSeconds(signal.ts, interval);
     const aligned = barSet.has(snapped) ? snapped : findClosestBarTime(snapped, barTimes);
+    if (Math.abs(aligned - snapped) > tolerance) return [];
 
-    return {
-      ...signal,
-      alignedTime: aligned as UTCTimestamp,
-    };
+    return [
+      {
+        ...signal,
+        alignedTime: aligned as UTCTimestamp,
+      },
+    ];
   });
 }
 
