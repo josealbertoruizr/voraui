@@ -187,9 +187,19 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
   const updateTooltipContent = (el: HTMLDivElement, list: AlignedSignal[], pt: { x: number; y: number }) => {
     const signal = list[0];
     const count = list.length;
+    const wasHidden = el.style.display !== "block";
     el.style.left = `${pt.x}px`;
     el.style.top = `${pt.y}px`;
     el.style.display = "block";
+
+    // Play the entrance only on the hidden -> shown transition, not on every
+    // crosshair move while the tooltip is already up (that would flicker).
+    if (wasHidden && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      // Restart the animation in case a previous run left the same value.
+      el.style.animation = "none";
+      void el.offsetWidth;
+      el.style.animation = "vorauiTooltipIn 0.16s ease-out";
+    }
 
     const indicatorSignals = list.filter((s) => s.category === "indicator");
     const tradeSignals = list.filter((s) => s.category !== "indicator");
@@ -395,6 +405,10 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
             0%, 100% { transform: translate(-50%,-50%) scale(1);   opacity: 1; }
             50%       { transform: translate(-50%,-50%) scale(1.3); opacity: 0.65; }
           }
+          @keyframes vorauiTooltipIn {
+            from { opacity: 0; transform: translate(-50%, -104%) scale(0.96); }
+            to   { opacity: 1; transform: translate(-50%, -110%) scale(1); }
+          }
         `;
         document.head.appendChild(style);
       }
@@ -537,6 +551,13 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
       chart.timeScale().subscribeVisibleLogicalRangeChange(async (range: any) => {
         if (!range || isLoadingMoreRef.current || !oldestTimestampRef.current || !hasMoreHistoryRef.current)
           return;
+
+        // A range that spans the whole dataset is the initial fitContent (or
+        // a full zoom-out), not a scroll toward history: its from is 0, which
+        // would auto-fetch on load and balloon the caller's `limit` into
+        // thousands of bars. Only paginate when some bars sit off-screen to
+        // the right, i.e. the user actually moved toward the left edge.
+        if (range.to >= candlesRef.current.length - 2) return;
 
         if (range.from < 50) {
           isLoadingMoreRef.current = true;

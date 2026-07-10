@@ -12,21 +12,29 @@ export function TradingChartDemo() {
     // eslint-disable-next-line react-hooks/purity -- Date.now() is needed to create timestamps relative to now
     const now = Date.now();
     const h = 3_600_000;
+    // Spread across ~1 week (168h) of 1h history, with a 3-buy cluster (3B)
+    // and a couple of noted trades so the tooltip variety shows too.
     return [
-      { id: "b1", ts: now - 90 * h, side: "BUY", price: 1000 },
-      { id: "b2", ts: now - 90 * h, side: "BUY", price: 700 },
-      { id: "b3", ts: now - 90 * h, side: "BUY", price: 300 },
-      { id: "s1", ts: now - 45 * h, side: "SELL", price: 2200 },
-      { id: "b4", ts: now - 20 * h, side: "BUY", price: 900 },
+      { id: "h1", ts: now - 160 * h, side: "BUY", price: 400, note: "First entry" },
+      { id: "h2", ts: now - 140 * h, side: "SELL", price: 900 },
+      { id: "h3", ts: now - 120 * h, side: "BUY", price: 800 },
+      { id: "h4", ts: now - 100 * h, side: "SELL", price: 1500 },
+      { id: "b1", ts: now - 80 * h, side: "BUY", price: 1200 },
+      { id: "b2", ts: now - 80 * h, side: "BUY", price: 800 },
+      { id: "b3", ts: now - 80 * h, side: "BUY", price: 500 },
+      { id: "s1", ts: now - 55 * h, side: "SELL", price: 1500, note: "Trim" },
+      { id: "b4", ts: now - 35 * h, side: "BUY", price: 1200, note: "Dip buy" },
+      { id: "s2", ts: now - 15 * h, side: "SELL", price: 2600, note: "Take profit" },
+      { id: "b5", ts: now - 5 * h, side: "BUY", price: 1500 },
     ];
   }, []);
 
-  const lastBuy = trades[4];
-  const sell = trades[3];
+  const lastBuy = trades.find((t) => t.id === "b5")!;
+  const sell = trades.find((t) => t.id === "s2")!;
 
   return (
     <div className="space-y-3">
-      <TradingChart ref={ref} symbol="BTCUSDT" timeframe="1h" trades={trades} height={440} />
+      <TradingChart ref={ref} symbol="BTCUSDT" timeframe="1h" trades={trades} height={440} limit={168} />
       <div className="flex flex-wrap gap-2">
         <Button
           size="sm"
