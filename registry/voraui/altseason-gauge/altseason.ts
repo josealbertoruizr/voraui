@@ -1,4 +1,4 @@
-export type AltseasonWindow = "24h" | "7d" | "30d" | "1y";
+export type AltseasonWindow = "24h" | "7d";
 
 export type AltseasonLabel = "Altcoin Season" | "Bitcoin Season" | "Mixed" | "Unknown";
 
@@ -25,8 +25,6 @@ export interface AltseasonData {
 export const WINDOW_KEYS: Record<AltseasonWindow, string> = {
   "24h": "percent_change_24h",
   "7d": "percent_change_7d",
-  "30d": "percent_change_30d",
-  "1y": "percent_change_1y",
 };
 
 /**
