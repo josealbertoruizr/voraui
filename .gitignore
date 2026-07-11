@@ -41,3 +41,6 @@ public/r/
 
 .superpowers/
 .worktrees/
+docs/superpowers/
+.claude/
+.playwright-mcp/

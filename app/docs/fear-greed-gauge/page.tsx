@@ -19,34 +19,52 @@ export default function Page() {
         </p>
       </div>
 
-      <ComponentPreview>
-        <FearGreedGauge />
-      </ComponentPreview>
-
-      <section className="space-y-3">
+      <section className="space-y-6">
         <h2 className="text-xl font-semibold">Variants</h2>
-        <p className="text-sm text-muted-foreground">
-          The default gradient variant shown above is a smooth continuous color blend with just
-          the dial, needle, and number. Pass variant=&quot;minimal&quot; for the same layout with
-          5 discrete color bands instead.
-        </p>
-        <ComponentPreview>
-          <FearGreedGauge variant="minimal" />
-        </ComponentPreview>
-        <p className="text-sm text-muted-foreground">
-          variant=&quot;ticks&quot; swaps the solid arc for 100 individual gradient tick marks
-          (one per index value) plus numeric labels, speedometer-style.
-        </p>
-        <ComponentPreview>
-          <FearGreedGauge variant="ticks" />
-        </ComponentPreview>
-        <p className="text-sm text-muted-foreground">
-          variant=&quot;wedges&quot; shows equal-width pie-slice zone sectors with numeric dial
-          ticks; the zone matching the current value is highlighted, the rest stay neutral gray.
-        </p>
-        <ComponentPreview>
-          <FearGreedGauge variant="wedges" />
-        </ComponentPreview>
+
+        <div className="space-y-3">
+          <h3 className="text-base font-semibold">Gradient</h3>
+          <p className="text-sm text-muted-foreground">
+            The default variant: a smooth continuous color blend with just the dial, needle, and
+            number.
+          </p>
+          <ComponentPreview>
+            <FearGreedGauge />
+          </ComponentPreview>
+        </div>
+
+        <div className="space-y-3">
+          <h3 className="text-base font-semibold">Minimal</h3>
+          <p className="text-sm text-muted-foreground">
+            variant=&quot;minimal&quot; shows the same layout with 5 discrete color bands instead
+            of a continuous gradient.
+          </p>
+          <ComponentPreview>
+            <FearGreedGauge variant="minimal" />
+          </ComponentPreview>
+        </div>
+
+        <div className="space-y-3">
+          <h3 className="text-base font-semibold">Ticks</h3>
+          <p className="text-sm text-muted-foreground">
+            variant=&quot;ticks&quot; swaps the solid arc for 100 individual gradient tick marks
+            (one per index value) plus numeric labels, speedometer-style.
+          </p>
+          <ComponentPreview>
+            <FearGreedGauge variant="ticks" />
+          </ComponentPreview>
+        </div>
+
+        <div className="space-y-3">
+          <h3 className="text-base font-semibold">Wedges</h3>
+          <p className="text-sm text-muted-foreground">
+            variant=&quot;wedges&quot; shows equal-width pie-slice zone sectors with numeric dial
+            ticks; the zone matching the current value is highlighted, the rest stay neutral gray.
+          </p>
+          <ComponentPreview>
+            <FearGreedGauge variant="wedges" />
+          </ComponentPreview>
+        </div>
       </section>
 
       <section className="space-y-3">
@@ -92,6 +110,12 @@ export default function Page() {
               defaultValue: '"gradient"',
               description:
                 "\"gradient\" is a smooth continuous color blend with just the dial, needle, and number; \"minimal\" shows the same layout with 5 discrete color bands instead; \"ticks\" swaps the solid arc for 100 individual gradient tick marks; \"wedges\" shows pie-slice zone sectors with the current zone highlighted.",
+            },
+            {
+              name: "animateOnLoad",
+              type: "boolean",
+              defaultValue: "true",
+              description: "Spring the needle in from neutral (12 o'clock) on first render instead of snapping straight to its value.",
             },
             { name: "className", type: "string", description: "Extra classes for the wrapper." },
           ]}
