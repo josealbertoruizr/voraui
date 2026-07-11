@@ -1,8 +1,28 @@
-import { getRegistryItem, readRegistryFile } from "@/lib/registry";
+import { Download, ChevronRight } from "lucide-react";
+import { getRegistryItem, readRegistryFile, type RegistryItem } from "@/lib/registry";
 import { CodeBlock } from "@/components/site/code-block";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 function langForFile(filePath: string): string {
   return filePath.endsWith(".tsx") ? "tsx" : "ts";
+}
+
+function FolderTree({ item }: { item: RegistryItem }) {
+  const files = item.files.map((f) => f.target.split("/").pop()!);
+  const lines = [
+    "components/",
+    "└── voraui/",
+    `    └── ${item.name}/`,
+    ...files.map(
+      (file, i) => `        ${i === files.length - 1 ? "└──" : "├──"} ${file}`,
+    ),
+  ];
+  return (
+    <pre className="overflow-x-auto rounded-lg border border-border bg-muted/40 px-4 py-3 font-mono text-xs leading-relaxed text-muted-foreground">
+      {lines.join("\n")}
+    </pre>
+  );
 }
 
 export async function ManualInstall({ name }: { name: string }) {
@@ -33,8 +53,44 @@ export async function ManualInstall({ name }: { name: string }) {
       </div>
 
       <div className="space-y-2">
-        <p className="font-medium">2. Copy the following files into your project:</p>
-        <div className="space-y-4">
+        <p className="font-medium">2. Download the component:</p>
+        <a
+          href={`/d/${name}.zip`}
+          download
+          className={cn(buttonVariants({ variant: "outline", size: "sm" }), "gap-2")}
+        >
+          <Download className="h-3.5 w-3.5" aria-hidden />
+          Download {name}.zip
+        </a>
+      </div>
+
+      <div className="space-y-2">
+        <p className="font-medium">
+          3. Extract it, then copy{" "}
+          <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">
+            components/voraui/{name}/
+          </code>{" "}
+          into your project:
+        </p>
+        <FolderTree item={item} />
+      </div>
+
+      <div className="space-y-2">
+        <p className="font-medium">4. Update the import paths:</p>
+        <p className="text-sm text-muted-foreground">
+          The files import from{" "}
+          <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">@/lib/utils</code> and{" "}
+          <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">@/components/ui/*</code>. Adjust
+          those to match your own project&apos;s path aliases if they differ.
+        </p>
+      </div>
+
+      <details className="group">
+        <summary className="flex cursor-pointer list-none items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground [&::-webkit-details-marker]:hidden">
+          <ChevronRight className="h-3.5 w-3.5 transition-transform group-open:rotate-90" aria-hidden />
+          View source ({item.files.length} files)
+        </summary>
+        <div className="mt-4 space-y-4">
           {item.files.map((file) => (
             <CodeBlock
               key={file.path}
@@ -44,17 +100,7 @@ export async function ManualInstall({ name }: { name: string }) {
             />
           ))}
         </div>
-      </div>
-
-      <div className="space-y-2">
-        <p className="font-medium">3. Update the import paths:</p>
-        <p className="text-sm text-muted-foreground">
-          The files above import from{" "}
-          <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">@/lib/utils</code> and{" "}
-          <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">@/components/ui/*</code>. Adjust
-          those to match your own project&apos;s path aliases if they differ.
-        </p>
-      </div>
+      </details>
     </div>
   );
 }
