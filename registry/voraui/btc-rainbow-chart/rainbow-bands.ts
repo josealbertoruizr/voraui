@@ -204,11 +204,6 @@ export class RainbowBandsPrimitive implements ISeriesPrimitive<Time> {
     this.paneView = new RainbowBandsPaneView(this);
   }
 
-  setBands(bands: RainbowBand[]): void {
-    this.bands = bands;
-    this.requestUpdate();
-  }
-
   requestUpdate(): void {
     this.requestChartUpdate?.();
   }

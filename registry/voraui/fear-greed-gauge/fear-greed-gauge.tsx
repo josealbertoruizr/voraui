@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { animate, useMotionValue } from "framer-motion";
 import NumberFlow from "@number-flow/react";
 import { cn } from "@/lib/utils";
 import { FearGreedGaugeSkeleton } from "./fear-greed-gauge-skeleton";
@@ -29,13 +30,15 @@ export interface FearGreedGaugeProps {
   data?: FearGreedData;
   /** "gradient" (default) is a smooth continuous color blend with just the dial, needle, and number; "minimal" shows the same layout with 5 discrete color bands instead; "ticks" swaps the solid arc for 100 individual gradient tick marks; "wedges" shows equal-width pie-slice zone sectors (CNN-style, with the dial remapped to match) and the current zone highlighted. */
   variant?: "minimal" | "ticks" | "gradient" | "wedges";
+  /** Spring the needle in from neutral (12 o'clock) on first render instead of snapping straight to its value. */
+  animateOnLoad?: boolean;
   className?: string;
 }
 
 // "ticks" variant: 100 individual gradient tick marks (one per index value)
-// instead of a solid colored arc, plus the same 0/20/40/50/60/80/100 numeric
+// instead of a solid colored arc, plus quarter (0/25/50/75/100) numeric
 // labels as reference speedometer-style gauges.
-const TICKS_MAJOR_VALUES = [0, 20, 40, 50, 60, 80, 100];
+const TICKS_MAJOR_VALUES = [0, 25, 50, 75, 100];
 const TICKS_FINE_VALUES = Array.from({ length: 100 }, (_, i) => i + 1);
 
 // "wedges" variant: pie-slice zone sectors instead of a thin arc, with the
@@ -62,7 +65,12 @@ function labelAnchor(value: number): "start" | "middle" | "end" {
   return "middle";
 }
 
-export function FearGreedGauge({ data, variant = "gradient", className }: FearGreedGaugeProps) {
+export function FearGreedGauge({
+  data,
+  variant = "gradient",
+  animateOnLoad = true,
+  className,
+}: FearGreedGaugeProps) {
   const gradientId = React.useId();
   const fetched = useFearGreed({ enabled: data === undefined });
   const resolved = data ?? fetched.data;
@@ -76,6 +84,34 @@ export function FearGreedGauge({ data, variant = "gradient", className }: FearGr
   const dialValue = value !== null && variant === "wedges" ? equalizedValue(value) : value;
   const needleRotation = dialValue !== null ? 90 - angleForValue(dialValue) : 0;
   const activeBand = variant === "wedges" && value !== null ? findFearGreedBand(value) : null;
+
+  // Animate the needle by driving the raw SVG `transform="rotate(...)"`
+  // attribute imperatively from a motion value, instead of going through
+  // motion.g's own transform system - framer always intercepts a "transform"
+  // prop into its CSS pipeline (and resets transform-origin to "50% 50%"
+  // there), which silently drops a 3-argument SVG rotate() string and would
+  // in any case pivot around the wrong point for this off-center needle
+  // shape. Only the very first real value (loading -> loaded) is gated by
+  // `animateOnLoad`; later value changes always spring smoothly.
+  const needleGroupRef = React.useRef<SVGGElement | null>(null);
+  const needleMV = useMotionValue(needleRotation);
+  React.useEffect(() => {
+    return needleMV.on("change", (r) => {
+      needleGroupRef.current?.setAttribute("transform", `rotate(${r} ${GAUGE_CENTER_X} ${GAUGE_CENTER_Y})`);
+    });
+  }, [needleMV]);
+  const hasLoadedOnceRef = React.useRef(false);
+  React.useEffect(() => {
+    const justLoaded = value !== null && !hasLoadedOnceRef.current;
+    if (value !== null) hasLoadedOnceRef.current = true;
+
+    if (justLoaded && !animateOnLoad) {
+      needleMV.set(needleRotation);
+      return;
+    }
+    const controls = animate(needleMV, needleRotation, { type: "spring", stiffness: 100 });
+    return controls.stop;
+  }, [needleRotation, value, animateOnLoad, needleMV]);
 
   if (loading) {
     return <FearGreedGaugeSkeleton variant={variant} className={className} />;
@@ -246,7 +282,7 @@ export function FearGreedGauge({ data, variant = "gradient", className }: FearGr
           )}
 
           {value !== null && (
-            <g transform={`rotate(${needleRotation} ${GAUGE_CENTER_X} ${GAUGE_CENTER_Y})`}>
+            <g ref={needleGroupRef} transform={`rotate(${needleMV.get()} ${GAUGE_CENTER_X} ${GAUGE_CENTER_Y})`}>
               {variant === "wedges" ? (
                 <polygon
                   points={`${GAUGE_CENTER_X - 4},${GAUGE_CENTER_Y - 58} ${GAUGE_CENTER_X},${GAUGE_CENTER_Y - 66} ${GAUGE_CENTER_X + 4},${GAUGE_CENTER_Y - 58} ${GAUGE_CENTER_X + 4},${GAUGE_CENTER_Y + 20} ${GAUGE_CENTER_X - 4},${GAUGE_CENTER_Y + 20}`}

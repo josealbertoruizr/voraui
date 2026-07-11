@@ -87,6 +87,11 @@
           "target": "components/voraui/rainbow-bands.ts"
         },
         {
+          "path": "registry/voraui/btc-rainbow-chart/rainbow-tooltip.ts",
+          "type": "registry:lib",
+          "target": "components/voraui/rainbow-tooltip.ts"
+        },
+        {
           "path": "registry/voraui/btc-rainbow-chart/use-btc-history.ts",
           "type": "registry:hook",
           "target": "components/voraui/use-btc-history.ts"

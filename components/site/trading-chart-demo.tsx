@@ -23,5 +23,13 @@ const trades: TradeSignal[] = [
 ];
 
 export function TradingChartDemo() {
-  return <TradingChart symbol="BTCUSDT" timeframe="1h" trades={trades} height={440} limit={168} />;
+  return (
+    <TradingChart
+      symbol="BTCUSDT"
+      timeframe="1h"
+      trades={trades}
+      height={440}
+      limit={168}
+    />
+  );
 }
