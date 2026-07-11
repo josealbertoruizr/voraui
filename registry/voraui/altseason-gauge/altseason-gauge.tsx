@@ -15,6 +15,8 @@ export interface AltseasonGaugeProps {
   window?: AltseasonWindow;
   /** "meter" (default) is a three-zone track with a position thumb; "bars" draws one bar per compared altcoin, filling the alts that outperform BTC. */
   variant?: "meter" | "bars";
+  /** Spring the meter's thumb in from the center on first render instead of snapping straight to its score position. */
+  animateOnLoad?: boolean;
   className?: string;
 }
 
@@ -62,6 +64,7 @@ export function AltseasonGauge({
   data,
   window: windowProp = "7d",
   variant = "meter",
+  animateOnLoad = true,
   className,
 }: AltseasonGaugeProps) {
   const fetched = useAltseason(windowProp, { enabled: data === undefined });
@@ -153,7 +156,7 @@ export function AltseasonGauge({
             />
             <motion.div
               className="pointer-events-none absolute top-1/2 -translate-x-1/2 -translate-y-1/2"
-              initial={{ left: "50%" }}
+              initial={animateOnLoad ? { left: "50%" } : false}
               animate={{ left: `${markerLeft}%` }}
               transition={{ type: "spring", stiffness: 100 }}
               aria-hidden

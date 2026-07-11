@@ -1,12 +1,10 @@
 import { ComponentPreview } from "@/components/site/component-preview";
+import { DemoPreview } from "@/components/site/demo-preview";
 import { InstallTabs } from "@/components/site/install-tabs";
 import { ManualInstall } from "@/components/site/manual-install";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PropsTable } from "@/components/site/props-table";
-import {
-  BtcRainbowChart,
-  BtcRainbowLegend,
-} from "@/registry/voraui/btc-rainbow-chart/btc-rainbow-chart";
+import { BtcRainbowChartDemo } from "@/components/site/btc-rainbow-chart-demo";
 import { BtcRainbowChartSkeleton } from "@/registry/voraui/btc-rainbow-chart/btc-rainbow-chart-skeleton";
 
 export const metadata = { title: "BTC Rainbow Chart" };
@@ -22,12 +20,9 @@ export default function Page() {
         </p>
       </div>
 
-      <ComponentPreview className="block min-h-0">
-        <div className="w-full max-w-none space-y-4">
-          <BtcRainbowChart />
-          <BtcRainbowLegend />
-        </div>
-      </ComponentPreview>
+      <DemoPreview source="components/site/btc-rainbow-chart-demo.tsx">
+        <BtcRainbowChartDemo />
+      </DemoPreview>
 
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">Skeleton</h2>
@@ -65,12 +60,6 @@ export default function Page() {
               type: "RainbowPoint[]",
               description:
                 "Your own daily series ({ time: unix seconds, price }). When set, the bundled fetcher is skipped.",
-            },
-            {
-              name: "bands",
-              type: "RainbowBand[]",
-              defaultValue: "DEFAULT_RAINBOW_BANDS",
-              description: "Override band labels and colors. Offsets drive the band math.",
             },
             { name: "className", type: "string", description: "Extra classes for the wrapper." },
           ]}

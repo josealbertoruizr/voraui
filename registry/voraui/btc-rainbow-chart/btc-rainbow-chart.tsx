@@ -6,19 +6,13 @@ import { BtcRainbowChartSkeleton } from "./btc-rainbow-chart-skeleton";
 import type { IChartApi, ISeriesApi, Time, UTCTimestamp } from "lightweight-charts";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import {
-  RainbowBandsPrimitive,
-  DEFAULT_RAINBOW_BANDS,
-  findActiveBand,
-  type RainbowBand,
-} from "./rainbow-bands";
+import { RainbowBandsPrimitive, DEFAULT_RAINBOW_BANDS } from "./rainbow-bands";
+import { createRainbowTooltip, type RainbowTooltip } from "./rainbow-tooltip";
 import { useBtcHistory, type RainbowPoint } from "./use-btc-history";
 
 export interface BtcRainbowChartProps {
   /** Provide your own daily BTC series to bypass the bundled fetcher. */
   data?: RainbowPoint[];
-  /** Override band labels/colors. Offsets should match the regression model. */
-  bands?: RainbowBand[];
   className?: string;
 }
 
@@ -26,20 +20,7 @@ type Preset = "1Y" | "5Y" | "10Y" | "ALL";
 const PRESETS: Preset[] = ["1Y", "5Y", "10Y", "ALL"];
 type ChartPoint = { time: UTCTimestamp; value: number };
 
-function escapeHtml(value: string): string {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
-
-function compactUsd(n: number): string {
-  if (!Number.isFinite(n) || n === 0) return "-";
-  if (n >= 1e9) return `$${(n / 1e9).toFixed(2)}B`;
-  if (n >= 1e6) return `$${(n / 1e6).toFixed(2)}M`;
-  if (n >= 1e3) return `$${(n / 1e3).toFixed(2)}K`;
-  if (n >= 1) return `$${n.toFixed(2)}`;
-  return `$${n.toFixed(4)}`;
-}
-
-export function BtcRainbowChart({ data, bands: bandsProp, className }: BtcRainbowChartProps) {
+export function BtcRainbowChart({ data, className }: BtcRainbowChartProps) {
   const { resolvedTheme } = useTheme();
   const fetched = useBtcHistory({ enabled: data === undefined });
   const series = data ?? fetched.data;
@@ -47,18 +28,12 @@ export function BtcRainbowChart({ data, bands: bandsProp, className }: BtcRainbo
   const error = data === undefined ? fetched.error : null;
 
   const containerRef = React.useRef<HTMLDivElement | null>(null);
-  const tooltipRef = React.useRef<HTMLDivElement | null>(null);
+  const tooltipRef = React.useRef<RainbowTooltip | null>(null);
   const chartRef = React.useRef<IChartApi | null>(null);
   const seriesRef = React.useRef<ISeriesApi<"Line", Time> | null>(null);
-  const bandsRef = React.useRef<RainbowBand[]>(DEFAULT_RAINBOW_BANDS);
   const primitiveRef = React.useRef<RainbowBandsPrimitive | null>(null);
 
   const [preset, setPreset] = React.useState<Preset>("ALL");
-
-  const bands = React.useMemo<RainbowBand[]>(
-    () => bandsProp ?? DEFAULT_RAINBOW_BANDS,
-    [bandsProp],
-  );
 
   const lineData = React.useMemo<ChartPoint[]>(() => {
     return (series ?? [])
@@ -101,13 +76,6 @@ export function BtcRainbowChart({ data, bands: bandsProp, className }: BtcRainbo
     applyVisibleRange();
     primitiveRef.current?.requestUpdate();
   }, [applyVisibleRange]);
-
-  // Keep bands accessible to the tooltip callback even though it captures
-  // its closure at mount time.
-  React.useEffect(() => {
-    bandsRef.current = bands;
-    primitiveRef.current?.setBands(bands);
-  }, [bands]);
 
   React.useEffect(() => {
     lineDataRef.current = lineData;
@@ -187,7 +155,7 @@ export function BtcRainbowChart({ data, bands: bandsProp, className }: BtcRainbo
         crosshairMarkerRadius: 4,
       });
 
-      const primitive = new RainbowBandsPrimitive(bandsRef.current, 0.45);
+      const primitive = new RainbowBandsPrimitive(DEFAULT_RAINBOW_BANDS, 0.45);
       primitiveRef.current = primitive;
       lineSeries.attachPrimitive(primitive);
 
@@ -195,66 +163,9 @@ export function BtcRainbowChart({ data, bands: bandsProp, className }: BtcRainbo
       seriesRef.current = lineSeries;
       applyLatestData();
 
-      // Floating tooltip
-      const tooltip = document.createElement("div");
-      tooltip.style.position = "absolute";
-      tooltip.style.zIndex = "30";
-      tooltip.style.pointerEvents = "none";
-      tooltip.style.display = "none";
-      tooltip.className =
-        "rounded-lg border border-zinc-800 bg-zinc-900/95 px-3 py-2 text-xs shadow-xl backdrop-blur-sm";
-      container.appendChild(tooltip);
+      const tooltip = createRainbowTooltip(container, () => seriesRef.current);
       tooltipRef.current = tooltip;
-
-      chart.subscribeCrosshairMove((param) => {
-        if (
-          !param.point ||
-          !param.time ||
-          param.point.x < 0 ||
-          param.point.y < 0 ||
-          param.point.x > container.clientWidth ||
-          param.point.y > container.clientHeight
-        ) {
-          tooltip.style.display = "none";
-          return;
-        }
-        const priceData = param.seriesData.get(lineSeries) as { value: number } | undefined;
-        if (!priceData) {
-          tooltip.style.display = "none";
-          return;
-        }
-        const ts = typeof param.time === "number" ? param.time * 1000 : NaN;
-        if (!Number.isFinite(ts)) {
-          tooltip.style.display = "none";
-          return;
-        }
-        const date = new Date(ts);
-        const dateStr = date.toISOString().slice(0, 10);
-        const band = findActiveBand(priceData.value, ts, bandsRef.current);
-
-        tooltip.innerHTML = `
-          <div class="text-zinc-400">${dateStr}</div>
-          <div class="mt-1 font-semibold text-white tabular-nums">${compactUsd(priceData.value)}</div>
-          ${band
-            ? `<div class="mt-1.5 flex items-center gap-1.5">
-                 <span class="h-2 w-2 shrink-0 rounded-full" style="background-color:${band.color}"></span>
-                 <span class="text-[11px] text-zinc-300">${escapeHtml(band.label)}</span>
-               </div>`
-            : ""}
-        `;
-
-        tooltip.style.display = "block";
-        const ttWidth = tooltip.offsetWidth || 140;
-        const ttHeight = tooltip.offsetHeight || 60;
-        let left = param.point.x + 12;
-        let top = param.point.y - ttHeight - 12;
-        if (left + ttWidth > container.clientWidth - 4) {
-          left = param.point.x - ttWidth - 12;
-        }
-        if (top < 4) top = param.point.y + 12;
-        tooltip.style.left = `${left}px`;
-        tooltip.style.top = `${top}px`;
-      });
+      chart.subscribeCrosshairMove(tooltip.onCrosshairMove);
     };
 
     if (containerRef.current) {
@@ -276,10 +187,8 @@ export function BtcRainbowChart({ data, bands: bandsProp, className }: BtcRainbo
     return () => {
       disposed = true;
       if (ro) ro.disconnect();
-      if (tooltipRef.current) {
-        tooltipRef.current.remove();
-        tooltipRef.current = null;
-      }
+      tooltipRef.current?.dispose();
+      tooltipRef.current = null;
       if (chartRef.current) {
         chartRef.current.remove();
         chartRef.current = null;
@@ -330,11 +239,11 @@ export function BtcRainbowChart({ data, bands: bandsProp, className }: BtcRainbo
   );
 }
 
-export function BtcRainbowLegend({ bands = DEFAULT_RAINBOW_BANDS }: { bands?: RainbowBand[] }) {
+export function BtcRainbowLegend() {
   return (
     <div className="space-y-2">
       <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-3">
-        {bands.map((b) => (
+        {DEFAULT_RAINBOW_BANDS.map((b) => (
           <div key={b.key} className="flex items-center gap-2 text-[11px]">
             <span
               className="h-2.5 w-2.5 shrink-0 rounded-sm"
