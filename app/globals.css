@@ -141,3 +141,15 @@
 .dark .shiki span {
   color: var(--shiki-dark);
 }
+
+.shiki .line.highlighted {
+  @apply -mx-4 inline-block w-[calc(100%+2rem)] bg-primary/10 px-4;
+}
+.shiki.line-numbers code {
+  counter-reset: line;
+}
+.shiki.line-numbers .line::before {
+  counter-increment: line;
+  content: counter(line);
+  @apply mr-4 inline-block w-6 select-none text-right text-muted-foreground/60;
+}
