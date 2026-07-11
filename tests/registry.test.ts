@@ -11,22 +11,22 @@ describe("getRegistryItem", () => {
       {
         path: "registry/voraui/fear-greed-gauge/fear-greed-gauge.tsx",
         type: "registry:component",
-        target: "components/voraui/fear-greed-gauge.tsx",
+        target: "components/voraui/fear-greed-gauge/fear-greed-gauge.tsx",
       },
       {
         path: "registry/voraui/fear-greed-gauge/fear-greed-gauge-skeleton.tsx",
         type: "registry:component",
-        target: "components/voraui/fear-greed-gauge-skeleton.tsx",
+        target: "components/voraui/fear-greed-gauge/fear-greed-gauge-skeleton.tsx",
       },
       {
         path: "registry/voraui/fear-greed-gauge/use-fear-greed.ts",
         type: "registry:hook",
-        target: "components/voraui/use-fear-greed.ts",
+        target: "components/voraui/fear-greed-gauge/use-fear-greed.ts",
       },
       {
         path: "registry/voraui/fear-greed-gauge/fear-greed-bands.ts",
         type: "registry:lib",
-        target: "components/voraui/fear-greed-bands.ts",
+        target: "components/voraui/fear-greed-gauge/fear-greed-bands.ts",
       },
     ]);
   });
