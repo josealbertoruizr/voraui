@@ -17,7 +17,7 @@ export default function Page() {
         <p className="mt-2 text-muted-foreground">
           A candlestick chart for showing your trades on live market data: B/S markers with
           same-candle clustering (3B), hover tooltips with trade details, infinite history on
-          scroll, live candle updates, and an imperative highlight API with a sonar-ring glow.
+          scroll, and live candle updates.
         </p>
       </div>
 
@@ -80,20 +80,6 @@ export default function Page() {
             { name: "limit", type: "number", defaultValue: "500", description: "Candles for the initial load (max 1000)." },
             { name: "showTooltips", type: "boolean", defaultValue: "true", description: "Show trade tooltips on hover." },
             { name: "className", type: "string", description: "Extra classes for the wrapper." },
-          ]}
-        />
-      </section>
-
-      <section className="space-y-3">
-        <h2 className="text-xl font-semibold">Ref API</h2>
-        <PropsTable
-          rows={[
-            {
-              name: "highlightTrade",
-              type: "(tsMs, price, side) => void",
-              description: "Pulse a sonar-ring glow at the trade's candle for 10 seconds.",
-            },
-            { name: "clearHighlight", type: "() => void", description: "Remove the glow immediately." },
           ]}
         />
       </section>
