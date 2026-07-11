@@ -27,22 +27,14 @@ export const WINDOW_KEYS: Record<AltseasonWindow, string> = {
   "7d": "percent_change_7d",
 };
 
-/**
- * Stablecoins plus wrapped/liquid-staked BTC and ETH derivatives.
- * Excluded because their price barely moves vs USD or simply tracks the
- * underlying asset, which would double-count BTC/ETH.
- */
+/** Stablecoins and wrapped/liquid-staked BTC/ETH derivatives, which would double-count. */
 export const ALTSEASON_EXCLUDED_SYMBOLS = new Set([
   "USDT", "USDC", "DAI", "BUSD", "TUSD", "FDUSD", "PYUSD", "USDD", "USDE", "USDS",
   "WBTC", "BTCB", "WETH", "STETH", "WSTETH", "RETH", "WEETH", "CBBTC", "TBTC",
 ]);
 
-/**
- * Altcoin Season Index: percentage of the top-50 (non-stable, non-wrapped)
- * altcoins outperforming BTC over the window.
- * Convention (blockchaincenter.net): score >= 75 is Altcoin Season,
- * <= 25 is Bitcoin Season, in between is Mixed.
- */
+/** Altcoin Season Index: % of the top-50 clean alts outperforming BTC over the
+ *  window. >= 75 is Altcoin Season, <= 25 is Bitcoin Season (blockchaincenter.net). */
 export function computeAltseason(
   tickers: PaprikaTicker[],
   window: AltseasonWindow = "7d",
@@ -74,11 +66,7 @@ export function computeAltseason(
     })
     .slice(0, 50);
 
-  // CoinPaprika's bulk tickers endpoint occasionally serves a dead column:
-  // every ticker (including BTC) reports exactly 0 for a given window (seen
-  // in practice for 30d/1y). That is upstream data unavailability, not a
-  // real market reading where every asset happened to be flat, so treat an
-  // all-zero column as unknown rather than scoring it as "Bitcoin Season".
+  // An all-zero column is a dead upstream column, not a flat market; treat as unknown.
   if (btcChange === 0 && clean.every((row) => changeOf(row) === 0)) {
     return { score: null, label: "Unknown", btcChangePct: null, window, compared: 0, outperforming: 0 };
   }

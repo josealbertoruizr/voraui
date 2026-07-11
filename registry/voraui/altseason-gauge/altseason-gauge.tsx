@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { motion } from "framer-motion";
 import NumberFlow from "@number-flow/react";
 import { cn } from "@/lib/utils";
@@ -13,24 +12,18 @@ export interface AltseasonGaugeProps {
   data?: AltseasonData;
   /** Comparison window for the bundled fetcher. Ignored when data is set. */
   window?: AltseasonWindow;
-  /** "meter" (default) is a three-zone track with a position thumb; "bars" draws one bar per compared altcoin, filling the alts that outperform BTC. */
+  /** "meter" (default) three-zone track with a thumb; "bars" one bar per compared altcoin. */
   variant?: "meter" | "bars";
-  /** Spring the meter's thumb in from the center on first render instead of snapping straight to its score position. */
+  /** Spring the thumb in from center on first render instead of snapping. */
   animateOnLoad?: boolean;
   className?: string;
 }
 
-// When custom data carries a score but no per-coin counts, the bars variant
-// falls back to a fixed strip driven by the score percentage alone.
+// Bars fallback when custom data has a score but no per-coin counts.
 const BARS_FALLBACK_TOTAL = 50;
 
-// The classic altseason spectrum (blockchaincenter.net): amber at the BTC
-// pole, cool blue at the mixed center, red at the alt pole, with yellow and
-// green in between. Slightly more saturated than the classic pastels so it
-// holds up on a light background. Both variants draw from this one ramp:
-// the meter as a continuous gradient track, the bars as per-bar colors
-// (saturated when filled, faded when not, so the strip still reads as a
-// scale past the current count).
+// Classic altseason spectrum (blockchaincenter.net): amber BTC pole, blue
+// mixed center, red alt pole. Both variants draw from this one ramp.
 const SEASON_RAMP_STOPS: { t: number; rgb: [number, number, number] }[] = [
   { t: 0, rgb: [245, 158, 11] },
   { t: 0.25, rgb: [250, 204, 21] },
@@ -83,9 +76,7 @@ export function AltseasonGauge({
 
   const hasScore = resolved.score !== null;
   const score = resolved.score ?? 50;
-  // Clamp marker position with edge padding so a score of 0 / 100 doesn't
-  // place the thumb half-off the track and visually collide with the zone
-  // labels sitting below.
+  // Edge padding so a 0/100 score doesn't push the thumb half-off the track.
   const markerLeft = Math.min(Math.max(score, 3), 97);
   const label = resolved.label;
   const isBtc = label === "Bitcoin Season";

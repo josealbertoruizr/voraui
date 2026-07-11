@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { OhlcvCandle, Timeframe } from "./trading-chart-types";
 import { sanitizeCandles } from "./candle-validation";
 
@@ -59,13 +59,13 @@ export function useKlines(
   options: { limit?: number; enabled?: boolean } = {},
 ) {
   const { limit = 500, enabled = true } = options;
-  const [candles, setCandles] = React.useState<OhlcvCandle[]>([]);
-  const [loading, setLoading] = React.useState(enabled);
-  const [error, setError] = React.useState<string | null>(null);
-  const [hasMoreHistory, setHasMoreHistory] = React.useState(true);
-  const lastOldestRef = React.useRef<number | null>(null);
+  const [candles, setCandles] = useState<OhlcvCandle[]>([]);
+  const [loading, setLoading] = useState(enabled);
+  const [error, setError] = useState<string | null>(null);
+  const [hasMoreHistory, setHasMoreHistory] = useState(true);
+  const lastOldestRef = useRef<number | null>(null);
 
-  const fetchMore = React.useCallback(
+  const fetchMore = useCallback(
     async (beforeSec: number) => {
       try {
         const older = await fetchKlines(symbol, timeframe, {
@@ -77,7 +77,7 @@ export function useKlines(
           return [];
         }
         const newOldest = older[0].time;
-        // If the oldest timestamp didn't advance, we've hit the listing boundary.
+        // Oldest timestamp didn't advance: we hit the listing boundary.
         if (lastOldestRef.current !== null && newOldest >= lastOldestRef.current) {
           setHasMoreHistory(false);
           return [];
@@ -93,13 +93,13 @@ export function useKlines(
     [symbol, timeframe],
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!enabled) return;
 
     const controller = new AbortController();
 
     const load = async () => {
-      // Clear state on key param change so the chart resets cleanly.
+      // Reset state on key param change.
       setCandles([]);
       setHasMoreHistory(true);
       setError(null);
@@ -123,7 +123,7 @@ export function useKlines(
     return () => controller.abort();
   }, [symbol, timeframe, limit, enabled]);
 
-  // Loading is forced false while disabled so a mid-fetch enabled->false toggle cannot leave it stuck.
+  // Forced false while disabled so a mid-fetch toggle can't leave loading stuck.
   return { candles, setCandles, loading: enabled ? loading : false, error, fetchMore, hasMoreHistory };
 }
 
@@ -134,9 +134,9 @@ export function useLatestCandlePolling(
   enabled: boolean,
   onUpdate: (candle: OhlcvCandle) => void,
 ) {
-  const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!enabled || !symbol) return;
     let active = true;
 
@@ -166,7 +166,7 @@ export function useLatestCandlePolling(
         if (!active) return;
         for (const candle of latest) onUpdate(candle);
       } catch {
-        // Transient network failures are retried on the next tick.
+        // Retried on the next tick.
       }
       if (active) timerRef.current = setTimeout(poll, intervalFor(timeframe));
     };

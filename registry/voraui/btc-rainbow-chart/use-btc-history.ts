@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useEffect, useState } from "react";
 import { BTC_DAILY_SEED } from "./btc-seed";
 
 export interface RainbowPoint {
@@ -59,11 +59,11 @@ export async function fetchBinanceDailyCloses(signal?: AbortSignal): Promise<Rai
 
 export function useBtcHistory(options: { enabled?: boolean } = {}) {
   const { enabled = true } = options;
-  const [data, setData] = React.useState<RainbowPoint[] | null>(null);
-  const [loading, setLoading] = React.useState(enabled);
-  const [error, setError] = React.useState<string | null>(null);
+  const [data, setData] = useState<RainbowPoint[] | null>(null);
+  const [loading, setLoading] = useState(enabled);
+  const [error, setError] = useState<string | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!enabled) return;
     const controller = new AbortController();
 
