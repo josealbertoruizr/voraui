@@ -14,6 +14,9 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Reference-only snapshots, not part of the app; see docs/README.
     "docs/**",
+    // Git worktree checkouts nested inside the repo; each lints on its own.
+    ".worktrees/**",
+    ".claude/worktrees/**",
   ]),
 ]);
 
