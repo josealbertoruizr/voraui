@@ -6,8 +6,7 @@ export interface FearGreedBand {
   color: string;
 }
 
-/** Boundaries mirror alternative.me's own value_classification thresholds,
- *  so the arc's coloring lines up with the label the bundled fetcher returns. */
+/** Boundaries mirror alternative.me's value_classification thresholds. */
 export const DEFAULT_FEAR_GREED_BANDS: FearGreedBand[] = [
   { key: "extreme-fear", label: "Extreme Fear", min: 0, max: 24, color: "#c0392b" },
   { key: "fear", label: "Fear", min: 25, max: 44, color: "#e0672b" },
@@ -19,19 +18,13 @@ export const DEFAULT_FEAR_GREED_BANDS: FearGreedBand[] = [
 export const GAUGE_CENTER_X = 130;
 export const GAUGE_CENTER_Y = 130;
 
-/** Angle in degrees (standard math convention, 0 deg = +x axis) for a 0-100
- *  gauge value along the top semicircle: 180 deg at value 0 (left) down to
- *  0 deg at value 100 (right). */
+/** Angle in degrees for a 0-100 value along the top semicircle (180 at 0, 0 at 100). */
 export function angleForValue(value: number): number {
   const clamped = Math.min(Math.max(value, 0), 100);
   return 180 - (clamped / 100) * 180;
 }
 
-/** Point on the gauge's circle at the given radius for a 0-100 value.
- *  Coordinates are rounded to 4 decimal places: Math.cos/Math.sin can differ
- *  in their last bit between the server's and browser's JS engine builds,
- *  which otherwise surfaces as a React hydration mismatch on these SVG
- *  attributes. */
+/** Point at radius for a 0-100 value; rounded to 4 decimals to avoid hydration mismatches. */
 export function arcPoint(radius: number, value: number): { x: number; y: number } {
   const rad = (angleForValue(value) * Math.PI) / 180;
   return {
@@ -40,16 +33,14 @@ export function arcPoint(radius: number, value: number): { x: number; y: number 
   };
 }
 
-/** SVG arc path `d` for the segment between two values, drawn along the top
- *  semicircle (sweeping left to right). */
+/** SVG arc path between two values along the top semicircle. */
 export function describeArc(radius: number, fromValue: number, toValue: number): string {
   const start = arcPoint(radius, fromValue);
   const end = arcPoint(radius, toValue);
   return `M ${start.x} ${start.y} A ${radius} ${radius} 0 0 1 ${end.x} ${end.y}`;
 }
 
-/** SVG path `d` for a filled annular wedge (a pie-slice ring segment) between
- *  two radii and two values, for the "wedges" variant's zone sectors. */
+/** SVG path for an annular wedge between two radii and two values. */
 export function describeWedge(
   outerRadius: number,
   innerRadius: number,
@@ -66,9 +57,7 @@ export function describeWedge(
   );
 }
 
-/** Which band a 0-100 value falls into, for the "wedges" variant's
- *  active-zone highlight. Clamps out-of-range values into the nearest edge
- *  band instead of returning undefined. */
+/** Band for a 0-100 value; out-of-range clamps to the nearest edge band. */
 export function findFearGreedBand(
   value: number,
   bands: FearGreedBand[] = DEFAULT_FEAR_GREED_BANDS,
@@ -77,12 +66,8 @@ export function findFearGreedBand(
   return bands.find((band) => clamped >= band.min && clamped <= band.max) ?? bands[bands.length - 1];
 }
 
-/** Remaps a 0-100 value onto a dial where every band covers an equal angular
- *  share, the way CNN's Fear & Greed gauge draws its zones: narrow bands like
- *  neutral (45-55) get the same wedge width as wide ones, so every zone label
- *  fits inside its wedge. The "wedges" variant runs its needle, dots, and
- *  scale numbers through this same mapping, keeping the needle inside the
- *  highlighted wedge (which a linear needle over equal wedges would not). */
+/** Remap a 0-100 value onto a CNN-style dial where every band gets an equal
+ *  angular share; the needle, dots, and scale numbers all use this mapping. */
 export function equalizedValue(
   value: number,
   bands: FearGreedBand[] = DEFAULT_FEAR_GREED_BANDS,
@@ -99,8 +84,7 @@ export interface GradientStop {
   color: string;
 }
 
-/** Evenly-spaced version of DEFAULT_FEAR_GREED_BANDS's 5 colors, used to
- *  interpolate a smooth per-tick gradient for the "ticks" variant. */
+/** Evenly-spaced band colors used to interpolate the per-tick gradient. */
 export const GRADIENT_STOPS: GradientStop[] = [
   { value: 0, color: "#c0392b" },
   { value: 25, color: "#e0672b" },
@@ -119,8 +103,7 @@ function rgbToHex(r: number, g: number, b: number): string {
   return `#${[r, g, b].map((c) => Math.round(c).toString(16).padStart(2, "0")).join("")}`;
 }
 
-/** Interpolated hex color for a 0-100 value, walking linearly between
- *  whichever pair of GRADIENT_STOPS the value falls between. */
+/** Interpolated hex color for a 0-100 value between GRADIENT_STOPS. */
 export function colorForValue(value: number, stops: GradientStop[] = GRADIENT_STOPS): string {
   const clamped = Math.min(Math.max(value, 0), 100);
   for (let i = 0; i < stops.length - 1; i++) {
@@ -136,12 +119,10 @@ export function colorForValue(value: number, stops: GradientStop[] = GRADIENT_ST
   return stops[stops.length - 1].color;
 }
 
-// "wedges" variant geometry, shared with FearGreedGaugeSkeleton so the ghost
-// dial lines up exactly with the real one.
+// Wedge geometry, shared with the skeleton so the ghost dial lines up.
 export const WEDGE_OUTER_RADIUS = 104;
 export const WEDGE_INNER_RADIUS = 64;
 export const WEDGE_GAP = 1.2;
 export const WEDGE_HUB_RADIUS = 40;
-// Tall enough for the full hub circle (center y 130 + radius 40) plus a small
-// bottom margin; also the denominator for the centered value overlay's top %.
+// Fits the hub circle plus margin; also sizes the centered value overlay.
 export const WEDGES_VIEWBOX_HEIGHT = 180;

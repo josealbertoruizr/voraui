@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 
 export interface TradingChartSkeletonProps {
@@ -17,9 +17,7 @@ export interface GhostCandle {
 
 const GHOST_CANDLE_COUNT = 48;
 
-/** Deterministic placeholder candle heights (0-100 percent of the ghost row's
- *  max height) so server and client renders match exactly - Math.random here
- *  would produce a hydration mismatch. */
+/** Deterministic heights; Math.random would cause a hydration mismatch. */
 export function generateGhostCandles(count: number): GhostCandle[] {
   return Array.from({ length: count }, (_, i) => {
     const bodyHeightPct = 25 + 35 * Math.abs(Math.sin(i * 0.7));
@@ -29,7 +27,7 @@ export function generateGhostCandles(count: number): GhostCandle[] {
 }
 
 export function TradingChartSkeleton({ className, height = 500 }: TradingChartSkeletonProps) {
-  const candles = React.useMemo(() => generateGhostCandles(GHOST_CANDLE_COUNT), []);
+  const candles = useMemo(() => generateGhostCandles(GHOST_CANDLE_COUNT), []);
 
   return (
     <div
@@ -55,7 +53,8 @@ export function TradingChartSkeleton({ className, height = 500 }: TradingChartSk
           }
         }
       `}</style>
-      <div className="absolute inset-0 flex items-end gap-[2px] px-3 pb-8 pt-4">
+      {/* pr-14 keeps the candles clear of the price-axis placeholder column. */}
+      <div className="absolute inset-0 flex items-end gap-[2px] pb-8 pl-3 pr-14 pt-4">
         {candles.map((candle, i) => (
           <div key={i} className="relative flex-1" style={{ height: `${candle.wickHeightPct}%` }}>
             <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-muted-foreground/20" />

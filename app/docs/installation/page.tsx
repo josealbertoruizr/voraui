@@ -32,7 +32,13 @@ export default function InstallationPage() {
           pnpm dlx shadcn@latest add @voraui/trading-chart
         </pre>
         <p className="text-sm text-muted-foreground">
-          Files land in components/voraui/ and npm dependencies are installed automatically.
+          Files land in components/voraui/&lt;component&gt;/ and npm dependencies are installed
+          automatically.
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Installed before components moved into per-component folders? Re-adding a component
+          writes the new folder but leaves the old flat files in components/voraui/ behind:
+          delete those and point your imports at the new folder.
         </p>
       </section>
 

@@ -82,10 +82,7 @@ export function alignSignalsToBars(
 
   const barTimes = candles.map((c) => c.time);
   const barSet = new Set(barTimes);
-  // Snapping to the closest bar papers over a single missing candle, but a
-  // signal whose bar isn't loaded at all (e.g. it predates the fetched
-  // history) would pile up on the edge bar instead. Drop those; they come
-  // back once their bar loads.
+  // Drop signals whose bar isn't loaded yet; they'd pile up on the edge bar.
   const tolerance = (INTERVAL_SECONDS[interval] ?? 3_600) * 2;
 
   return signals.flatMap((signal) => {

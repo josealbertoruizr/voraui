@@ -7,7 +7,6 @@ export function isValidCandle(candle: {
 }): boolean {
   const { open, high, low, close, time } = candle;
 
-  // All values must be finite positive numbers.
   if (!isFinite(open) || !isFinite(high) || !isFinite(low) || !isFinite(close)) {
     return false;
   }
@@ -15,18 +14,17 @@ export function isValidCandle(candle: {
     return false;
   }
 
-  // OHLC logical consistency: high must be the highest, low the lowest.
+  // OHLC consistency: high must be the highest, low the lowest.
   if (high < Math.max(open, close)) return false;
   if (low > Math.min(open, close)) return false;
   if (high < low) return false;
 
-  // Sanity check: reject candles where the range is > 90% of the close price.
-  const range = high - low;
-  if (range / close > 0.9) {
+  // Reject candles whose range exceeds 90% of the close price.
+  if ((high - low) / close > 0.9) {
     return false;
   }
 
-  // Timestamp must be in seconds (UTCTimestamp), not milliseconds.
+  // Timestamp must be in seconds, not milliseconds.
   const MAX_REASONABLE_TS = 9_999_999_999;
   if (time > MAX_REASONABLE_TS) {
     return false;

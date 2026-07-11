@@ -1,18 +1,7 @@
 /**
- * RainbowBandsPrimitive
- *
- * lightweight-charts v5 series primitive that paints the BTC rainbow chart's
- * 9 log-regression band ceilings as 8 filled strips between consecutive
- * ceilings.
- *
- * The bands are computed analytically from `A · log10(days_since_genesis) + B
- * + offset`, so the server doesn't need to ship band values per row — the
- * primitive walks the visible time range, computes ceilings at a sparse set
- * of sample points, and draws a polygon per strip.
- *
- * Below the lowest band (b9) the area is left transparent — by design the
- * "Basically a Fire Sale" zone shows as a label in the legend, not as a
- * coloured floor that floods the chart.
+ * lightweight-charts series primitive painting the 9 log-regression band
+ * ceilings (A * log10(days_since_genesis) + B + offset) as 8 filled strips.
+ * Below the lowest band the chart stays transparent by design.
  */
 
 import type {
@@ -27,9 +16,7 @@ import type {
   Time,
 } from "lightweight-charts";
 
-// lightweight-charts uses `CanvasRenderingTarget2D` from the `fancy-canvas`
-// package, which isn't a direct dependency of this project. Inline a
-// structural subset of the type — we only need `useMediaCoordinateSpace`.
+// Structural subset of fancy-canvas's CanvasRenderingTarget2D (not a direct dependency).
 interface MediaScope {
   context: CanvasRenderingContext2D;
   mediaSize: { width: number; height: number };
@@ -50,8 +37,7 @@ export interface RainbowBand {
   color: string;
 }
 
-// Default bands match the server's `_RAINBOW_BANDS` ordering: top → bottom
-// (most expensive → cheapest).
+// Ordered top -> bottom (most expensive -> cheapest).
 export const DEFAULT_RAINBOW_BANDS: RainbowBand[] = [
   { key: "b1", label: "Maximum Bubble Territory", offset: 0.5, color: "#dc2626" },
   { key: "b2", label: "Sell. Seriously, SELL!", offset: 0.36, color: "#f97316" },
@@ -69,8 +55,7 @@ export function rainbowPriceAt(dateMs: number, offset: number): number {
   return Math.pow(10, A * Math.log10(days) + B + offset);
 }
 
-/** Given a price + date, return the band the price currently sits inside.
- *  Returns null if the price is below every ceiling. */
+/** Band the price sits inside, or null if below every ceiling. */
 export function findActiveBand(
   price: number,
   dateMs: number,
@@ -106,8 +91,7 @@ class RainbowBandsRenderer implements IPrimitivePaneRenderer {
 
       const timeScale = chart.timeScale();
 
-      // Sample roughly one point every 6 CSS pixels — smooth enough for
-      // bands' gentle curves while staying cheap on zoom/resize.
+      // Sample every ~6 CSS px: smooth enough, cheap on zoom/resize.
       const STEP = 6;
       const sampleCount = Math.max(2, Math.ceil(width / STEP));
 
@@ -124,7 +108,7 @@ class RainbowBandsRenderer implements IPrimitivePaneRenderer {
       }
       if (xs.length < 2) return;
 
-      // Sort bands top→bottom (highest offset first).
+      // Sort bands top -> bottom (highest offset first).
       const sorted = [...this.bands].sort((a, b) => b.offset - a.offset);
 
       // Precompute ceiling y-coords for every band at every sample x.
@@ -138,9 +122,7 @@ class RainbowBandsRenderer implements IPrimitivePaneRenderer {
         }
       }
 
-      // Paint 8 strips between consecutive ceilings. The strip between
-      // sorted[i] (top) and sorted[i+1] (bottom) gets sorted[i+1]'s color —
-      // visually that strip is the band immediately below sorted[i].
+      // Each strip between consecutive ceilings gets the lower band's color.
       ctx.save();
       ctx.globalAlpha = this.fillOpacity;
       for (let b = 0; b < sorted.length - 1; b++) {
@@ -221,7 +203,7 @@ export class RainbowBandsPrimitive implements ISeriesPrimitive<Time> {
   }
 
   updateAllViews(): void {
-    // No internal state to refresh — values are computed at draw time.
+    // No internal state; values are computed at draw time.
   }
 
   paneViews(): readonly IPrimitivePaneView[] {
@@ -255,9 +237,7 @@ export class RainbowBandsPrimitive implements ISeriesPrimitive<Time> {
   }
 }
 
-/** Convert lightweight-charts `Time` to a UTC ms timestamp. For our daily
- *  data Time is always a Unix-seconds number, but we handle string + business-
- *  day shapes defensively. */
+/** Time to UTC ms; handles number, string, and business-day shapes. */
 function timeToMs(t: Time): number | null {
   if (typeof t === "number") return t * 1000;
   if (typeof t === "string") {
