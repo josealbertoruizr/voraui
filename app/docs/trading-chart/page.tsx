@@ -1,4 +1,5 @@
 import { ComponentPreview } from "@/components/site/component-preview";
+import { DemoPreview } from "@/components/site/demo-preview";
 import { InstallTabs } from "@/components/site/install-tabs";
 import { ManualInstall } from "@/components/site/manual-install";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -20,7 +21,9 @@ export default function Page() {
         </p>
       </div>
 
-      <TradingChartDemo />
+      <DemoPreview source="components/site/trading-chart-demo.tsx">
+        <TradingChartDemo />
+      </DemoPreview>
 
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">Skeleton</h2>
