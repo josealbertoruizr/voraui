@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useEffect, useState } from "react";
 
 export interface FearGreedData {
   /** 0-100 index value, or null when the upstream has no data. */
@@ -29,11 +29,11 @@ export function useFearGreed(
   options: { enabled?: boolean; refreshInterval?: number } = {},
 ) {
   const { enabled = true, refreshInterval = 600_000 } = options;
-  const [data, setData] = React.useState<FearGreedData | null>(null);
-  const [loading, setLoading] = React.useState(enabled);
-  const [error, setError] = React.useState<string | null>(null);
+  const [data, setData] = useState<FearGreedData | null>(null);
+  const [loading, setLoading] = useState(enabled);
+  const [error, setError] = useState<string | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!enabled) return;
     let cancelled = false;
 

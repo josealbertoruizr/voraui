@@ -19,7 +19,7 @@ export interface TradeSignal {
   /** Execution time in epoch milliseconds. */
   ts: number;
   side: TradeSide;
-  /** Execution price. When quantity is set, tooltips show price * quantity as the position size; otherwise price itself is treated as the position size in quote currency. */
+  /** Execution price; with quantity set, tooltips show price * quantity as position size. */
   price: number;
   quantity?: number;
   note?: string;

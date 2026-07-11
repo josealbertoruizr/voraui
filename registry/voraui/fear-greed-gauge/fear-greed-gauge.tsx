@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useEffect, useId, useRef } from "react";
 import { animate, useMotionValue } from "framer-motion";
 import NumberFlow from "@number-flow/react";
 import { cn } from "@/lib/utils";
@@ -28,30 +28,21 @@ import {
 export interface FearGreedGaugeProps {
   /** Provide your own data to bypass the bundled alternative.me fetcher. */
   data?: FearGreedData;
-  /** "gradient" (default) is a smooth continuous color blend with just the dial, needle, and number; "minimal" shows the same layout with 5 discrete color bands instead; "ticks" swaps the solid arc for 100 individual gradient tick marks; "wedges" shows equal-width pie-slice zone sectors (CNN-style, with the dial remapped to match) and the current zone highlighted. */
+  /** "gradient" (default) smooth blend; "minimal" 5 discrete bands; "ticks" 100 tick marks; "wedges" CNN-style zone sectors. */
   variant?: "minimal" | "ticks" | "gradient" | "wedges";
-  /** Spring the needle in from neutral (12 o'clock) on first render instead of snapping straight to its value. */
+  /** Spring the needle in from neutral on first render instead of snapping. */
   animateOnLoad?: boolean;
   className?: string;
 }
 
-// "ticks" variant: 100 individual gradient tick marks (one per index value)
-// instead of a solid colored arc, plus quarter (0/25/50/75/100) numeric
-// labels as reference speedometer-style gauges.
 const TICKS_MAJOR_VALUES = [0, 25, 50, 75, 100];
 const TICKS_FINE_VALUES = Array.from({ length: 100 }, (_, i) => i + 1);
 
-// "wedges" variant: pie-slice zone sectors instead of a thin arc, with the
-// zone matching the current value highlighted and the rest neutral gray.
 const WEDGE_LABEL_RADIUS = (WEDGE_OUTER_RADIUS + WEDGE_INNER_RADIUS) / 2;
 const WEDGE_BAND_SHARE = 100 / DEFAULT_FEAR_GREED_BANDS.length;
-// With equalized wedges every wedge corner is a real band boundary, so the
-// scale numbers sit at the corners and each zone's true value range reads
-// straight off the dial (neutral between 45 and 55, greed 55-75, ...).
+// Equalized wedge corners are real band boundaries, so numbers sit at the corners.
 const WEDGE_SCALE_NUMBER_VALUES = [0, 25, 45, 55, 75, 100];
-// Two decorative dots per zone, at thirds between the corner numbers. They
-// mark display positions, not round values: the dial is equalized per band
-// (see equalizedValue), so in-between values don't land on round angles.
+// Decorative dots at thirds between the corner numbers (display positions, not values).
 const WEDGE_SCALE_DOT_DISPLAY_VALUES = DEFAULT_FEAR_GREED_BANDS.flatMap((_, i) => [
   (i + 1 / 3) * WEDGE_BAND_SHARE,
   (i + 2 / 3) * WEDGE_BAND_SHARE,
@@ -71,37 +62,29 @@ export function FearGreedGauge({
   animateOnLoad = true,
   className,
 }: FearGreedGaugeProps) {
-  const gradientId = React.useId();
+  const gradientId = useId();
   const fetched = useFearGreed({ enabled: data === undefined });
   const resolved = data ?? fetched.data;
   const loading = data === undefined && fetched.loading;
   const value = resolved?.value ?? null;
   const label = resolved?.label ?? "Unknown";
   const hasError = data === undefined && Boolean(fetched.error);
-  // The wedges dial is drawn in equalized display space (see equalizedValue),
-  // so its needle has to go through the same remapping to land inside the
-  // highlighted wedge.
+  // The wedges dial is drawn in equalized space; remap the needle to match.
   const dialValue = value !== null && variant === "wedges" ? equalizedValue(value) : value;
   const needleRotation = dialValue !== null ? 90 - angleForValue(dialValue) : 0;
   const activeBand = variant === "wedges" && value !== null ? findFearGreedBand(value) : null;
 
-  // Animate the needle by driving the raw SVG `transform="rotate(...)"`
-  // attribute imperatively from a motion value, instead of going through
-  // motion.g's own transform system - framer always intercepts a "transform"
-  // prop into its CSS pipeline (and resets transform-origin to "50% 50%"
-  // there), which silently drops a 3-argument SVG rotate() string and would
-  // in any case pivot around the wrong point for this off-center needle
-  // shape. Only the very first real value (loading -> loaded) is gated by
-  // `animateOnLoad`; later value changes always spring smoothly.
-  const needleGroupRef = React.useRef<SVGGElement | null>(null);
+  // Drive the SVG rotate() attribute imperatively: framer's transform pipeline
+  // drops 3-arg SVG rotate() and would pivot around the wrong origin.
+  const needleGroupRef = useRef<SVGGElement | null>(null);
   const needleMV = useMotionValue(needleRotation);
-  React.useEffect(() => {
+  useEffect(() => {
     return needleMV.on("change", (r) => {
       needleGroupRef.current?.setAttribute("transform", `rotate(${r} ${GAUGE_CENTER_X} ${GAUGE_CENTER_Y})`);
     });
   }, [needleMV]);
-  const hasLoadedOnceRef = React.useRef(false);
-  React.useEffect(() => {
+  const hasLoadedOnceRef = useRef(false);
+  useEffect(() => {
     const justLoaded = value !== null && !hasLoadedOnceRef.current;
     if (value !== null) hasLoadedOnceRef.current = true;
 
@@ -190,10 +173,7 @@ export function FearGreedGauge({
               })}
               {TICKS_MAJOR_VALUES.map((v) => {
                 const p = arcPoint(118, v);
-                // At the 0/100 endpoints the tick is perfectly horizontal, so a
-                // wide label like "100" extends backward right over the tick
-                // instead of past it (unlike the angled major ticks in between).
-                // Push those two down onto their own line instead.
+                // The horizontal 0/100 end labels overlap their ticks; push them down a line.
                 const isEdge = v === 0 || v === 100;
                 return (
                   <text
@@ -234,11 +214,7 @@ export function FearGreedGauge({
               })}
               {DEFAULT_FEAR_GREED_BANDS.map((band) => {
                 const mid = equalizedValue((band.min + band.max) / 2);
-                // A radial textPath clips text past its (short) path length -
-                // fine for "FEAR"/"GREED" but drops characters from "NEUTRAL"
-                // and the two-word EXTREME labels. Plain rotated text with
-                // tspans has no such limit, so split multi-word labels onto
-                // their own stacked lines instead.
+                // textPath clips long labels; rotated text with stacked tspans doesn't.
                 const rotation = 90 - angleForValue(mid);
                 const p = arcPoint(WEDGE_LABEL_RADIUS, mid);
                 const words = band.label.toUpperCase().split(" ");
@@ -321,8 +297,7 @@ export function FearGreedGauge({
           >
             <p className="text-3xl font-bold tabular-nums text-foreground">
               {value !== null ? <NumberFlow value={value} /> : "-"}
-              {/* The zone name is only drawn inside the aria-hidden SVG for
-                  this variant, so repeat it for screen readers. */}
+              {/* The zone name only exists in the aria-hidden SVG; repeat it for screen readers. */}
               {!hasError && <span className="sr-only"> {label}</span>}
             </p>
           </div>

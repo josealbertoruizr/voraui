@@ -1,3 +1,4 @@
+import type { MouseEventParams } from "lightweight-charts";
 import type { OhlcvCandle, TradeSignal } from "./trading-chart-types";
 import {
   alignSignalsToBars,
@@ -18,8 +19,7 @@ export interface SignalTooltipDeps {
 
 export interface SignalTooltip {
   /** Pass to chart.subscribeCrosshairMove. */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- crosshair event param from the dynamically-imported chart instance.
-  onCrosshairMove: (param: any) => void;
+  onCrosshairMove: (param: MouseEventParams) => void;
   hide: () => void;
   dispose: () => void;
 }
@@ -147,10 +147,8 @@ export function createSignalTooltip({
     el.style.top = `${pt.y}px`;
     el.style.display = "block";
 
-    // Play the entrance only on the hidden -> shown transition, not on every
-    // crosshair move while the tooltip is already up (that would flicker).
+    // Animate only on hidden -> shown; re-animating on every move would flicker.
     if (wasHidden && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      // Restart the animation in case a previous run left the same value.
       el.style.animation = "none";
       void el.offsetWidth;
       el.style.animation = "vorauiTooltipIn 0.16s ease-out";
@@ -159,14 +157,13 @@ export function createSignalTooltip({
     el.innerHTML = renderTooltipHtml(list);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- see SignalTooltip.onCrosshairMove.
-  const onCrosshairMove = (param: any) => {
+  const onCrosshairMove = (param: MouseEventParams) => {
     if (!isEnabled()) {
       hide();
       return;
     }
-    const pt = param?.point;
-    const t = normalizeParamTime(param?.time);
+    const pt = param.point;
+    const t = normalizeParamTime(param.time);
     if (!pt || t == null) {
       hide();
       return;

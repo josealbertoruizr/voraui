@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "next-themes";
 import { BtcRainbowChartSkeleton } from "./btc-rainbow-chart-skeleton";
 import type { IChartApi, ISeriesApi, Time, UTCTimestamp } from "lightweight-charts";
@@ -27,25 +27,25 @@ export function BtcRainbowChart({ data, className }: BtcRainbowChartProps) {
   const loading = data === undefined && fetched.loading;
   const error = data === undefined ? fetched.error : null;
 
-  const containerRef = React.useRef<HTMLDivElement | null>(null);
-  const tooltipRef = React.useRef<RainbowTooltip | null>(null);
-  const chartRef = React.useRef<IChartApi | null>(null);
-  const seriesRef = React.useRef<ISeriesApi<"Line", Time> | null>(null);
-  const primitiveRef = React.useRef<RainbowBandsPrimitive | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const tooltipRef = useRef<RainbowTooltip | null>(null);
+  const chartRef = useRef<IChartApi | null>(null);
+  const seriesRef = useRef<ISeriesApi<"Line", Time> | null>(null);
+  const primitiveRef = useRef<RainbowBandsPrimitive | null>(null);
 
-  const [preset, setPreset] = React.useState<Preset>("ALL");
+  const [preset, setPreset] = useState<Preset>("ALL");
 
-  const lineData = React.useMemo<ChartPoint[]>(() => {
+  const lineData = useMemo<ChartPoint[]>(() => {
     return (series ?? [])
       .filter((p) => Number.isFinite(p.time) && Number.isFinite(p.price) && p.time > 0 && p.price > 0)
       .map((p) => ({ time: p.time as UTCTimestamp, value: p.price }));
   }, [series]);
 
-  const lineDataRef = React.useRef<ChartPoint[]>(lineData);
-  const presetRef = React.useRef<Preset>(preset);
+  const lineDataRef = useRef<ChartPoint[]>(lineData);
+  const presetRef = useRef<Preset>(preset);
   const hasLineData = lineData.length > 0;
 
-  const applyVisibleRange = React.useCallback(() => {
+  const applyVisibleRange = useCallback(() => {
     const chart = chartRef.current;
     const points = lineDataRef.current;
     if (!chart || points.length === 0) return;
@@ -66,7 +66,7 @@ export function BtcRainbowChart({ data, className }: BtcRainbowChartProps) {
     });
   }, []);
 
-  const applyLatestData = React.useCallback(() => {
+  const applyLatestData = useCallback(() => {
     const lineSeries = seriesRef.current;
     const chart = chartRef.current;
     const points = lineDataRef.current;
@@ -77,19 +77,18 @@ export function BtcRainbowChart({ data, className }: BtcRainbowChartProps) {
     primitiveRef.current?.requestUpdate();
   }, [applyVisibleRange]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     lineDataRef.current = lineData;
     applyLatestData();
   }, [lineData, applyLatestData]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     presetRef.current = preset;
     applyVisibleRange();
   }, [preset, applyVisibleRange]);
 
-  // Mount the chart once per theme. Data updates happen in a separate effect
-  // so a fresh fetch doesn't tear down the chart instance.
-  React.useEffect(() => {
+  // Mount once per theme; data updates live in a separate effect.
+  useEffect(() => {
     if (!hasLineData) return;
 
     let disposed = false;
