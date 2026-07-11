@@ -1,9 +1,7 @@
 "use client";
 
-import * as React from "react";
-import { Button } from "@/components/ui/button";
 import { TradingChart } from "@/registry/voraui/trading-chart/trading-chart";
-import type { TradeSignal, TradingChartHandle } from "@/registry/voraui/trading-chart/trading-chart-types";
+import type { TradeSignal } from "@/registry/voraui/trading-chart/trading-chart-types";
 
 const now = Date.now();
 const h = 3_600_000;
@@ -24,34 +22,6 @@ const trades: TradeSignal[] = [
   { id: "b5", ts: now - 5 * h, side: "BUY", price: 1500 },
 ];
 
-const lastBuy = trades.find((t) => t.id === "b5")!;
-const sell = trades.find((t) => t.id === "s2")!;
-
 export function TradingChartDemo() {
-  const ref = React.useRef<TradingChartHandle>(null);
-
-  return (
-    <div className="space-y-3">
-      <TradingChart ref={ref} symbol="BTCUSDT" timeframe="1h" trades={trades} height={440} limit={168} />
-      <div className="flex flex-wrap gap-2">
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => ref.current?.highlightTrade(lastBuy.ts, lastBuy.price, "BUY")}
-        >
-          Highlight last buy
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => ref.current?.highlightTrade(sell.ts, sell.price, "SELL")}
-        >
-          Highlight sell
-        </Button>
-        <Button size="sm" variant="ghost" onClick={() => ref.current?.clearHighlight()}>
-          Clear
-        </Button>
-      </div>
-    </div>
-  );
+  return <TradingChart symbol="BTCUSDT" timeframe="1h" trades={trades} height={440} limit={168} />;
 }
