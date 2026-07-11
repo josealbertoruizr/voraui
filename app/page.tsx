@@ -3,7 +3,7 @@ import { TechStack } from "@/components/site/tech-stack";
 import { DotPattern } from "@/components/site/dot-pattern";
 import { HeroDemo } from "@/components/site/hero-demo";
 import { ShowcaseTile } from "@/components/site/showcase-tile";
-import { BtcRainbowChart } from "@/registry/voraui/btc-rainbow-chart/btc-rainbow-chart";
+import { BtcRainbowChart, BtcRainbowLegend } from "@/registry/voraui/btc-rainbow-chart/btc-rainbow-chart";
 import { FearGreedGauge } from "@/registry/voraui/fear-greed-gauge/fear-greed-gauge";
 import { AltseasonGauge } from "@/registry/voraui/altseason-gauge/altseason-gauge";
 
@@ -52,6 +52,7 @@ export default function Home() {
               href="/docs/btc-rainbow-chart"
               title="BTC Rainbow Chart"
               description="The classic log-regression rainbow with full history back to 2010. Nine color bands mark valuation zones on a log scale, with range presets and a band-aware tooltip."
+              extra={<BtcRainbowLegend />}
             >
               <BtcRainbowChart />
             </ShowcaseTile>

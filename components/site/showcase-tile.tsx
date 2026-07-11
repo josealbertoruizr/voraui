@@ -7,12 +7,15 @@ export function ShowcaseTile({
   href,
   title,
   description,
+  extra,
   children,
   className,
 }: {
   href: string;
   title: string;
   description: string;
+  /** Extra real content below the description - e.g. a legend - not filler, for tiles with room to spare. */
+  extra?: ReactNode;
   children: ReactNode;
   className?: string;
 }) {
@@ -25,6 +28,7 @@ export function ShowcaseTile({
         <CardHeader>
           <CardTitle>{title}</CardTitle>
           <CardDescription>{description}</CardDescription>
+          {extra}
         </CardHeader>
       </Card>
     </Link>
