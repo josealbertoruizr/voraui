@@ -34,8 +34,6 @@ export interface TradingChartHandle {
   /** Pulse a sonar-ring glow at the trade's candle for ~10 seconds. */
   highlightTrade: (timestampMs: number, price: number, side: TradeSide) => void;
   clearHighlight: () => void;
-  /** Animate the visible range to center the given timestamp (seconds or ms). */
-  scrollToTimestamp: (timestamp: number) => void;
 }
 
 export interface TradingChartProps {
