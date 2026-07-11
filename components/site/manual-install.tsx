@@ -8,16 +8,41 @@ function langForFile(filePath: string): string {
   return filePath.endsWith(".tsx") ? "tsx" : "ts";
 }
 
+interface TreeNode {
+  name: string;
+  children?: TreeNode[];
+}
+
+/** Nested tree from target paths, preserving registry file order. */
+function buildTree(paths: string[][]): TreeNode[] {
+  const nodes: TreeNode[] = [];
+  for (const segments of paths) {
+    let level = nodes;
+    for (const [i, segment] of segments.entries()) {
+      const isDir = i < segments.length - 1;
+      let node = level.find((n) => n.name === segment && Boolean(n.children) === isDir);
+      if (!node) {
+        node = isDir ? { name: segment, children: [] } : { name: segment };
+        level.push(node);
+      }
+      if (node.children) level = node.children;
+    }
+  }
+  return nodes;
+}
+
+function treeLines(nodes: TreeNode[], prefix: string): string[] {
+  return nodes.flatMap((node, i) => {
+    const isLast = i === nodes.length - 1;
+    const line = `${prefix}${isLast ? "└──" : "├──"} ${node.name}${node.children ? "/" : ""}`;
+    const childPrefix = `${prefix}${isLast ? "    " : "│   "}`;
+    return node.children ? [line, ...treeLines(node.children, childPrefix)] : [line];
+  });
+}
+
 function FolderTree({ item }: { item: RegistryItem }) {
-  const files = item.files.map((f) => f.target.split("/").pop()!);
-  const lines = [
-    "components/",
-    "└── voraui/",
-    `    └── ${item.name}/`,
-    ...files.map(
-      (file, i) => `        ${i === files.length - 1 ? "└──" : "├──"} ${file}`,
-    ),
-  ];
+  const [root] = buildTree(item.files.map((f) => f.target.split("/")));
+  const lines = [`${root.name}/`, ...treeLines(root.children ?? [], "")];
   return (
     <pre className="overflow-x-auto rounded-lg border border-border bg-muted/40 px-4 py-3 font-mono text-xs leading-relaxed text-muted-foreground">
       {lines.join("\n")}

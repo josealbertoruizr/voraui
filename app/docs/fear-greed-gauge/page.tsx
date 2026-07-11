@@ -6,8 +6,8 @@ import { InstallTabs } from "@/components/site/install-tabs";
 import { ManualInstall } from "@/components/site/manual-install";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PropsTable } from "@/components/site/props-table";
-import { FearGreedGauge } from "@/registry/voraui/fear-greed-gauge/fear-greed-gauge";
-import { FearGreedGaugeSkeleton } from "@/registry/voraui/fear-greed-gauge/fear-greed-gauge-skeleton";
+import { FearGreedGauge } from "@/registry/voraui/fear-greed-gauge";
+import { FearGreedGaugeSkeleton } from "@/registry/voraui/fear-greed-gauge";
 
 export const metadata = { title: "Fear & Greed Gauge" };
 

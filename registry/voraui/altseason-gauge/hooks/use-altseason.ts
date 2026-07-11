@@ -6,7 +6,7 @@ import {
   type AltseasonData,
   type AltseasonWindow,
   type PaprikaTicker,
-} from "./altseason";
+} from "../lib/altseason";
 
 // CoinPaprika public tickers. Free, no API key; large response but fetched rarely.
 const TICKERS_URL = "https://api.coinpaprika.com/v1/tickers?quotes=USD";

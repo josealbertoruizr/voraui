@@ -5,7 +5,7 @@ import { ManualInstall } from "@/components/site/manual-install";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PropsTable } from "@/components/site/props-table";
 import { BtcRainbowChartDemo } from "@/components/site/btc-rainbow-chart-demo";
-import { BtcRainbowChartSkeleton } from "@/registry/voraui/btc-rainbow-chart/btc-rainbow-chart-skeleton";
+import { BtcRainbowChartSkeleton } from "@/registry/voraui/btc-rainbow-chart";
 
 export const metadata = { title: "BTC Rainbow Chart" };
 

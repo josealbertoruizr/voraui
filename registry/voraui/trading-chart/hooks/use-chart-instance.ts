@@ -10,9 +10,9 @@ import type {
   LogicalRange,
   Time,
 } from "lightweight-charts";
-import type { OhlcvCandle, Timeframe, TradeSignal } from "./trading-chart-types";
-import { CANDLE_SERIES_OPTIONS, getChartOptions } from "./chart-options";
-import { createSignalTooltip, type SignalTooltip } from "./signal-tooltip";
+import type { OhlcvCandle, Timeframe, TradeSignal } from "../types";
+import { CANDLE_SERIES_OPTIONS, getChartOptions } from "../lib/chart-options";
+import { createSignalTooltip, type SignalTooltip } from "../lib/signal-tooltip";
 
 /** Props snapshot for the imperative chart handlers, so they never see stale closures. */
 export interface LatestChartProps {

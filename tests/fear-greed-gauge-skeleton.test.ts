@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { FearGreedGaugeSkeleton } from "@/registry/voraui/fear-greed-gauge/fear-greed-gauge-skeleton";
-import { FearGreedGauge } from "@/registry/voraui/fear-greed-gauge/fear-greed-gauge";
+import { FearGreedGaugeSkeleton } from "@/registry/voraui/fear-greed-gauge/components/skeleton";
+import { FearGreedGauge } from "@/registry/voraui/fear-greed-gauge";
 
 describe("FearGreedGaugeSkeleton", () => {
   it("renders a status role with an accessible loading label", () => {

@@ -3,7 +3,7 @@ import {
   DEFAULT_RAINBOW_BANDS,
   findActiveBand,
   rainbowPriceAt,
-} from "@/registry/voraui/btc-rainbow-chart/rainbow-bands";
+} from "@/registry/voraui/btc-rainbow-chart/lib/rainbow-bands";
 
 const GENESIS_MS = Date.UTC(2009, 0, 3);
 const DAY_MS = 86_400_000;

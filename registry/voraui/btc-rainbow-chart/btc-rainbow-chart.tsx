@@ -2,13 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "next-themes";
-import { BtcRainbowChartSkeleton } from "./btc-rainbow-chart-skeleton";
+import { BtcRainbowChartSkeleton } from "./components/skeleton";
 import type { IChartApi, ISeriesApi, Time, UTCTimestamp } from "lightweight-charts";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { RainbowBandsPrimitive, DEFAULT_RAINBOW_BANDS } from "./rainbow-bands";
-import { createRainbowTooltip, type RainbowTooltip } from "./rainbow-tooltip";
-import { useBtcHistory, type RainbowPoint } from "./use-btc-history";
+import { RainbowBandsPrimitive, DEFAULT_RAINBOW_BANDS } from "./lib/rainbow-bands";
+import { createRainbowTooltip, type RainbowTooltip } from "./lib/rainbow-tooltip";
+import { useBtcHistory, type RainbowPoint } from "./hooks/use-btc-history";
 
 export interface BtcRainbowChartProps {
   /** Provide your own daily BTC series to bypass the bundled fetcher. */

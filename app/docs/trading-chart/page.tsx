@@ -5,7 +5,7 @@ import { ManualInstall } from "@/components/site/manual-install";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PropsTable } from "@/components/site/props-table";
 import { TradingChartDemo } from "@/components/site/trading-chart-demo";
-import { TradingChartSkeleton } from "@/registry/voraui/trading-chart/trading-chart-skeleton";
+import { TradingChartSkeleton } from "@/registry/voraui/trading-chart";
 
 export const metadata = { title: "Trading Chart" };
 

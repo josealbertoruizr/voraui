@@ -6,8 +6,8 @@ import { InstallTabs } from "@/components/site/install-tabs";
 import { ManualInstall } from "@/components/site/manual-install";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PropsTable } from "@/components/site/props-table";
-import { AltseasonGauge } from "@/registry/voraui/altseason-gauge/altseason-gauge";
-import { AltseasonGaugeSkeleton } from "@/registry/voraui/altseason-gauge/altseason-gauge-skeleton";
+import { AltseasonGauge } from "@/registry/voraui/altseason-gauge";
+import { AltseasonGaugeSkeleton } from "@/registry/voraui/altseason-gauge";
 
 export const metadata = { title: "Altseason Gauge" };
 
