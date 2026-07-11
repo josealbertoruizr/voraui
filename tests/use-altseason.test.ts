@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { fetchTickersWithRetry } from "@/registry/voraui/altseason-gauge/use-altseason";
-import type { PaprikaTicker } from "@/registry/voraui/altseason-gauge/altseason";
+import { fetchTickersWithRetry } from "@/registry/voraui/altseason-gauge/hooks/use-altseason";
+import type { PaprikaTicker } from "@/registry/voraui/altseason-gauge/lib/altseason";
 
 describe("fetchTickersWithRetry", () => {
   it("returns data from the first successful attempt", async () => {

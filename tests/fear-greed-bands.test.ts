@@ -11,7 +11,7 @@ import {
   describeWedge,
   equalizedValue,
   findFearGreedBand,
-} from "@/registry/voraui/fear-greed-gauge/fear-greed-bands";
+} from "@/registry/voraui/fear-greed-gauge/lib/fear-greed-bands";
 
 describe("angleForValue", () => {
   it("maps 0 to 180 degrees (left) and 100 to 0 degrees (right)", () => {

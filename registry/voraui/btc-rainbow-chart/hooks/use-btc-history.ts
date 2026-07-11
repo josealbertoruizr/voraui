@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BTC_DAILY_SEED } from "./btc-seed";
+import { BTC_DAILY_SEED } from "../lib/btc-seed";
 
 export interface RainbowPoint {
   /** Unix seconds (UTC day open). */

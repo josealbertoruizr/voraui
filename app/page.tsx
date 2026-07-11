@@ -3,9 +3,9 @@ import { TechStack } from "@/components/site/tech-stack";
 import { DotPattern } from "@/components/site/dot-pattern";
 import { HeroDemo } from "@/components/site/hero-demo";
 import { ShowcaseTile } from "@/components/site/showcase-tile";
-import { BtcRainbowChart, BtcRainbowLegend } from "@/registry/voraui/btc-rainbow-chart/btc-rainbow-chart";
-import { FearGreedGauge } from "@/registry/voraui/fear-greed-gauge/fear-greed-gauge";
-import { AltseasonGauge } from "@/registry/voraui/altseason-gauge/altseason-gauge";
+import { BtcRainbowChart, BtcRainbowLegend } from "@/registry/voraui/btc-rainbow-chart";
+import { FearGreedGauge } from "@/registry/voraui/fear-greed-gauge";
+import { AltseasonGauge } from "@/registry/voraui/altseason-gauge";
 
 export default function Home() {
   return (

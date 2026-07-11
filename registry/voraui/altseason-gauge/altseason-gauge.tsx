@@ -3,9 +3,9 @@
 import { motion } from "framer-motion";
 import NumberFlow from "@number-flow/react";
 import { cn } from "@/lib/utils";
-import { AltseasonGaugeSkeleton } from "./altseason-gauge-skeleton";
-import { useAltseason } from "./use-altseason";
-import type { AltseasonData, AltseasonWindow } from "./altseason";
+import { AltseasonGaugeSkeleton } from "./components/skeleton";
+import { useAltseason } from "./hooks/use-altseason";
+import type { AltseasonData, AltseasonWindow } from "./lib/altseason";
 
 export interface AltseasonGaugeProps {
   /** Provide your own data to bypass the bundled CoinPaprika fetcher. */
