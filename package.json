@@ -8,12 +8,12 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "shadcn build && next build",
+    "build": "shadcn build && node scripts/build-zips.mjs && next build",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "registry:build": "shadcn build"
+    "registry:build": "shadcn build && node scripts/build-zips.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
@@ -39,6 +39,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
+    "jszip": "^3.10.1",
     "shadcn": "^4.13.0",
     "tailwindcss": "^4",
     "typescript": "^5",

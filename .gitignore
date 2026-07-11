@@ -38,6 +38,7 @@ pnpm-debug.log*
 
 # registry build output (generated)
 public/r/
+public/d/
 
 .superpowers/
 .worktrees/
