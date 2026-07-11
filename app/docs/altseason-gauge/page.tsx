@@ -19,21 +19,31 @@ export default function Page() {
         </p>
       </div>
 
-      <ComponentPreview>
-        <AltseasonGauge />
-      </ComponentPreview>
-
-      <section className="space-y-3">
+      <section className="space-y-6">
         <h2 className="text-xl font-semibold">Variants</h2>
-        <p className="text-sm text-muted-foreground">
-          variant=&quot;bars&quot; draws one bar per compared altcoin and fills the ones
-          outperforming BTC, so the strip is the computation itself. Bars are colored along the
-          classic altseason spectrum, and the unfilled remainder stays faintly visible so the
-          current position on the scale is always readable.
-        </p>
-        <ComponentPreview>
-          <AltseasonGauge variant="bars" />
-        </ComponentPreview>
+
+        <div className="space-y-3">
+          <h3 className="text-base font-semibold">Meter</h3>
+          <p className="text-sm text-muted-foreground">
+            The default variant: a three-zone track with a position thumb.
+          </p>
+          <ComponentPreview>
+            <AltseasonGauge />
+          </ComponentPreview>
+        </div>
+
+        <div className="space-y-3">
+          <h3 className="text-base font-semibold">Bars</h3>
+          <p className="text-sm text-muted-foreground">
+            variant=&quot;bars&quot; draws one bar per compared altcoin and fills the ones
+            outperforming BTC, so the strip is the computation itself. Bars are colored along the
+            classic altseason spectrum, and the unfilled remainder stays faintly visible so the
+            current position on the scale is always readable.
+          </p>
+          <ComponentPreview>
+            <AltseasonGauge variant="bars" />
+          </ComponentPreview>
+        </div>
       </section>
 
       <section className="space-y-3">
@@ -85,6 +95,12 @@ export default function Page() {
               defaultValue: '"meter"',
               description:
                 "\"meter\" is a three-zone track with a position thumb; \"bars\" draws one bar per compared altcoin, filling the alts that outperform BTC.",
+            },
+            {
+              name: "animateOnLoad",
+              type: "boolean",
+              defaultValue: "true",
+              description: "Spring the meter's thumb in from the center on first render instead of snapping straight to its score position.",
             },
             { name: "className", type: "string", description: "Extra classes for the wrapper." },
           ]}
