@@ -135,6 +135,21 @@
           "path": "registry/voraui/trading-chart/trading-chart-types.ts",
           "type": "registry:lib",
           "target": "components/voraui/trading-chart-types.ts"
+        },
+        {
+          "path": "registry/voraui/trading-chart/chart-time.ts",
+          "type": "registry:lib",
+          "target": "components/voraui/chart-time.ts"
+        },
+        {
+          "path": "registry/voraui/trading-chart/trade-glow.ts",
+          "type": "registry:lib",
+          "target": "components/voraui/trade-glow.ts"
+        },
+        {
+          "path": "registry/voraui/trading-chart/signal-tooltip.ts",
+          "type": "registry:lib",
+          "target": "components/voraui/signal-tooltip.ts"
         }
       ]
     }

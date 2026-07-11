@@ -75,7 +75,7 @@ export default function Page() {
             { name: "live", type: "boolean", defaultValue: "true", description: "Poll Binance for live candle updates." },
             { name: "height", type: "number", defaultValue: "500", description: "Chart height in pixels." },
             { name: "limit", type: "number", defaultValue: "500", description: "Candles for the initial load (max 1000)." },
-            { name: "showTooltips", type: "boolean", defaultValue: "true", description: "Show trade tooltips on hover/click." },
+            { name: "showTooltips", type: "boolean", defaultValue: "true", description: "Show trade tooltips on hover." },
             { name: "className", type: "string", description: "Extra classes for the wrapper." },
           ]}
         />
@@ -91,11 +91,6 @@ export default function Page() {
               description: "Pulse a sonar-ring glow at the trade's candle for 10 seconds.",
             },
             { name: "clearHighlight", type: "() => void", description: "Remove the glow immediately." },
-            {
-              name: "scrollToTimestamp",
-              type: "(timestamp) => void",
-              description: "Animate the visible range to center a timestamp (seconds or ms).",
-            },
           ]}
         />
       </section>
