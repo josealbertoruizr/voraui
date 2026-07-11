@@ -1,11 +1,11 @@
-import path from "node:path";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CodeBlock } from "@/components/site/code-block";
 import { readRegistryFile } from "@/lib/registry";
 
 /**
- * MagicUI-style demo block: a Preview tab with the live demo and a Code tab
- * showing the demo file's full source, so usage can be copied verbatim.
+ * MagicUI-style demo block: a Preview tab with the live demo in a bordered
+ * frame and a Code tab showing the demo file's full source (line numbers,
+ * registry import highlighted), so usage can be copied verbatim.
  */
 export async function DemoPreview({
   source,
@@ -23,9 +23,17 @@ export async function DemoPreview({
         <TabsTrigger value="preview">Preview</TabsTrigger>
         <TabsTrigger value="code">Code</TabsTrigger>
       </TabsList>
-      <TabsContent value="preview">{children}</TabsContent>
+      <TabsContent value="preview">
+        <div className="rounded-xl border border-border p-4 md:p-6">{children}</div>
+      </TabsContent>
       <TabsContent value="code">
-        <CodeBlock code={code} lang="tsx" filename={path.basename(source)} />
+        <CodeBlock
+          code={code}
+          lang="tsx"
+          filename={source}
+          lineNumbers
+          highlightLinesMatching="@/registry/voraui/"
+        />
       </TabsContent>
     </Tabs>
   );
