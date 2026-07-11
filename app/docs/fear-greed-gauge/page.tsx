@@ -1,4 +1,6 @@
 import { ComponentPreview } from "@/components/site/component-preview";
+import { DemoPreview } from "@/components/site/demo-preview";
+import { FearGreedGaugeDemo } from "@/components/site/fear-greed-gauge-demo";
 import { InstallTabs } from "@/components/site/install-tabs";
 import { ManualInstall } from "@/components/site/manual-install";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,9 +21,11 @@ export default function Page() {
         </p>
       </div>
 
-      <ComponentPreview>
-        <FearGreedGauge />
-      </ComponentPreview>
+      <DemoPreview source="components/site/fear-greed-gauge-demo.tsx">
+        <div className="flex min-h-[300px] items-center justify-center">
+          <FearGreedGaugeDemo />
+        </div>
+      </DemoPreview>
 
       <section className="space-y-3">
         <h2 className="text-xl font-semibold">Variants</h2>
