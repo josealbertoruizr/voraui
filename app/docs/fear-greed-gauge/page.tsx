@@ -1,3 +1,4 @@
+import { CodeBlock } from "@/components/site/code-block";
 import { ComponentPreview } from "@/components/site/component-preview";
 import { DemoPreview } from "@/components/site/demo-preview";
 import { FearGreedGaugeDemo } from "@/components/site/fear-greed-gauge-demo";
@@ -27,52 +28,55 @@ export default function Page() {
         </div>
       </DemoPreview>
 
-      <section className="space-y-6">
+      <section className="space-y-3">
         <h2 className="text-xl font-semibold">Variants</h2>
-
-        <div className="space-y-3">
-          <h3 className="text-base font-semibold">Gradient</h3>
-          <p className="text-sm text-muted-foreground">
-            The default variant: a smooth continuous color blend with just the dial, needle, and
-            number.
-          </p>
-          <ComponentPreview>
-            <FearGreedGauge />
-          </ComponentPreview>
-        </div>
-
-        <div className="space-y-3">
-          <h3 className="text-base font-semibold">Minimal</h3>
-          <p className="text-sm text-muted-foreground">
-            variant=&quot;minimal&quot; shows the same layout with 5 discrete color bands instead
-            of a continuous gradient.
-          </p>
-          <ComponentPreview>
-            <FearGreedGauge variant="minimal" />
-          </ComponentPreview>
-        </div>
-
-        <div className="space-y-3">
-          <h3 className="text-base font-semibold">Ticks</h3>
-          <p className="text-sm text-muted-foreground">
-            variant=&quot;ticks&quot; swaps the solid arc for 100 individual gradient tick marks
-            (one per index value) plus numeric labels, speedometer-style.
-          </p>
-          <ComponentPreview>
-            <FearGreedGauge variant="ticks" />
-          </ComponentPreview>
-        </div>
-
-        <div className="space-y-3">
-          <h3 className="text-base font-semibold">Wedges</h3>
-          <p className="text-sm text-muted-foreground">
-            variant=&quot;wedges&quot; shows equal-width pie-slice zone sectors with numeric dial
-            ticks; the zone matching the current value is highlighted, the rest stay neutral gray.
-          </p>
-          <ComponentPreview>
-            <FearGreedGauge variant="wedges" />
-          </ComponentPreview>
-        </div>
+        <Tabs defaultValue="gradient">
+          <TabsList>
+            <TabsTrigger value="gradient">Gradient</TabsTrigger>
+            <TabsTrigger value="minimal">Minimal</TabsTrigger>
+            <TabsTrigger value="ticks">Ticks</TabsTrigger>
+            <TabsTrigger value="wedges">Wedges</TabsTrigger>
+          </TabsList>
+          <TabsContent value="gradient" className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              The default variant: a smooth continuous color blend with just the dial, needle, and
+              number.
+            </p>
+            <ComponentPreview>
+              <FearGreedGauge />
+            </ComponentPreview>
+            <CodeBlock code="<FearGreedGauge />" lang="tsx" filename="Usage" />
+          </TabsContent>
+          <TabsContent value="minimal" className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              The same layout with 5 discrete color bands instead of a continuous gradient.
+            </p>
+            <ComponentPreview>
+              <FearGreedGauge variant="minimal" />
+            </ComponentPreview>
+            <CodeBlock code={'<FearGreedGauge variant="minimal" />'} lang="tsx" filename="Usage" />
+          </TabsContent>
+          <TabsContent value="ticks" className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Swaps the solid arc for 100 individual gradient tick marks (one per index value) plus
+              numeric labels, speedometer-style.
+            </p>
+            <ComponentPreview>
+              <FearGreedGauge variant="ticks" />
+            </ComponentPreview>
+            <CodeBlock code={'<FearGreedGauge variant="ticks" />'} lang="tsx" filename="Usage" />
+          </TabsContent>
+          <TabsContent value="wedges" className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Equal-width pie-slice zone sectors with numeric dial ticks; the zone matching the
+              current value is highlighted, the rest stay neutral gray.
+            </p>
+            <ComponentPreview>
+              <FearGreedGauge variant="wedges" />
+            </ComponentPreview>
+            <CodeBlock code={'<FearGreedGauge variant="wedges" />'} lang="tsx" filename="Usage" />
+          </TabsContent>
+        </Tabs>
       </section>
 
       <section className="space-y-3">
