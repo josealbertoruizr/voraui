@@ -1,37 +1,27 @@
 "use client";
 
 import * as React from "react";
-import { forwardRef, useImperativeHandle } from "react";
 import { TradingChartSkeleton } from "./trading-chart-skeleton";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
-import type {
-  OhlcvCandle,
-  TradeSide,
-  TradingChartHandle,
-  TradingChartProps,
-} from "./trading-chart-types";
+import type { OhlcvCandle, TradingChartProps } from "./trading-chart-types";
 import { sanitizeCandles, isValidCandle } from "./candle-validation";
 import { useKlines, useLatestCandlePolling } from "./use-klines";
 import { alignSignalsToBars, buildSeriesMarkers, BUY_COLOR, SELL_COLOR } from "./markers";
 import { normalizeToSeconds, toChartTime } from "./chart-time";
-import { createTradeGlow, type TradeGlow } from "./trade-glow";
 import { createSignalTooltip, type SignalTooltip } from "./signal-tooltip";
 
-const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function TradingChart(
-  {
-    symbol = "BTCUSDT",
-    timeframe = "1h",
-    trades = [],
-    candles: candlesProp,
-    live = true,
-    height = 500,
-    limit = 500,
-    showTooltips = true,
-    className,
-  },
-  ref,
-) {
+function TradingChart({
+  symbol = "BTCUSDT",
+  timeframe = "1h",
+  trades = [],
+  candles: candlesProp,
+  live = true,
+  height = 500,
+  limit = 500,
+  showTooltips = true,
+  className,
+}: TradingChartProps) {
   const { resolvedTheme } = useTheme();
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- lightweight-charts's chart instance is only available via dynamic import; typing this precisely would force an eager import.
@@ -40,7 +30,6 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
   const seriesRef = React.useRef<any>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- see chartRef above.
   const markersPluginRef = React.useRef<any>(null);
-  const glowRef = React.useRef<TradeGlow | null>(null);
   const tooltipRef = React.useRef<SignalTooltip | null>(null);
 
   const isAutoFitDoneRef = React.useRef(false);
@@ -87,29 +76,20 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
     if (!showTooltips) tooltipRef.current?.hide();
   }, [showTooltips]);
 
-  useImperativeHandle(ref, () => ({
-    highlightTrade: (timestampMs: number, price: number, side: TradeSide) =>
-      glowRef.current?.highlight(timestampMs, price, side),
-    clearHighlight: () => glowRef.current?.clear(),
-  }));
-
-  const [showNoMoreData, setShowNoMoreData] = React.useState(false);
-  const noMoreDataTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const [chartEpoch, setChartEpoch] = React.useState(0);
 
-  // Brief notification when the user hits the historical data boundary.
+  // Brief notification when the user hits the historical data boundary. It
+  // auto-dismisses after 4 seconds and re-arms on a symbol/timeframe change.
+  const atHistoryBoundary =
+    !hasMoreHistory && !loading && candles.length > 0 && candlesProp === undefined;
+  const [dismissedBoundaryKey, setDismissedBoundaryKey] = React.useState<string | null>(null);
+  const showNoMoreData = atHistoryBoundary && dismissedBoundaryKey !== `${symbol}-${timeframe}`;
+
   React.useEffect(() => {
-    if (!hasMoreHistory && !loading && candles.length > 0 && candlesProp === undefined) {
-      setShowNoMoreData(true);
-      if (noMoreDataTimerRef.current) clearTimeout(noMoreDataTimerRef.current);
-      noMoreDataTimerRef.current = setTimeout(() => setShowNoMoreData(false), 4000);
-    } else {
-      setShowNoMoreData(false);
-    }
-    return () => {
-      if (noMoreDataTimerRef.current) clearTimeout(noMoreDataTimerRef.current);
-    };
-  }, [hasMoreHistory, loading, candles.length, candlesProp]);
+    if (!atHistoryBoundary) return;
+    const timer = setTimeout(() => setDismissedBoundaryKey(`${symbol}-${timeframe}`), 4000);
+    return () => clearTimeout(timer);
+  }, [atHistoryBoundary, symbol, timeframe]);
 
   const isLoadingMoreRef = React.useRef(false);
   // Set alongside isLoadingMoreRef, but consumed (and cleared) by the "Update
@@ -192,17 +172,6 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
       // Trade/indicator markers.
       markersPluginRef.current = createSeriesMarkers(series, []);
 
-      // Trade highlight glow.
-      const glow = createTradeGlow({
-        container,
-        getChart: () => chartRef.current,
-        getSeries: () => seriesRef.current,
-        getCandles: () => latestRef.current.candles,
-        getTimeframe: () => latestRef.current.timeframe,
-      });
-      glowRef.current = glow;
-      chart.timeScale().subscribeVisibleLogicalRangeChange(glow.updatePosition);
-
       // Hover tooltip for trade/indicator signals.
       const tooltip = createSignalTooltip({
         container,
@@ -270,8 +239,6 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
       if (ro) ro.disconnect();
       tooltipRef.current?.dispose();
       tooltipRef.current = null;
-      glowRef.current?.dispose();
-      glowRef.current = null;
       if (chartRef.current) {
         chartRef.current.remove();
         chartRef.current = null;
@@ -478,8 +445,6 @@ const TradingChart = forwardRef<TradingChartHandle, TradingChartProps>(function 
       <div ref={containerRef} className="relative w-full" style={{ height }} />
     </div>
   );
-});
-
-TradingChart.displayName = "TradingChart";
+}
 
 export { TradingChart };
