@@ -26,7 +26,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <SiteHeader />
           <div className="flex-1">{children}</div>
           <footer className="border-t border-border py-4">
-            <p className="mx-auto max-w-6xl px-4 text-xs text-muted-foreground">
+            <p className="mx-auto max-w-6xl px-4 text-center text-xs text-muted-foreground">
               Built by{" "}
               <Link
                 href="https://github.com/josealbertoruizr"
