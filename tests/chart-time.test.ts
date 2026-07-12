@@ -4,7 +4,7 @@ import {
   normalizeParamTime,
   normalizeToSeconds,
   toChartTime,
-} from "@/registry/voraui/trading-chart/chart-time";
+} from "@/registry/voraui/trading-chart/lib/chart-time";
 
 describe("isDailyOrHigher", () => {
   it("is true only for 1d/1w/1M", () => {

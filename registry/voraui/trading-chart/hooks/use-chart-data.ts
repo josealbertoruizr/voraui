@@ -3,10 +3,10 @@
 import { useEffect } from "react";
 import type { RefObject } from "react";
 import type { LogicalRange } from "lightweight-charts";
-import type { OhlcvCandle, Timeframe, TradeSignal } from "./trading-chart-types";
-import { sanitizeCandles } from "./candle-validation";
-import { toChartTime } from "./chart-time";
-import { alignSignalsToBars, buildSeriesMarkers } from "./markers";
+import type { OhlcvCandle, Timeframe, TradeSignal } from "../types";
+import { sanitizeCandles } from "../lib/candle-validation";
+import { toChartTime } from "../lib/chart-time";
+import { alignSignalsToBars, buildSeriesMarkers } from "../lib/markers";
 import type { ChartState } from "./use-chart-instance";
 
 export interface UseChartDataOptions {

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   computeAltseason,
   type PaprikaTicker,
-} from "@/registry/voraui/altseason-gauge/altseason";
+} from "@/registry/voraui/altseason-gauge/lib/altseason";
 
 function ticker(symbol: string, rank: number, change7d: number | null): PaprikaTicker {
   return { symbol, rank, quotes: { USD: { percent_change_7d: change7d } } };

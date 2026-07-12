@@ -12,7 +12,7 @@ import {
   WEDGES_VIEWBOX_HEIGHT,
   describeArc,
   describeWedge,
-} from "./fear-greed-bands";
+} from "../lib/fear-greed-bands";
 
 export interface FearGreedGaugeSkeletonProps {
   /** Matches FearGreedGaugeProps["variant"] so the ghost lines up with the real dial. */

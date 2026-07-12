@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { compactUsd, renderRainbowTooltipHtml } from "@/registry/voraui/btc-rainbow-chart/rainbow-tooltip";
-import { DEFAULT_RAINBOW_BANDS } from "@/registry/voraui/btc-rainbow-chart/rainbow-bands";
+import { compactUsd, renderRainbowTooltipHtml } from "@/registry/voraui/btc-rainbow-chart/lib/rainbow-tooltip";
+import { DEFAULT_RAINBOW_BANDS } from "@/registry/voraui/btc-rainbow-chart/lib/rainbow-bands";
 
 describe("compactUsd", () => {
   it("formats magnitudes with the right suffix", () => {

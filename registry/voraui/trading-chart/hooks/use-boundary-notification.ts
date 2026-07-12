@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { Timeframe } from "./trading-chart-types";
+import type { Timeframe } from "../types";
 
 export interface UseBoundaryNotificationOptions {
   hasMoreHistory: boolean;

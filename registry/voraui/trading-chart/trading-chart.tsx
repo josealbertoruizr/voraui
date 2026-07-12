@@ -1,14 +1,14 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { TradingChartSkeleton } from "./trading-chart-skeleton";
-import type { TradingChartProps } from "./trading-chart-types";
-import { useKlines } from "./use-klines";
-import { useChartInstance } from "./use-chart-instance";
-import { useChartTheme } from "./use-chart-theme";
-import { useChartData } from "./use-chart-data";
-import { useLiveCandles } from "./use-live-candles";
-import { useBoundaryNotification } from "./use-boundary-notification";
+import { TradingChartSkeleton } from "./components/skeleton";
+import type { TradingChartProps } from "./types";
+import { useKlines } from "./hooks/use-klines";
+import { useChartInstance } from "./hooks/use-chart-instance";
+import { useChartTheme } from "./hooks/use-chart-theme";
+import { useChartData } from "./hooks/use-chart-data";
+import { useLiveCandles } from "./hooks/use-live-candles";
+import { useBoundaryNotification } from "./hooks/use-boundary-notification";
 
 function TradingChart({
   symbol = "BTCUSDT",

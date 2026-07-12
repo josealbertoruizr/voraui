@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mergeBtcHistory } from "@/registry/voraui/btc-rainbow-chart/use-btc-history";
+import { mergeBtcHistory } from "@/registry/voraui/btc-rainbow-chart/hooks/use-btc-history";
 
 describe("mergeBtcHistory", () => {
   it("prefers Binance values on overlapping days and sorts ascending", () => {

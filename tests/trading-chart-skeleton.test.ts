@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { TradingChartSkeleton, generateGhostCandles } from "@/registry/voraui/trading-chart/trading-chart-skeleton";
-import { TradingChart } from "@/registry/voraui/trading-chart/trading-chart";
+import { TradingChartSkeleton, generateGhostCandles } from "@/registry/voraui/trading-chart/components/skeleton";
+import { TradingChart } from "@/registry/voraui/trading-chart";
 
 describe("generateGhostCandles", () => {
   it("returns the requested number of deterministic candles within range", () => {

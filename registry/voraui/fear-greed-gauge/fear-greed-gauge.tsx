@@ -4,8 +4,8 @@ import { useEffect, useId, useRef } from "react";
 import { animate, useMotionValue } from "framer-motion";
 import NumberFlow from "@number-flow/react";
 import { cn } from "@/lib/utils";
-import { FearGreedGaugeSkeleton } from "./fear-greed-gauge-skeleton";
-import { useFearGreed, type FearGreedData } from "./use-fear-greed";
+import { FearGreedGaugeSkeleton } from "./components/skeleton";
+import { useFearGreed, type FearGreedData } from "./hooks/use-fear-greed";
 import {
   DEFAULT_FEAR_GREED_BANDS,
   GAUGE_CENTER_X,
@@ -23,7 +23,7 @@ import {
   describeWedge,
   equalizedValue,
   findFearGreedBand,
-} from "./fear-greed-bands";
+} from "./lib/fear-greed-bands";
 
 export interface FearGreedGaugeProps {
   /** Provide your own data to bypass the bundled alternative.me fetcher. */

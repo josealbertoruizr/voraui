@@ -5,8 +5,8 @@ import {
   buildSeriesMarkers,
   floorToIntervalSeconds,
   type AlignedSignal,
-} from "@/registry/voraui/trading-chart/markers";
-import type { OhlcvCandle, TradeSignal } from "@/registry/voraui/trading-chart/trading-chart-types";
+} from "@/registry/voraui/trading-chart/lib/markers";
+import type { OhlcvCandle, TradeSignal } from "@/registry/voraui/trading-chart/types";
 
 function candle(time: number): OhlcvCandle {
   return { time, open: 100, high: 110, low: 90, close: 105, volume: 1 };

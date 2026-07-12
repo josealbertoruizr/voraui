@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isValidCandle, sanitizeCandles } from "@/registry/voraui/trading-chart/candle-validation";
+import { isValidCandle, sanitizeCandles } from "@/registry/voraui/trading-chart/lib/candle-validation";
 
 const base = { time: 1_700_000_000, open: 100, high: 110, low: 90, close: 105, volume: 1 };
 

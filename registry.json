@@ -16,24 +16,29 @@
       ],
       "files": [
         {
+          "path": "registry/voraui/fear-greed-gauge/index.ts",
+          "type": "registry:lib",
+          "target": "components/voraui/fear-greed-gauge/index.ts"
+        },
+        {
           "path": "registry/voraui/fear-greed-gauge/fear-greed-gauge.tsx",
           "type": "registry:component",
           "target": "components/voraui/fear-greed-gauge/fear-greed-gauge.tsx"
         },
         {
-          "path": "registry/voraui/fear-greed-gauge/fear-greed-gauge-skeleton.tsx",
+          "path": "registry/voraui/fear-greed-gauge/components/skeleton.tsx",
           "type": "registry:component",
-          "target": "components/voraui/fear-greed-gauge/fear-greed-gauge-skeleton.tsx"
+          "target": "components/voraui/fear-greed-gauge/components/skeleton.tsx"
         },
         {
-          "path": "registry/voraui/fear-greed-gauge/use-fear-greed.ts",
+          "path": "registry/voraui/fear-greed-gauge/hooks/use-fear-greed.ts",
           "type": "registry:hook",
-          "target": "components/voraui/fear-greed-gauge/use-fear-greed.ts"
+          "target": "components/voraui/fear-greed-gauge/hooks/use-fear-greed.ts"
         },
         {
-          "path": "registry/voraui/fear-greed-gauge/fear-greed-bands.ts",
+          "path": "registry/voraui/fear-greed-gauge/lib/fear-greed-bands.ts",
           "type": "registry:lib",
-          "target": "components/voraui/fear-greed-gauge/fear-greed-bands.ts"
+          "target": "components/voraui/fear-greed-gauge/lib/fear-greed-bands.ts"
         }
       ]
     },
@@ -51,24 +56,29 @@
       ],
       "files": [
         {
+          "path": "registry/voraui/altseason-gauge/index.ts",
+          "type": "registry:lib",
+          "target": "components/voraui/altseason-gauge/index.ts"
+        },
+        {
           "path": "registry/voraui/altseason-gauge/altseason-gauge.tsx",
           "type": "registry:component",
           "target": "components/voraui/altseason-gauge/altseason-gauge.tsx"
         },
         {
-          "path": "registry/voraui/altseason-gauge/altseason-gauge-skeleton.tsx",
+          "path": "registry/voraui/altseason-gauge/components/skeleton.tsx",
           "type": "registry:component",
-          "target": "components/voraui/altseason-gauge/altseason-gauge-skeleton.tsx"
+          "target": "components/voraui/altseason-gauge/components/skeleton.tsx"
         },
         {
-          "path": "registry/voraui/altseason-gauge/use-altseason.ts",
+          "path": "registry/voraui/altseason-gauge/hooks/use-altseason.ts",
           "type": "registry:hook",
-          "target": "components/voraui/altseason-gauge/use-altseason.ts"
+          "target": "components/voraui/altseason-gauge/hooks/use-altseason.ts"
         },
         {
-          "path": "registry/voraui/altseason-gauge/altseason.ts",
+          "path": "registry/voraui/altseason-gauge/lib/altseason.ts",
           "type": "registry:lib",
-          "target": "components/voraui/altseason-gauge/altseason.ts"
+          "target": "components/voraui/altseason-gauge/lib/altseason.ts"
         }
       ]
     },
@@ -87,34 +97,39 @@
       ],
       "files": [
         {
+          "path": "registry/voraui/btc-rainbow-chart/index.ts",
+          "type": "registry:lib",
+          "target": "components/voraui/btc-rainbow-chart/index.ts"
+        },
+        {
           "path": "registry/voraui/btc-rainbow-chart/btc-rainbow-chart.tsx",
           "type": "registry:component",
           "target": "components/voraui/btc-rainbow-chart/btc-rainbow-chart.tsx"
         },
         {
-          "path": "registry/voraui/btc-rainbow-chart/btc-rainbow-chart-skeleton.tsx",
+          "path": "registry/voraui/btc-rainbow-chart/components/skeleton.tsx",
           "type": "registry:component",
-          "target": "components/voraui/btc-rainbow-chart/btc-rainbow-chart-skeleton.tsx"
+          "target": "components/voraui/btc-rainbow-chart/components/skeleton.tsx"
         },
         {
-          "path": "registry/voraui/btc-rainbow-chart/rainbow-bands.ts",
-          "type": "registry:lib",
-          "target": "components/voraui/btc-rainbow-chart/rainbow-bands.ts"
-        },
-        {
-          "path": "registry/voraui/btc-rainbow-chart/rainbow-tooltip.ts",
-          "type": "registry:lib",
-          "target": "components/voraui/btc-rainbow-chart/rainbow-tooltip.ts"
-        },
-        {
-          "path": "registry/voraui/btc-rainbow-chart/use-btc-history.ts",
+          "path": "registry/voraui/btc-rainbow-chart/hooks/use-btc-history.ts",
           "type": "registry:hook",
-          "target": "components/voraui/btc-rainbow-chart/use-btc-history.ts"
+          "target": "components/voraui/btc-rainbow-chart/hooks/use-btc-history.ts"
         },
         {
-          "path": "registry/voraui/btc-rainbow-chart/btc-seed.ts",
+          "path": "registry/voraui/btc-rainbow-chart/lib/rainbow-bands.ts",
           "type": "registry:lib",
-          "target": "components/voraui/btc-rainbow-chart/btc-seed.ts"
+          "target": "components/voraui/btc-rainbow-chart/lib/rainbow-bands.ts"
+        },
+        {
+          "path": "registry/voraui/btc-rainbow-chart/lib/rainbow-tooltip.ts",
+          "type": "registry:lib",
+          "target": "components/voraui/btc-rainbow-chart/lib/rainbow-tooltip.ts"
+        },
+        {
+          "path": "registry/voraui/btc-rainbow-chart/lib/btc-seed.ts",
+          "type": "registry:lib",
+          "target": "components/voraui/btc-rainbow-chart/lib/btc-seed.ts"
         }
       ]
     },
@@ -132,74 +147,79 @@
       ],
       "files": [
         {
+          "path": "registry/voraui/trading-chart/index.ts",
+          "type": "registry:lib",
+          "target": "components/voraui/trading-chart/index.ts"
+        },
+        {
           "path": "registry/voraui/trading-chart/trading-chart.tsx",
           "type": "registry:component",
           "target": "components/voraui/trading-chart/trading-chart.tsx"
         },
         {
-          "path": "registry/voraui/trading-chart/trading-chart-skeleton.tsx",
+          "path": "registry/voraui/trading-chart/types.ts",
+          "type": "registry:lib",
+          "target": "components/voraui/trading-chart/types.ts"
+        },
+        {
+          "path": "registry/voraui/trading-chart/components/skeleton.tsx",
           "type": "registry:component",
-          "target": "components/voraui/trading-chart/trading-chart-skeleton.tsx"
+          "target": "components/voraui/trading-chart/components/skeleton.tsx"
         },
         {
-          "path": "registry/voraui/trading-chart/use-chart-instance.ts",
+          "path": "registry/voraui/trading-chart/hooks/use-chart-instance.ts",
           "type": "registry:hook",
-          "target": "components/voraui/trading-chart/use-chart-instance.ts"
+          "target": "components/voraui/trading-chart/hooks/use-chart-instance.ts"
         },
         {
-          "path": "registry/voraui/trading-chart/use-chart-theme.ts",
+          "path": "registry/voraui/trading-chart/hooks/use-chart-theme.ts",
           "type": "registry:hook",
-          "target": "components/voraui/trading-chart/use-chart-theme.ts"
+          "target": "components/voraui/trading-chart/hooks/use-chart-theme.ts"
         },
         {
-          "path": "registry/voraui/trading-chart/use-chart-data.ts",
+          "path": "registry/voraui/trading-chart/hooks/use-chart-data.ts",
           "type": "registry:hook",
-          "target": "components/voraui/trading-chart/use-chart-data.ts"
+          "target": "components/voraui/trading-chart/hooks/use-chart-data.ts"
         },
         {
-          "path": "registry/voraui/trading-chart/use-live-candles.ts",
+          "path": "registry/voraui/trading-chart/hooks/use-live-candles.ts",
           "type": "registry:hook",
-          "target": "components/voraui/trading-chart/use-live-candles.ts"
+          "target": "components/voraui/trading-chart/hooks/use-live-candles.ts"
         },
         {
-          "path": "registry/voraui/trading-chart/use-boundary-notification.ts",
+          "path": "registry/voraui/trading-chart/hooks/use-boundary-notification.ts",
           "type": "registry:hook",
-          "target": "components/voraui/trading-chart/use-boundary-notification.ts"
+          "target": "components/voraui/trading-chart/hooks/use-boundary-notification.ts"
         },
         {
-          "path": "registry/voraui/trading-chart/use-klines.ts",
+          "path": "registry/voraui/trading-chart/hooks/use-klines.ts",
           "type": "registry:hook",
-          "target": "components/voraui/trading-chart/use-klines.ts"
+          "target": "components/voraui/trading-chart/hooks/use-klines.ts"
         },
         {
-          "path": "registry/voraui/trading-chart/chart-options.ts",
+          "path": "registry/voraui/trading-chart/lib/chart-options.ts",
           "type": "registry:lib",
-          "target": "components/voraui/trading-chart/chart-options.ts"
+          "target": "components/voraui/trading-chart/lib/chart-options.ts"
         },
         {
-          "path": "registry/voraui/trading-chart/markers.ts",
+          "path": "registry/voraui/trading-chart/lib/markers.ts",
           "type": "registry:lib",
-          "target": "components/voraui/trading-chart/markers.ts"
+          "target": "components/voraui/trading-chart/lib/markers.ts"
         },
         {
-          "path": "registry/voraui/trading-chart/candle-validation.ts",
+          "path": "registry/voraui/trading-chart/lib/candle-validation.ts",
           "type": "registry:lib",
-          "target": "components/voraui/trading-chart/candle-validation.ts"
+          "target": "components/voraui/trading-chart/lib/candle-validation.ts"
         },
         {
-          "path": "registry/voraui/trading-chart/trading-chart-types.ts",
+          "path": "registry/voraui/trading-chart/lib/chart-time.ts",
           "type": "registry:lib",
-          "target": "components/voraui/trading-chart/trading-chart-types.ts"
+          "target": "components/voraui/trading-chart/lib/chart-time.ts"
         },
         {
-          "path": "registry/voraui/trading-chart/chart-time.ts",
+          "path": "registry/voraui/trading-chart/lib/signal-tooltip.ts",
           "type": "registry:lib",
-          "target": "components/voraui/trading-chart/chart-time.ts"
-        },
-        {
-          "path": "registry/voraui/trading-chart/signal-tooltip.ts",
-          "type": "registry:lib",
-          "target": "components/voraui/trading-chart/signal-tooltip.ts"
+          "target": "components/voraui/trading-chart/lib/signal-tooltip.ts"
         }
       ]
     }

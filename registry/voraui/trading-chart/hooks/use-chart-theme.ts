@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import type { RefObject } from "react";
 import { useTheme } from "next-themes";
-import { getThemeOptions } from "./chart-options";
+import { getThemeOptions } from "../lib/chart-options";
 import type { ChartState } from "./use-chart-instance";
 
 /** Restyle the chart when the next-themes theme changes. */

@@ -1,10 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { TradingChart } from "@/registry/voraui/trading-chart/trading-chart";
-import { TradingChartSkeleton } from "@/registry/voraui/trading-chart/trading-chart-skeleton";
-import { fetchKlines } from "@/registry/voraui/trading-chart/use-klines";
-import type { OhlcvCandle, TradeSignal } from "@/registry/voraui/trading-chart/trading-chart-types";
+import {
+  TradingChart,
+  TradingChartSkeleton,
+  type OhlcvCandle,
+  type TradeSignal,
+} from "@/registry/voraui/trading-chart";
+import { fetchKlines } from "@/registry/voraui/trading-chart/hooks/use-klines";
 
 // This is a landing-page preview tile, not the interactive component demo on
 // /docs/trading-chart: it fetches a fixed one-week window itself and hands it

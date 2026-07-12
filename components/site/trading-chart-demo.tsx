@@ -1,7 +1,6 @@
 "use client";
 
-import { TradingChart } from "@/registry/voraui/trading-chart/trading-chart";
-import type { TradeSignal } from "@/registry/voraui/trading-chart/trading-chart-types";
+import { TradingChart, type TradeSignal } from "@/registry/voraui/trading-chart";
 
 const now = Date.now();
 const h = 3_600_000;

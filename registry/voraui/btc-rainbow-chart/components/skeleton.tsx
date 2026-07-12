@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
-import { DEFAULT_RAINBOW_BANDS } from "./rainbow-bands";
+import { DEFAULT_RAINBOW_BANDS } from "../lib/rainbow-bands";
 
 export interface BtcRainbowChartSkeletonProps {
   className?: string;

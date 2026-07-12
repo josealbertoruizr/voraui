@@ -2,9 +2,9 @@
 
 import { useCallback } from "react";
 import type { Dispatch, RefObject, SetStateAction } from "react";
-import type { OhlcvCandle, Timeframe } from "./trading-chart-types";
-import { isValidCandle } from "./candle-validation";
-import { normalizeToSeconds, toChartTime } from "./chart-time";
+import type { OhlcvCandle, Timeframe } from "../types";
+import { isValidCandle } from "../lib/candle-validation";
+import { normalizeToSeconds, toChartTime } from "../lib/chart-time";
 import { useLatestCandlePolling } from "./use-klines";
 import type { ChartState } from "./use-chart-instance";
 
