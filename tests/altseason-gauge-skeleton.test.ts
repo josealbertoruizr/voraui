@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { AltseasonGaugeSkeleton } from "@/registry/voraui/altseason-gauge/altseason-gauge-skeleton";
-import { AltseasonGauge } from "@/registry/voraui/altseason-gauge/altseason-gauge";
+import { AltseasonGaugeSkeleton } from "@/registry/voraui/altseason-gauge/components/skeleton";
+import { AltseasonGauge } from "@/registry/voraui/altseason-gauge";
 
 describe("AltseasonGaugeSkeleton", () => {
   it("renders a status role with an accessible loading label", () => {

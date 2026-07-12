@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { normalizeKlines, type RawKline } from "@/registry/voraui/trading-chart/use-klines";
+import { normalizeKlines, type RawKline } from "@/registry/voraui/trading-chart/hooks/use-klines";
 
 const raw: RawKline[] = [
   [1_700_000_000_000, "100", "110", "90", "105", "12.5", 1_700_003_599_999],

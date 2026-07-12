@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseFngResponse } from "@/registry/voraui/fear-greed-gauge/use-fear-greed";
+import { parseFngResponse } from "@/registry/voraui/fear-greed-gauge/hooks/use-fear-greed";
 
 describe("parseFngResponse", () => {
   it("parses a valid alternative.me payload", () => {

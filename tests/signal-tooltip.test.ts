@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { renderTooltipHtml } from "@/registry/voraui/trading-chart/signal-tooltip";
-import type { AlignedSignal } from "@/registry/voraui/trading-chart/markers";
+import { renderTooltipHtml } from "@/registry/voraui/trading-chart/lib/signal-tooltip";
+import type { AlignedSignal } from "@/registry/voraui/trading-chart/lib/markers";
 import type { UTCTimestamp } from "lightweight-charts";
 
 const t = 1_700_000_000 as UTCTimestamp;

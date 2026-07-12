@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { OhlcvCandle, Timeframe } from "./trading-chart-types";
-import { sanitizeCandles } from "./candle-validation";
+import type { OhlcvCandle, Timeframe } from "../types";
+import { sanitizeCandles } from "../lib/candle-validation";
 
 // Binance public spot klines. No API key, CORS-enabled, ~1200 weight/min/IP.
 const BINANCE_KLINES_URL = "https://api.binance.com/api/v3/klines";

@@ -1,5 +1,5 @@
 import type { MouseEventParams } from "lightweight-charts";
-import type { OhlcvCandle, TradeSignal } from "./trading-chart-types";
+import type { OhlcvCandle, TradeSignal } from "../types";
 import {
   alignSignalsToBars,
   BUY_COLOR,

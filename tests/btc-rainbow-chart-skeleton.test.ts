@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { BtcRainbowChartSkeleton } from "@/registry/voraui/btc-rainbow-chart/btc-rainbow-chart-skeleton";
-import { BtcRainbowChart } from "@/registry/voraui/btc-rainbow-chart/btc-rainbow-chart";
+import { BtcRainbowChartSkeleton } from "@/registry/voraui/btc-rainbow-chart/components/skeleton";
+import { BtcRainbowChart } from "@/registry/voraui/btc-rainbow-chart";
 
 describe("BtcRainbowChartSkeleton", () => {
   it("renders a status role with an accessible loading label", () => {

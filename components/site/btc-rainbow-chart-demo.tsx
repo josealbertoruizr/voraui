@@ -1,7 +1,7 @@
 import {
   BtcRainbowChart,
   BtcRainbowLegend,
-} from "@/registry/voraui/btc-rainbow-chart/btc-rainbow-chart";
+} from "@/registry/voraui/btc-rainbow-chart";
 
 export function BtcRainbowChartDemo() {
   return (
