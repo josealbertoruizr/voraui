@@ -26,15 +26,13 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
         <nav className="sticky top-20 space-y-4 text-sm">
           {navGroups.map((group) => (
             <div key={group.label}>
-              <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {group.label}
-              </p>
+              <p className="px-3 pb-1 text-muted-foreground">{group.label}</p>
               <div className="space-y-1">
                 {group.items.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="block rounded-md px-3 py-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+                    className="block rounded-md px-3 py-1.5 text-foreground/80 hover:bg-muted hover:text-foreground"
                   >
                     {item.label}
                   </Link>
