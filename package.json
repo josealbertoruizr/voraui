@@ -1,8 +1,14 @@
 {
   "name": "voraui",
   "version": "0.1.0",
+  "description": "Open source crypto market analytics components for shadcn/ui.",
   "private": true,
   "license": "MIT",
+  "homepage": "https://voraui.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josealbertoruizr/voraui.git"
+  },
   "engines": {
     "node": ">=22"
   },
