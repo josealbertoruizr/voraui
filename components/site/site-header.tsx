@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "./theme-toggle";
 
@@ -6,8 +7,21 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
-          <span className="inline-block h-2.5 w-2.5 rounded-sm bg-violet-500" aria-hidden />
-          Vora UI
+          <Image
+            src="/logo/voraui-black.svg"
+            alt=""
+            width={24}
+            height={16}
+            className="block dark:hidden"
+          />
+          <Image
+            src="/logo/voraui-white.svg"
+            alt=""
+            width={24}
+            height={16}
+            className="hidden dark:block"
+          />
+          <span className="leading-none">Vora UI</span>
         </Link>
         <nav className="flex items-center gap-1 text-sm">
           <Link
