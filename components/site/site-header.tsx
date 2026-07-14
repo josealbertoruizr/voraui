@@ -21,7 +21,7 @@ export function SiteHeader() {
             height={17}
             className="hidden dark:block"
           />
-          Vora UI
+          <span className="leading-none">Vora UI</span>
         </Link>
         <nav className="flex items-center gap-1 text-sm">
           <Link
