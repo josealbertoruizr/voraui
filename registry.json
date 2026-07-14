@@ -9,7 +9,8 @@
       "title": "Fear & Greed Gauge",
       "description": "Crypto Fear & Greed index dial with live data from alternative.me.",
       "dependencies": [
-        "@number-flow/react"
+        "@number-flow/react",
+        "framer-motion"
       ],
       "registryDependencies": [
         "utils"
