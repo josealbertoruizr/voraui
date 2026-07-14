@@ -10,15 +10,15 @@ export function SiteHeader() {
           <Image
             src="/logo/voraui-black.svg"
             alt=""
-            width={32}
-            height={17}
+            width={24}
+            height={16}
             className="block dark:hidden"
           />
           <Image
             src="/logo/voraui-white.svg"
             alt=""
-            width={32}
-            height={17}
+            width={24}
+            height={16}
             className="hidden dark:block"
           />
           <span className="leading-none">Vora UI</span>
