@@ -24,7 +24,7 @@ export default function OpengraphImage() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          <img src={logoDataUri} width={64} height={32} alt="" />
+          <img src={logoDataUri} width={64} height={34} alt="" />
           <div style={{ fontSize: 72, fontWeight: 700 }}>Vora UI</div>
         </div>
         <div style={{ marginTop: 24, fontSize: 32, color: "#a1a1aa" }}>

@@ -11,14 +11,14 @@ export function SiteHeader() {
             src="/logo/voraui-black.svg"
             alt=""
             width={32}
-            height={16}
+            height={17}
             className="block dark:hidden"
           />
           <Image
             src="/logo/voraui-white.svg"
             alt=""
             width={32}
-            height={16}
+            height={17}
             className="hidden dark:block"
           />
           Vora UI
