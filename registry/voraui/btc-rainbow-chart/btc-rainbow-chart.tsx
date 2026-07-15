@@ -7,7 +7,7 @@ import type { IChartApi, ISeriesApi, Time, UTCTimestamp } from "lightweight-char
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { RainbowBandsPrimitive, DEFAULT_RAINBOW_BANDS } from "./lib/rainbow-bands";
-import { createRainbowTooltip, type RainbowTooltip } from "./lib/rainbow-tooltip";
+import { createRainbowTooltip, compactUsdTick, type RainbowTooltip } from "./lib/rainbow-tooltip";
 import { useBtcHistory, type RainbowPoint } from "./hooks/use-btc-history";
 
 export interface BtcRainbowChartProps {
@@ -119,6 +119,10 @@ export function BtcRainbowChart({ data, className }: BtcRainbowChartProps) {
         rightPriceScale: {
           mode: lwc.PriceScaleMode.Logarithmic,
           borderVisible: false,
+          // Default scaleMargins (top 20% / bottom 10%) add ~3 empty decades in log
+          // space, pushing the top edge label to a nonsense price ("$280M") and, on
+          // narrow panes, collapsing the tick marks entirely (blank scale on mobile).
+          scaleMargins: { top: 0.05, bottom: 0.05 },
         },
         timeScale: {
           borderVisible: false,
@@ -152,6 +156,12 @@ export function BtcRainbowChart({ data, className }: BtcRainbowChartProps) {
         lastValueVisible: false,
         crosshairMarkerVisible: true,
         crosshairMarkerRadius: 4,
+        priceFormat: {
+          type: "custom",
+          // Compact ("$63.1K") so the price scale stays narrow; full-length labels
+          // ("63100.00") force a wide scale that overflows and clips on mobile.
+          formatter: compactUsdTick,
+        },
       });
 
       const primitive = new RainbowBandsPrimitive(DEFAULT_RAINBOW_BANDS, 0.45);
