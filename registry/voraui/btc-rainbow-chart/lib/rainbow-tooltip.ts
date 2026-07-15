@@ -10,6 +10,21 @@ export function compactUsd(n: number): string {
   return `$${n.toFixed(4)}`;
 }
 
+/**
+ * Compact price for axis ticks: like {@link compactUsd} but drops trailing
+ * ".00" so labels stay short (e.g. "$280M" not "$280000000.00"). Full-length
+ * labels force a price scale wide enough to overflow and clip on mobile.
+ */
+export function compactUsdTick(n: number): string {
+  if (!Number.isFinite(n) || n === 0) return "-";
+  const trim = (v: number) => v.toFixed(2).replace(/\.?0+$/, "");
+  if (n >= 1e9) return `$${trim(n / 1e9)}B`;
+  if (n >= 1e6) return `$${trim(n / 1e6)}M`;
+  if (n >= 1e3) return `$${trim(n / 1e3)}K`;
+  if (n >= 1) return `$${trim(n)}`;
+  return `$${n.toFixed(4).replace(/0+$/, "")}`;
+}
+
 function escapeHtml(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
