@@ -1,4 +1,12 @@
-# Vora UI
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="public/logo/voraui-white.svg">
+    <source media="(prefers-color-scheme: light)" srcset="public/logo/voraui-black.svg">
+    <img src="public/logo/voraui-black.svg" alt="Vora UI logo" width="240" />
+  </picture>
+</p>
+
+<h1 align="center">Vora UI</h1>
 
 Open source crypto market analytics components for [shadcn/ui](https://ui.shadcn.com).
 Components install as source code into your project via the shadcn CLI, so you own every line.
