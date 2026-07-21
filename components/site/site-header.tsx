@@ -1,6 +1,10 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "./theme-toggle";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 export function SiteHeader() {
   return (
@@ -24,6 +28,19 @@ export function SiteHeader() {
           <span className="leading-none">Vora UI</span>
         </Link>
         <nav className="flex items-center gap-1 text-sm">
+
+          <Badge variant="default" >
+            <Button
+              onClick={() => {
+                navigator.clipboard.writeText("AGENTS.md");
+              }}
+              className="cursor-pointer"
+              size="small"
+            >
+              AGENTS.MD
+            </Button>
+          </Badge>
+
           <Link
             href="/docs"
             className="rounded-md px-3 py-1.5 text-muted-foreground hover:text-foreground"
