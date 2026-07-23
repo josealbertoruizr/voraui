@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useState, useRef, useEffect } from "react";
 import { Check, FileText, TriangleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -11,8 +12,8 @@ const AGENTS_PROMPT =
 type CopyState = "idle" | "copied" | "error";
 
 export function AgentsCopyButton() {
-  const [state, setState] = React.useState<CopyState>("idle");
-  const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [state, setState] = useState<CopyState>("idle");
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const copyPrompt = async () => {
     try {
@@ -26,7 +27,7 @@ export function AgentsCopyButton() {
     timerRef.current = setTimeout(() => setState("idle"), 1500);
   };
 
-  React.useEffect(
+  useEffect(
     () => () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     },
