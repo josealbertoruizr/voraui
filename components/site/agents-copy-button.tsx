@@ -37,11 +37,11 @@ export function AgentsCopyButton() {
   return (
     <Button
       type="button"
-      variant="outline"
+      variant="ghost"
       size="sm"
       onClick={copyPrompt}
       aria-label="Copy prompt for AI agents"
-      className="relative h-8 w-[7.25rem] overflow-hidden rounded-full font-mono text-xs"
+      className="relative h-8 w-24 overflow-hidden rounded-full border-transparent bg-transparent font-mono text-xs text-muted-foreground hover:bg-transparent hover:text-foreground"
     >
       <span
         aria-hidden
@@ -50,8 +50,7 @@ export function AgentsCopyButton() {
           state === "idle" ? "translate-y-0 opacity-100" : "-translate-y-1 opacity-0",
         )}
       >
-        <FileText data-icon="inline-start" className="size-3.5" />
-        agents.md
+        AGENTS.md
       </span>
       <span
         aria-hidden
