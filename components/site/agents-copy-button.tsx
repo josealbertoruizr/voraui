@@ -41,7 +41,7 @@ export function AgentsCopyButton() {
       size="sm"
       onClick={copyPrompt}
       aria-label="Copy prompt for AI agents"
-      className="relative h-8 w-24 overflow-hidden rounded-full border-transparent bg-transparent font-mono text-xs text-muted-foreground hover:bg-transparent hover:text-foreground"
+      className="relative h-9 w-[7.15rem] overflow-hidden rounded-[999px] border border-border/60 bg-background/80 font-mono text-xs text-muted-foreground shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-[transform,box-shadow,border-color,color] duration-150 ease-out hover:-translate-y-px hover:border-border hover:bg-background hover:text-foreground hover:shadow-[0_2px_6px_rgba(0,0,0,0.06)] dark:bg-background/60 dark:shadow-none dark:hover:shadow-[0_0_0_1px_rgba(255,255,255,0.06)]"
     >
       <span
         aria-hidden
@@ -50,7 +50,8 @@ export function AgentsCopyButton() {
           state === "idle" ? "translate-y-0 opacity-100" : "-translate-y-1 opacity-0",
         )}
       >
-        AGENTS.md
+        <FileText className="size-3.5" />
+        <span>AGENTS.md</span>
       </span>
       <span
         aria-hidden
