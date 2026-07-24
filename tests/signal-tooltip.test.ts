@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { renderTooltipHtml } from "@/registry/voraui/trading-chart/lib/signal-tooltip";
+import {
+  getSignalTooltipPosition,
+  renderTooltipHtml,
+} from "@/registry/voraui/trading-chart/lib/signal-tooltip";
 import type { AlignedSignal } from "@/registry/voraui/trading-chart/lib/markers";
 import type { UTCTimestamp } from "lightweight-charts";
 
@@ -48,5 +51,44 @@ describe("renderTooltipHtml", () => {
   it("has no sticky unlock footer", () => {
     const html = renderTooltipHtml([{ ...base, side: "BUY", price: 100 } as AlignedSignal]);
     expect(html).not.toContain("Click again to unlock");
+  });
+});
+
+describe("getSignalTooltipPosition", () => {
+  it("places the tooltip below the cursor when above would leave the chart", () => {
+    const position = getSignalTooltipPosition(
+      { x: 200, y: 10 },
+      { width: 180, height: 96 },
+      { width: 500, height: 320 },
+    );
+
+    expect(position).toEqual({ left: 110, top: 22 });
+  });
+
+  it("clamps the tooltip horizontally inside the chart", () => {
+    expect(
+      getSignalTooltipPosition(
+        { x: 10, y: 200 },
+        { width: 180, height: 96 },
+        { width: 500, height: 320 },
+      ).left,
+    ).toBe(8);
+    expect(
+      getSignalTooltipPosition(
+        { x: 490, y: 200 },
+        { width: 180, height: 96 },
+        { width: 500, height: 320 },
+      ).left,
+    ).toBe(312);
+  });
+
+  it("clamps a tall tooltip vertically inside the chart", () => {
+    const position = getSignalTooltipPosition(
+      { x: 250, y: 180 },
+      { width: 180, height: 304 },
+      { width: 500, height: 320 },
+    );
+
+    expect(position.top).toBe(8);
   });
 });
