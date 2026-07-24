@@ -25,6 +25,51 @@ export interface SignalTooltip {
 }
 
 const STYLE_ID = "voraui-tooltip-styles";
+const TOOLTIP_EDGE_INSET = 8;
+const TOOLTIP_OFFSET = 12;
+
+interface TooltipPoint {
+  x: number;
+  y: number;
+}
+
+interface TooltipPosition {
+  left: number;
+  top: number;
+}
+
+interface TooltipBox {
+  width: number;
+  height: number;
+}
+
+function clamp(value: number, min: number, max: number): number {
+  if (max < min) return min;
+  return Math.min(Math.max(value, min), max);
+}
+
+/** Keeps the tooltip inside the chart while preferring the familiar above-cursor placement. */
+export function getSignalTooltipPosition(
+  point: TooltipPoint,
+  tooltip: TooltipBox,
+  container: TooltipBox,
+): TooltipPosition {
+  const maxLeft = Math.max(TOOLTIP_EDGE_INSET, container.width - tooltip.width - TOOLTIP_EDGE_INSET);
+  const maxTop = Math.max(TOOLTIP_EDGE_INSET, container.height - tooltip.height - TOOLTIP_EDGE_INSET);
+  const preferredTop = point.y - tooltip.height - TOOLTIP_OFFSET;
+  const belowTop = point.y + TOOLTIP_OFFSET;
+  const top =
+    preferredTop >= TOOLTIP_EDGE_INSET
+      ? preferredTop
+      : belowTop + tooltip.height <= container.height - TOOLTIP_EDGE_INSET
+        ? belowTop
+        : preferredTop;
+
+  return {
+    left: clamp(point.x - tooltip.width / 2, TOOLTIP_EDGE_INSET, maxLeft),
+    top: clamp(top, TOOLTIP_EDGE_INSET, maxTop),
+  };
+}
 
 function escapeHtml(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -110,8 +155,8 @@ export function createSignalTooltip({
     style.id = STYLE_ID;
     style.textContent = `
       @keyframes vorauiTooltipIn {
-        from { opacity: 0; transform: translate(-50%, -104%) scale(0.96); }
-        to   { opacity: 1; transform: translate(-50%, -110%) scale(1); }
+        from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+        to   { opacity: 1; transform: translateY(0) scale(1); }
       }
     `;
     document.head.appendChild(style);
@@ -130,9 +175,12 @@ export function createSignalTooltip({
     boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
     border: "1px solid rgba(255,255,255,0.1)",
     backdropFilter: "blur(8px)",
-    transform: "translate(-50%, -110%)",
+    boxSizing: "border-box",
     display: "none",
     minWidth: "160px",
+    maxWidth: `calc(100% - ${TOOLTIP_EDGE_INSET * 2}px)`,
+    maxHeight: `calc(100% - ${TOOLTIP_EDGE_INSET * 2}px)`,
+    overflow: "hidden",
     transition: "opacity 0.2s ease-in-out",
   } as unknown as CSSStyleDeclaration);
   container.appendChild(el);
@@ -143,9 +191,15 @@ export function createSignalTooltip({
 
   const show = (list: AlignedSignal[], pt: { x: number; y: number }) => {
     const wasHidden = el.style.display !== "block";
-    el.style.left = `${pt.x}px`;
-    el.style.top = `${pt.y}px`;
+    el.innerHTML = renderTooltipHtml(list);
     el.style.display = "block";
+    const position = getSignalTooltipPosition(
+      pt,
+      { width: el.offsetWidth || 180, height: el.offsetHeight || 80 },
+      { width: container.clientWidth, height: container.clientHeight },
+    );
+    el.style.left = `${position.left}px`;
+    el.style.top = `${position.top}px`;
 
     // Animate only on hidden -> shown; re-animating on every move would flicker.
     if (wasHidden && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -153,8 +207,6 @@ export function createSignalTooltip({
       void el.offsetWidth;
       el.style.animation = "vorauiTooltipIn 0.16s ease-out";
     }
-
-    el.innerHTML = renderTooltipHtml(list);
   };
 
   const onCrosshairMove = (param: MouseEventParams) => {
@@ -165,6 +217,15 @@ export function createSignalTooltip({
     const pt = param.point;
     const t = normalizeParamTime(param.time);
     if (!pt || t == null) {
+      hide();
+      return;
+    }
+    if (
+      pt.x < 0 ||
+      pt.y < 0 ||
+      pt.x > container.clientWidth ||
+      pt.y > container.clientHeight
+    ) {
       hide();
       return;
     }
