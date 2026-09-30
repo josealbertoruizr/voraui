@@ -98,7 +98,7 @@ export default function Page() {
             <TabsTrigger value="manual">Manual</TabsTrigger>
           </TabsList>
           <TabsContent value="cli">
-            <InstallTabs name="fear-greed-gauge" />
+            <InstallTabs args="add @voraui/fear-greed-gauge" />
           </TabsContent>
           <TabsContent value="manual">
             <ManualInstall name="fear-greed-gauge" />

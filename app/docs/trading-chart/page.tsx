@@ -44,7 +44,7 @@ export default function Page() {
             <TabsTrigger value="manual">Manual</TabsTrigger>
           </TabsList>
           <TabsContent value="cli">
-            <InstallTabs name="trading-chart" />
+            <InstallTabs args="add @voraui/trading-chart" />
           </TabsContent>
           <TabsContent value="manual">
             <ManualInstall name="trading-chart" />
