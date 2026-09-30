@@ -25,7 +25,13 @@ For production, every component accepts your own data via props and the bundled 
 
 ## Installation
 
-Add the registry to your `components.json`:
+Vora UI is listed in the [shadcn registry directory](https://ui.shadcn.com/docs/directory?q=vora), so the `@voraui` namespace works with no setup:
+
+```bash
+pnpm dlx shadcn@latest add @voraui/trading-chart
+```
+
+On older shadcn CLI versions, add the registry to your `components.json`:
 
 ```json
 {
@@ -35,13 +41,7 @@ Add the registry to your `components.json`:
 }
 ```
 
-Then add components:
-
-```bash
-pnpm dlx shadcn@latest add @voraui/trading-chart
-```
-
-Or use the zero-config full URL form:
+Or use the full URL form:
 
 ```bash
 npx shadcn@latest add https://voraui.vercel.app/r/trading-chart.json

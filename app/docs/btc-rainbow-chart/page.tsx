@@ -43,7 +43,7 @@ export default function Page() {
             <TabsTrigger value="manual">Manual</TabsTrigger>
           </TabsList>
           <TabsContent value="cli">
-            <InstallTabs name="btc-rainbow-chart" />
+            <InstallTabs args="add @voraui/btc-rainbow-chart" />
           </TabsContent>
           <TabsContent value="manual">
             <ManualInstall name="btc-rainbow-chart" />

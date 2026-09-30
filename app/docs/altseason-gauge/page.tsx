@@ -80,7 +80,7 @@ export default function Page() {
             <TabsTrigger value="manual">Manual</TabsTrigger>
           </TabsList>
           <TabsContent value="cli">
-            <InstallTabs name="altseason-gauge" />
+            <InstallTabs args="add @voraui/altseason-gauge" />
           </TabsContent>
           <TabsContent value="manual">
             <ManualInstall name="altseason-gauge" />
