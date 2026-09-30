@@ -14,14 +14,16 @@ export function SiteHeader() {
             src="/logo/voraui-black.svg"
             alt=""
             width={24}
-            height={16}
+            height={13}
+            style={{ height: "auto" }}
             className="block dark:hidden"
           />
           <Image
             src="/logo/voraui-white.svg"
             alt=""
             width={24}
-            height={16}
+            height={13}
+            style={{ height: "auto" }}
             className="hidden dark:block"
           />
           <span className="leading-none">Vora UI</span>
