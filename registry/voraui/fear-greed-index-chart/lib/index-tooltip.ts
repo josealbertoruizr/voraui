@@ -55,6 +55,42 @@ export function renderIndexTooltipHtml(
   `;
 }
 
+const TOOLTIP_OFFSET = 12;
+const TOOLTIP_EDGE_INSET = 4;
+
+interface TooltipBox {
+  width: number;
+  height: number;
+}
+
+function clamp(value: number, min: number, max: number): number {
+  if (max < min) return min;
+  return Math.min(Math.max(value, min), max);
+}
+
+/**
+ * Places the tooltip right of and above a pane-relative cursor, in container coordinates,
+ * flipping left or below at the edges and never leaving the container.
+ */
+export function getIndexTooltipPosition(
+  point: { x: number; y: number },
+  paneLeft: number,
+  tooltip: TooltipBox,
+  container: TooltipBox,
+): { left: number; top: number } {
+  const x = paneLeft + point.x;
+  let left = x + TOOLTIP_OFFSET;
+  if (left + tooltip.width > container.width - TOOLTIP_EDGE_INSET) {
+    left = x - tooltip.width - TOOLTIP_OFFSET;
+  }
+  let top = point.y - tooltip.height - TOOLTIP_OFFSET;
+  if (top < TOOLTIP_EDGE_INSET) top = point.y + TOOLTIP_OFFSET;
+  return {
+    left: clamp(left, TOOLTIP_EDGE_INSET, container.width - tooltip.width - TOOLTIP_EDGE_INSET),
+    top: clamp(top, TOOLTIP_EDGE_INSET, container.height - tooltip.height - TOOLTIP_EDGE_INSET),
+  };
+}
+
 export interface IndexTooltipSeries {
   index: ISeriesApi<"Line", Time> | null;
   price: ISeriesApi<"Line", Time> | null;
@@ -67,10 +103,14 @@ export interface IndexTooltip {
   dispose: () => void;
 }
 
-/** Floating tooltip for the index chart; hidden on days with no index value. */
+/**
+ * Floating tooltip for the index chart; hidden on days with no index value.
+ * `getPaneLeft` returns the plot pane's left offset in the container (the left scale width).
+ */
 export function createIndexTooltip(
   container: HTMLElement,
   getSeries: () => IndexTooltipSeries,
+  getPaneLeft: () => number,
 ): IndexTooltip {
   const tooltip = document.createElement("div");
   tooltip.style.position = "absolute";
@@ -98,13 +138,14 @@ export function createIndexTooltip(
 
   const onCrosshairMove = (param: MouseEventParams<Time>) => {
     const { index, price, volume } = getSeries();
+    const paneLeft = getPaneLeft();
     if (
       !index ||
       !param.point ||
       !param.time ||
       param.point.x < 0 ||
       param.point.y < 0 ||
-      param.point.x > container.clientWidth ||
+      paneLeft + param.point.x > container.clientWidth ||
       param.point.y > container.clientHeight
     ) {
       hide();
@@ -124,14 +165,12 @@ export function createIndexTooltip(
     });
 
     tooltip.style.display = "block";
-    const ttWidth = tooltip.offsetWidth || 140;
-    const ttHeight = tooltip.offsetHeight || 60;
-    let left = param.point.x + 12;
-    let top = param.point.y - ttHeight - 12;
-    if (left + ttWidth > container.clientWidth - 4) {
-      left = param.point.x - ttWidth - 12;
-    }
-    if (top < 4) top = param.point.y + 12;
+    const { left, top } = getIndexTooltipPosition(
+      param.point,
+      paneLeft,
+      { width: tooltip.offsetWidth || 140, height: tooltip.offsetHeight || 60 },
+      { width: container.clientWidth, height: container.clientHeight },
+    );
     tooltip.style.left = `${left}px`;
     tooltip.style.top = `${top}px`;
   };

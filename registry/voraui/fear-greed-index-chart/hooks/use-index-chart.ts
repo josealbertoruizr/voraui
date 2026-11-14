@@ -286,11 +286,16 @@ export function useIndexChart({
       syncLayers();
       applyLatestData();
 
-      const tooltip = createIndexTooltip(container, () => ({
-        index: indexSeriesRef.current,
-        price: priceSeriesRef.current,
-        volume: volumeSeriesRef.current,
-      }));
+      const tooltip = createIndexTooltip(
+        container,
+        () => ({
+          index: indexSeriesRef.current,
+          price: priceSeriesRef.current,
+          volume: volumeSeriesRef.current,
+        }),
+        // 0 while the left scale is hidden (index only).
+        () => chart.priceScale("left").width(),
+      );
       tooltipRef.current = tooltip;
       chart.subscribeCrosshairMove(tooltip.onCrosshairMove);
     };
