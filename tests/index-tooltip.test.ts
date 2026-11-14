@@ -14,6 +14,10 @@ describe("formatters", () => {
     expect(compactUsdTick(90_000)).toBe("$90K");
     expect(compactUsdTick(NaN)).toBe("-");
   });
+
+  it("labels the zero tick of the linear price axis as $0", () => {
+    expect(compactUsdTick(0)).toBe("$0");
+  });
 });
 
 describe("renderIndexTooltipHtml", () => {
