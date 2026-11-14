@@ -264,6 +264,11 @@
           "target": "components/voraui/fear-greed-index-chart/hooks/use-btc-daily.ts"
         },
         {
+          "path": "registry/voraui/fear-greed-index-chart/hooks/use-index-chart.ts",
+          "type": "registry:hook",
+          "target": "components/voraui/fear-greed-index-chart/hooks/use-index-chart.ts"
+        },
+        {
           "path": "registry/voraui/fear-greed-index-chart/lib/fear-greed-bands.ts",
           "type": "registry:lib",
           "target": "components/voraui/fear-greed-index-chart/lib/fear-greed-bands.ts"
@@ -277,6 +282,16 @@
           "path": "registry/voraui/fear-greed-index-chart/lib/index-tooltip.ts",
           "type": "registry:lib",
           "target": "components/voraui/fear-greed-index-chart/lib/index-tooltip.ts"
+        },
+        {
+          "path": "registry/voraui/fear-greed-index-chart/lib/chart-options.ts",
+          "type": "registry:lib",
+          "target": "components/voraui/fear-greed-index-chart/lib/chart-options.ts"
+        },
+        {
+          "path": "registry/voraui/fear-greed-index-chart/lib/chart-range.ts",
+          "type": "registry:lib",
+          "target": "components/voraui/fear-greed-index-chart/lib/chart-range.ts"
         }
       ]
     }

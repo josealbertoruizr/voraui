@@ -47,9 +47,12 @@ describe("getRegistryItem", () => {
       "components/voraui/fear-greed-index-chart/components/skeleton.tsx",
       "components/voraui/fear-greed-index-chart/hooks/use-fear-greed-history.ts",
       "components/voraui/fear-greed-index-chart/hooks/use-btc-daily.ts",
+      "components/voraui/fear-greed-index-chart/hooks/use-index-chart.ts",
       "components/voraui/fear-greed-index-chart/lib/fear-greed-bands.ts",
       "components/voraui/fear-greed-index-chart/lib/zones-primitive.ts",
       "components/voraui/fear-greed-index-chart/lib/index-tooltip.ts",
+      "components/voraui/fear-greed-index-chart/lib/chart-options.ts",
+      "components/voraui/fear-greed-index-chart/lib/chart-range.ts",
     ]);
   });
 

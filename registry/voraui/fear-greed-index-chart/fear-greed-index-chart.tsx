@@ -1,13 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useTheme } from "next-themes";
-import type { IChartApi, ISeriesApi, Time, UTCTimestamp } from "lightweight-charts";
+import type { UTCTimestamp } from "lightweight-charts";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { FearGreedIndexChartSkeleton } from "./components/skeleton";
 import { useFearGreedHistory } from "./hooks/use-fear-greed-history";
 import { useBtcDaily } from "./hooks/use-btc-daily";
+import { useIndexChart, type IndexPoint, type ValuePoint } from "./hooks/use-index-chart";
 import {
   clipToRange,
   normalizeByTime,
@@ -15,13 +16,7 @@ import {
   type BtcDailyPoint,
   type FearGreedPoint,
 } from "./lib/fear-greed-bands";
-import {
-  FearGreedZonesPrimitive,
-  labelGutterPixels,
-  minBarSpacingFor,
-  presetLogicalRange,
-} from "./lib/zones-primitive";
-import { compactUsdTick, createIndexTooltip, type IndexTooltip } from "./lib/index-tooltip";
+import type { Preset } from "./lib/chart-range";
 
 export interface FearGreedIndexChartProps {
   /** Draw the BTC price line on the left scale. */
@@ -35,51 +30,8 @@ export interface FearGreedIndexChartProps {
   className?: string;
 }
 
-type Preset = "30D" | "1Y" | "ALL";
 const PRESETS: Preset[] = ["30D", "1Y", "ALL"];
-const PRESET_DAYS: Record<Exclude<Preset, "ALL">, number> = { "30D": 30, "1Y": 365 };
-const DAY_SECONDS = 86_400;
 const INDEX_LEGEND_COLOR = "#f0c929";
-const VOLUME_SCALE_ID = "volume";
-
-type IndexPoint = { time: UTCTimestamp; value: number; color: string };
-type ValuePoint = { time: UTCTimestamp; value: number };
-type LightweightCharts = typeof import("lightweight-charts");
-
-const SCALE_MARGIN = 0.05;
-// Fits "$120K" ticks, so the reserved scale rarely changes width once prices arrive.
-const PRICE_SCALE_MIN_WIDTH = 60;
-// Below this many pixels per day the index line drops to 1px so it stays readable.
-const DENSE_BAR_SPACING = 1;
-
-interface ChartPalette {
-  text: string;
-  grid: string;
-  label: string;
-  halo: string;
-  price: string;
-  volume: string;
-}
-
-function chartPalette(theme: string | undefined): ChartPalette {
-  return theme === "dark"
-    ? {
-        text: "#9CA3AF",
-        grid: "rgba(148,163,184,0.10)",
-        label: "rgba(156,163,175,0.85)",
-        halo: "rgba(10,10,10,0.85)",
-        price: "rgba(161,161,170,0.85)",
-        volume: "rgba(161,161,170,0.22)",
-      }
-    : {
-        text: "#52525b",
-        grid: "rgba(0,0,0,0.05)",
-        label: "rgba(82,82,91,0.85)",
-        halo: "rgba(255,255,255,0.85)",
-        price: "rgba(82,82,91,0.8)",
-        volume: "rgba(82,82,91,0.16)",
-      };
-}
 
 /** Crypto Fear & Greed index history as a band-colored line with optional BTC price and volume. */
 export function FearGreedIndexChart({
@@ -133,310 +85,17 @@ export function FearGreedIndexChart({
   // Holding the price scale open while BTC loads keeps the plot from narrowing when it lands.
   const reservePriceScale = drawPrice || (showPrice && fetchedBtc.loading);
 
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const tooltipRef = useRef<IndexTooltip | null>(null);
-  const lwcRef = useRef<LightweightCharts | null>(null);
-  const chartRef = useRef<IChartApi | null>(null);
-  const indexSeriesRef = useRef<ISeriesApi<"Line", Time> | null>(null);
-  const priceSeriesRef = useRef<ISeriesApi<"Line", Time> | null>(null);
-  const volumeSeriesRef = useRef<ISeriesApi<"Histogram", Time> | null>(null);
-  const primitiveRef = useRef<FearGreedZonesPrimitive | null>(null);
-
   const [preset, setPreset] = useState<Preset>("ALL");
-  const [chartFailed, setChartFailed] = useState(false);
-
-  const indexLineRef = useRef<IndexPoint[]>(indexLine);
-  const priceLineRef = useRef<ValuePoint[]>(priceLine);
-  const volumeBarsRef = useRef<ValuePoint[]>(volumeBars);
-  const drawPriceRef = useRef(drawPrice);
-  const reservePriceScaleRef = useRef(reservePriceScale);
-  const drawVolumeRef = useRef(drawVolume);
-  const paletteRef = useRef<ChartPalette>(chartPalette(resolvedTheme));
-  const presetRef = useRef<Preset>(preset);
-  // Time bounds the visible range was last fitted to; unchanged bounds keep the user's zoom.
-  const rangeKeyRef = useRef<string | null>(null);
-
-  // Zoom-out stops where every day plus the label gutter fits, like fixed edges would.
-  const applyZoomLimit = useCallback(() => {
-    const chart = chartRef.current;
-    if (!chart) return;
-    const timeScale = chart.timeScale();
-    const bars = Math.max(
-      indexLineRef.current.length,
-      priceLineRef.current.length,
-      volumeBarsRef.current.length,
-    );
-    const gutter = labelGutterPixels(chart.options().width);
-    timeScale.applyOptions({ minBarSpacing: minBarSpacingFor(timeScale.width(), gutter, bars) });
-  }, []);
-
-  const applyVisibleRange = useCallback(() => {
-    const chart = chartRef.current;
-    const points = indexLineRef.current;
-    if (!chart || points.length === 0) return;
-    const timeScale = chart.timeScale();
-
-    if (presetRef.current === "ALL") {
-      timeScale.fitContent();
-      return;
-    }
-
-    const first = points[0].time as number;
-    const last = points[points.length - 1].time as number;
-    const from = Math.max(first, last - PRESET_DAYS[presetRef.current] * DAY_SECONDS);
-    const fromIndex = timeScale.timeToIndex(from as UTCTimestamp, true);
-    const toIndex = timeScale.timeToIndex(last as UTCTimestamp, true);
-    if (fromIndex === null || toIndex === null) return;
-    const gutter = labelGutterPixels(chart.options().width);
-    timeScale.setVisibleLogicalRange(
-      presetLogicalRange(fromIndex, toIndex, timeScale.width(), gutter),
-    );
-  }, []);
-
-  const applyLatestData = useCallback(() => {
-    const indexSeries = indexSeriesRef.current;
-    const points = indexLineRef.current;
-    if (!chartRef.current || !indexSeries || points.length === 0) return;
-
-    indexSeries.setData(points);
-    // The series color drives the last-value label, so it follows the latest band.
-    indexSeries.applyOptions({ color: points[points.length - 1].color });
-    priceSeriesRef.current?.setData(priceLineRef.current);
-    volumeSeriesRef.current?.setData(volumeBarsRef.current);
-
-    applyZoomLimit();
-    const rangeKey = `${points[0].time}:${points[points.length - 1].time}`;
-    if (rangeKeyRef.current !== rangeKey) {
-      rangeKeyRef.current = rangeKey;
-      applyVisibleRange();
-    }
-    primitiveRef.current?.requestUpdate();
-  }, [applyVisibleRange, applyZoomLimit]);
-
-  // Adds or removes the BTC layers on the live chart so the index view and zoom survive.
-  const syncLayers = useCallback(() => {
-    const lwc = lwcRef.current;
-    const chart = chartRef.current;
-    if (!lwc || !chart) return;
-    const palette = paletteRef.current;
-
-    if (drawVolumeRef.current && !volumeSeriesRef.current) {
-      const volumeSeries = chart.addSeries(lwc.HistogramSeries, {
-        color: palette.volume,
-        priceScaleId: VOLUME_SCALE_ID,
-        priceFormat: { type: "volume" },
-        priceLineVisible: false,
-        lastValueVisible: false,
-      });
-      chart.priceScale(VOLUME_SCALE_ID).applyOptions({
-        scaleMargins: { top: 0.8, bottom: SCALE_MARGIN },
-      });
-      volumeSeries.setData(volumeBarsRef.current);
-      volumeSeriesRef.current = volumeSeries;
-    } else if (!drawVolumeRef.current && volumeSeriesRef.current) {
-      chart.removeSeries(volumeSeriesRef.current);
-      volumeSeriesRef.current = null;
-    }
-
-    if (drawPriceRef.current && !priceSeriesRef.current) {
-      const priceSeries = chart.addSeries(lwc.LineSeries, {
-        color: palette.price,
-        lineWidth: 1,
-        priceScaleId: "left",
-        priceLineVisible: false,
-        lastValueVisible: false,
-        crosshairMarkerVisible: false,
-        priceFormat: { type: "custom", formatter: compactUsdTick },
-      });
-      priceSeries.setData(priceLineRef.current);
-      priceSeriesRef.current = priceSeries;
-    } else if (!drawPriceRef.current && priceSeriesRef.current) {
-      chart.removeSeries(priceSeriesRef.current);
-      priceSeriesRef.current = null;
-    }
-
-    // Paint order: volume, then price, then the index on top.
-    volumeSeriesRef.current?.setSeriesOrder(0);
-    priceSeriesRef.current?.setSeriesOrder(volumeSeriesRef.current ? 1 : 0);
-    chart.applyOptions({
-      leftPriceScale: {
-        visible: reservePriceScaleRef.current,
-        minimumWidth: PRICE_SCALE_MIN_WIDTH,
-      },
-    });
-  }, []);
-
-  useEffect(() => {
-    indexLineRef.current = indexLine;
-    priceLineRef.current = priceLine;
-    volumeBarsRef.current = volumeBars;
-    applyLatestData();
-  }, [indexLine, priceLine, volumeBars, applyLatestData]);
-
-  useEffect(() => {
-    drawPriceRef.current = drawPrice;
-    reservePriceScaleRef.current = reservePriceScale;
-    drawVolumeRef.current = drawVolume;
-    syncLayers();
-  }, [drawPrice, drawVolume, reservePriceScale, syncLayers]);
-
-  useEffect(() => {
-    const palette = chartPalette(resolvedTheme);
-    paletteRef.current = palette;
-    const chart = chartRef.current;
-    if (!chart) return;
-    chart.applyOptions({
-      layout: { textColor: palette.text },
-      grid: { vertLines: { color: palette.grid }, horzLines: { color: palette.grid } },
-    });
-    priceSeriesRef.current?.applyOptions({ color: palette.price });
-    volumeSeriesRef.current?.applyOptions({ color: palette.volume });
-    primitiveRef.current?.setColors(palette.label, palette.halo);
-  }, [resolvedTheme]);
-
-  useEffect(() => {
-    presetRef.current = preset;
-    applyVisibleRange();
-  }, [preset, applyVisibleRange]);
-
-  // Mount once; theme, layers, and data are applied in place by the effects above.
-  useEffect(() => {
-    if (!hasIndex) return;
-
-    let disposed = false;
-    let ro: ResizeObserver | null = null;
-    let chartInitialized = false;
-
-    const initChart = async (container: HTMLDivElement) => {
-      const lwc = await import("lightweight-charts");
-      if (disposed) return;
-      lwcRef.current = lwc;
-      const palette = paletteRef.current;
-
-      const chart = lwc.createChart(container, {
-        width: container.clientWidth,
-        height: container.clientHeight,
-        autoSize: false,
-        layout: {
-          background: { type: lwc.ColorType.Solid, color: "rgba(0,0,0,0)" },
-          textColor: palette.text,
-        },
-        grid: {
-          vertLines: { color: palette.grid },
-          horzLines: { color: palette.grid },
-        },
-        rightPriceScale: {
-          borderVisible: false,
-          scaleMargins: { top: SCALE_MARGIN, bottom: SCALE_MARGIN },
-        },
-        leftPriceScale: {
-          visible: false,
-          mode: lwc.PriceScaleMode.Normal,
-          borderVisible: false,
-          scaleMargins: { top: SCALE_MARGIN, bottom: SCALE_MARGIN },
-        },
-        timeScale: {
-          borderVisible: false,
-          timeVisible: false,
-          secondsVisible: false,
-          rightOffsetPixels: labelGutterPixels(container.clientWidth),
-          barSpacing: 4,
-          // No fixRightEdge: it would force the right offset, and with it the label gutter, to 0.
-          fixLeftEdge: true,
-          lockVisibleTimeRangeOnResize: true,
-        },
-        // The tooltip carries the values; a horizontal crosshair label would read past 0-100.
-        crosshair: { mode: 0, horzLine: { visible: false, labelVisible: false } },
-        handleScroll: {
-          mouseWheel: true,
-          pressedMouseMove: true,
-          horzTouchDrag: true,
-          vertTouchDrag: false,
-        },
-        handleScale: {
-          mouseWheel: true,
-          pinch: true,
-          axisPressedMouseMove: false,
-          axisDoubleClickReset: true,
-        },
-      });
-      chartRef.current = chart;
-
-      const indexSeries = chart.addSeries(lwc.LineSeries, {
-        lineWidth: 2,
-        priceScaleId: "right",
-        priceLineVisible: false,
-        lastValueVisible: true,
-        crosshairMarkerVisible: true,
-        crosshairMarkerRadius: 4,
-        priceFormat: { type: "price", precision: 0, minMove: 1 },
-        autoscaleInfoProvider: () => ({ priceRange: { minValue: 0, maxValue: 100 } }),
-      });
-      indexSeriesRef.current = indexSeries;
-
-      const primitive = new FearGreedZonesPrimitive({
-        labelColor: palette.label,
-        haloColor: palette.halo,
-      });
-      primitiveRef.current = primitive;
-      indexSeries.attachPrimitive(primitive);
-
-      // The plot narrows when the left price scale appears or the chart resizes.
-      chart.timeScale().subscribeSizeChange(applyZoomLimit);
-
-      // Thin the index line when days are packed tighter than its stroke.
-      chart.timeScale().subscribeVisibleLogicalRangeChange(() => {
-        const width = chart.timeScale().options().barSpacing < DENSE_BAR_SPACING ? 1 : 2;
-        if (indexSeries.options().lineWidth !== width) indexSeries.applyOptions({ lineWidth: width });
-      });
-
-      syncLayers();
-      applyLatestData();
-
-      const tooltip = createIndexTooltip(container, () => ({
-        index: indexSeriesRef.current,
-        price: priceSeriesRef.current,
-        volume: volumeSeriesRef.current,
-      }));
-      tooltipRef.current = tooltip;
-      chart.subscribeCrosshairMove(tooltip.onCrosshairMove);
-    };
-
-    if (containerRef.current) {
-      ro = new ResizeObserver((entries) => {
-        const rect = entries[0].contentRect;
-        if (rect.width > 0 && rect.height > 0 && !chartInitialized) {
-          chartInitialized = true;
-          initChart(containerRef.current!).catch(() => {
-            if (!disposed) setChartFailed(true);
-          });
-        } else if (chartInitialized && chartRef.current) {
-          chartRef.current.applyOptions({
-            width: rect.width,
-            height: rect.height,
-            timeScale: { rightOffsetPixels: labelGutterPixels(rect.width) },
-          });
-        }
-      });
-      ro.observe(containerRef.current);
-    }
-
-    return () => {
-      disposed = true;
-      if (ro) ro.disconnect();
-      tooltipRef.current?.dispose();
-      tooltipRef.current = null;
-      if (chartRef.current) {
-        chartRef.current.remove();
-        chartRef.current = null;
-      }
-      indexSeriesRef.current = null;
-      priceSeriesRef.current = null;
-      volumeSeriesRef.current = null;
-      primitiveRef.current = null;
-      rangeKeyRef.current = null;
-    };
-  }, [applyLatestData, applyZoomLimit, syncLayers, hasIndex]);
+  const { containerRef, failed: chartFailed } = useIndexChart({
+    indexLine,
+    priceLine,
+    volumeBars,
+    drawPrice,
+    drawVolume,
+    reservePriceScale,
+    theme: resolvedTheme,
+    preset,
+  });
 
   if (loading) {
     return <FearGreedIndexChartSkeleton className={className} />;

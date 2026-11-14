@@ -4,7 +4,7 @@ import {
   labelGutterPixels,
   minBarSpacingFor,
   presetLogicalRange,
-} from "@/registry/voraui/fear-greed-index-chart/lib/zones-primitive";
+} from "@/registry/voraui/fear-greed-index-chart/lib/chart-range";
 
 describe("labelGutterPixels", () => {
   it("reserves a label column right of the latest day on wide charts", () => {
