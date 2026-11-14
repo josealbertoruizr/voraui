@@ -18,6 +18,7 @@ Docs and live demos: https://voraui.vercel.app
 - **Trading Chart** (flagship) - candlesticks with B/S trade markers, same-candle clustering (`3B`), hover tooltips, infinite history on scroll, and live Binance updates.
 - **BTC Rainbow Chart** - the classic log-regression rainbow over the full daily price history since 2010, with a bundled 2010-2017 seed.
 - **Fear & Greed Gauge** - the crypto Fear & Greed index as an SVG dial, live from alternative.me.
+- **Fear & Greed Index Chart** - the full Fear & Greed history as a band-colored line, with optional Bitcoin price and volume layers and range presets.
 - **Altseason Gauge** - the Altcoin Season index computed client-side from CoinPaprika data.
 
 Every component renders real data out of the box from free, keyless public APIs (alternative.me, CoinPaprika, Binance).

@@ -5,6 +5,7 @@ import { HeroDemo } from "@/components/site/hero-demo";
 import { ShowcaseTile } from "@/components/site/showcase-tile";
 import { BtcRainbowChart, BtcRainbowLegend } from "@/registry/voraui/btc-rainbow-chart";
 import { FearGreedGauge } from "@/registry/voraui/fear-greed-gauge";
+import { FearGreedIndexChart } from "@/registry/voraui/fear-greed-index-chart";
 import { AltseasonGauge } from "@/registry/voraui/altseason-gauge";
 
 export default function Home() {
@@ -74,6 +75,14 @@ export default function Home() {
               </ShowcaseTile>
             </div>
           </div>
+
+          <ShowcaseTile
+            href="/docs/fear-greed-index-chart"
+            title="Fear & Greed Index Chart"
+            description="Market sentiment over time. The full Fear & Greed history as a band-colored line against the Bitcoin price, with range presets."
+          >
+            <FearGreedIndexChart />
+          </ShowcaseTile>
         </div>
       </section>
     </main>
