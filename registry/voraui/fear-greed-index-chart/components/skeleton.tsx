@@ -14,6 +14,7 @@ const VIEW_HEIGHT = 200;
 const LINE_POINTS = 70;
 const FEAR_COLOR = "#c0392b";
 const GREED_COLOR = "#2e7d32";
+const ZONE_OPACITY = 0.1;
 
 /** Deterministic wavy index line; Math.random would cause a hydration mismatch. */
 function indexLinePoints(): string {
@@ -35,7 +36,7 @@ export function FearGreedIndexChartSkeleton({ className }: FearGreedIndexChartSk
   const zoneHeight = VIEW_HEIGHT / 4;
 
   return (
-    <div className={cn("space-y-2", className)} role="status">
+    <div className={cn("@container space-y-2", className)} role="status">
       <span className="sr-only">Loading Fear &amp; Greed history</span>
       <style href="voraui-fear-greed-index-chart-skeleton" precedence="low">{`
         @keyframes voraui-fear-greed-index-chart-skeleton-shimmer {
@@ -55,10 +56,10 @@ export function FearGreedIndexChartSkeleton({ className }: FearGreedIndexChartSk
           }
         }
       `}</style>
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col items-start gap-2 @lg:flex-row @lg:items-center @lg:justify-between">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           {LEGEND_WIDTHS.map((width) => (
-            <div key={width} className="flex items-center gap-1.5">
+            <div key={width} className="flex h-4 items-center gap-1.5">
               <div className="size-2 rounded-full bg-muted" />
               <div className={cn("h-3 rounded bg-muted", width)} />
             </div>
@@ -77,14 +78,14 @@ export function FearGreedIndexChartSkeleton({ className }: FearGreedIndexChartSk
           className="absolute inset-0 h-full w-full"
           aria-hidden="true"
         >
-          <rect x={0} y={0} width={VIEW_WIDTH} height={zoneHeight} fill={GREED_COLOR} opacity={0.12} />
+          <rect x={0} y={0} width={VIEW_WIDTH} height={zoneHeight} fill={GREED_COLOR} opacity={ZONE_OPACITY} />
           <rect
             x={0}
             y={VIEW_HEIGHT - zoneHeight}
             width={VIEW_WIDTH}
             height={zoneHeight}
             fill={FEAR_COLOR}
-            opacity={0.12}
+            opacity={ZONE_OPACITY}
           />
           <polyline
             points={linePoints}
@@ -93,6 +94,7 @@ export function FearGreedIndexChartSkeleton({ className }: FearGreedIndexChartSk
             strokeWidth={2}
             strokeLinejoin="round"
             strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
             className="text-muted-foreground/55"
           />
         </svg>
