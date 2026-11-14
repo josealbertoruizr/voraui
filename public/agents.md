@@ -213,8 +213,7 @@ type FearGreedData = {
 
 ## Fear & Greed Index Chart
 
-Use for the crypto Fear & Greed index over time as a band-colored line, with
-optional Bitcoin price and volume layers and range presets.
+Use for the crypto Fear & Greed index over time as a band-colored line, with optional Bitcoin price and volume layers and range presets.
 
 ```tsx
 import { FearGreedIndexChart } from "@/components/voraui/fear-greed-index-chart";
@@ -303,10 +302,9 @@ import { AltseasonGaugeSkeleton } from "@/components/voraui/altseason-gauge";
 - `BtcRainbowChart` uses a bundled 2010-2017 BTC daily seed and Binance daily
   klines from 2017-08-17 onward.
 - `FearGreedGauge` fetches `https://api.alternative.me/fng/?limit=1`.
-- `FearGreedIndexChart` fetches `https://api.alternative.me/fng/?limit=0` (daily
-  since February 2018). BTC closes and quote volume come from Binance daily
-  klines, requested only when `showPrice` or `showVolume` is on. If Binance is
-  unreachable the chart renders the index alone.
+- `FearGreedIndexChart` fetches `https://api.alternative.me/fng/?limit=0` (daily since February 2018).
+  BTC closes and quote volume come from Binance daily klines, requested only when `showPrice` or `showVolume` is on.
+  If Binance is unreachable the chart renders the index alone.
 - `AltseasonGauge` fetches `https://api.coinpaprika.com/v1/tickers?quotes=USD`
   and computes the score client-side.
 - Public fetchers are free and keyless, but production apps should pass owned

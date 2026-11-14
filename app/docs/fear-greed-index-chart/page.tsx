@@ -21,7 +21,8 @@ export default function Page() {
         <p className="mt-2 text-muted-foreground">
           The crypto Fear &amp; Greed index over time: the full daily history since 2018 as a
           band-colored line, with an optional Bitcoin price line and volume histogram, range
-          presets, and a tooltip that names the sentiment zone.
+          presets, and a tooltip that names the sentiment zone. When the chart is narrow (plot under
+          480px), the zone labels are hidden so the data uses the full width.
         </p>
       </div>
 
