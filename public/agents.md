@@ -320,12 +320,13 @@ import { AltseasonGaugeSkeleton } from "@/components/voraui/altseason-gauge";
   props are serializable. Put callbacks or browser-only surrounding logic in a
   client wrapper.
 - `TradingChart`, `BtcRainbowChart` and `FearGreedIndexChart` render with
-  `lightweight-charts`; give them stable visible dimensions and avoid placing them in initially hidden
-  zero-width containers.
+  `lightweight-charts`; give them stable visible dimensions and avoid placing
+  them in initially hidden zero-width containers.
 - Dark mode for chart canvases follows `next-themes`. Without a provider, chart
   canvases render in their light theme.
-- `TradeSignal.ts` times use epoch milliseconds; `OhlcvCandle.time` and
-  `RainbowPoint.time` use Unix seconds.
+- `TradeSignal.ts` times use epoch milliseconds; `OhlcvCandle.time`,
+  `RainbowPoint.time`, `FearGreedPoint.time` and `BtcDailyPoint.time` use Unix
+  seconds.
 - Keep installed files editable. If the user asks for custom behavior, modify
   the copied component source in `components/voraui/<component>/`.
 
