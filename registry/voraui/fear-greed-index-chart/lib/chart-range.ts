@@ -6,13 +6,12 @@ export const DAY_SECONDS = 86_400;
 
 // Fits "Extreme Greed" at 11px plus the inset on both sides.
 const LABEL_GUTTER = 92;
-const NARROW_RIGHT_OFFSET = 8;
-/** Chart width from which the band labels get their own column right of the latest day. */
-export const LABEL_GUTTER_MIN_WIDTH = 480;
+/** Plot width from which the band labels get their own column; narrower plots hide them. */
+export const LABEL_GUTTER_MIN_PLOT_WIDTH = 480;
 
-/** Right offset in pixels for the time scale, so the latest stretch stays clear of the labels. */
-export function labelGutterPixels(chartWidth: number): number {
-  return chartWidth >= LABEL_GUTTER_MIN_WIDTH ? LABEL_GUTTER : NARROW_RIGHT_OFFSET;
+/** Right offset in pixels reserved for the band labels; 0 means the labels are hidden. */
+export function labelGutterPixels(plotWidth: number): number {
+  return plotWidth >= LABEL_GUTTER_MIN_PLOT_WIDTH ? LABEL_GUTTER : 0;
 }
 
 /** Logical range showing bars `from..to` with the gutter kept free right of `to`. */
@@ -35,4 +34,31 @@ export function minBarSpacingFor(plotWidth: number, gutter: number, bars: number
   const usable = plotWidth - gutter;
   if (bars <= 0 || usable <= 0) return DEFAULT_MIN_BAR_SPACING;
   return usable / bars;
+}
+
+type LogicalSpan = { from: number; to: number };
+
+// Half a bar either side of the first and last bar centers.
+const FIRST_BAR_EDGE = -0.5;
+// Overshoot the chart produces on its own edge corrections; clamping it would loop.
+const CLAMP_TOLERANCE = 0.5;
+
+/**
+ * Keeps a requested logical range between the first bar and the reserved padding past the last
+ * bar, preserving its span; a span wider than everything fits everything.
+ */
+export function clampLogicalRange(
+  range: LogicalSpan,
+  barCount: number,
+  rightPaddingBars: number,
+): LogicalSpan {
+  if (barCount <= 0) return range;
+  const maxTo = barCount - 1 + rightPaddingBars;
+  const span = range.to - range.from;
+  if (span > maxTo - FIRST_BAR_EDGE + 2 * CLAMP_TOLERANCE) return { from: FIRST_BAR_EDGE, to: maxTo };
+  if (range.to > maxTo + CLAMP_TOLERANCE) return { from: maxTo - span, to: maxTo };
+  if (range.from < FIRST_BAR_EDGE - CLAMP_TOLERANCE) {
+    return { from: FIRST_BAR_EDGE, to: FIRST_BAR_EDGE + span };
+  }
+  return range;
 }

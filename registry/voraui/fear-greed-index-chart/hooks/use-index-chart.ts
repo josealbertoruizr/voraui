@@ -1,7 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { IChartApi, ISeriesApi, Time, UTCTimestamp } from "lightweight-charts";
+import type {
+  IChartApi,
+  ISeriesApi,
+  LogicalRange,
+  LogicalRangeChangeEventHandler,
+  SizeChangeEventHandler,
+  Time,
+  UTCTimestamp,
+} from "lightweight-charts";
 import { FearGreedZonesPrimitive } from "../lib/zones-primitive";
 import { createIndexTooltip, type IndexTooltip } from "../lib/index-tooltip";
 import {
@@ -20,6 +28,7 @@ import {
 import {
   DAY_SECONDS,
   PRESET_DAYS,
+  clampLogicalRange,
   labelGutterPixels,
   minBarSpacingFor,
   presetLogicalRange,
@@ -79,6 +88,8 @@ export function useIndexChart({
   const presetRef = useRef<Preset>(preset);
   // Time bounds the visible range was last fitted to; unchanged bounds keep the user's zoom.
   const rangeKeyRef = useRef<string | null>(null);
+  // Pixels reserved right of the latest day for the band labels; 0 while they are hidden.
+  const gutterRef = useRef(0);
 
   // Zoom-out stops where every day plus the label gutter fits, like fixed edges would.
   const applyZoomLimit = useCallback(() => {
@@ -90,8 +101,9 @@ export function useIndexChart({
       priceLineRef.current.length,
       volumeBarsRef.current.length,
     );
-    const gutter = labelGutterPixels(chart.options().width);
-    timeScale.applyOptions({ minBarSpacing: minBarSpacingFor(timeScale.width(), gutter, bars) });
+    timeScale.applyOptions({
+      minBarSpacing: minBarSpacingFor(timeScale.width(), gutterRef.current, bars),
+    });
   }, []);
 
   const applyVisibleRange = useCallback(() => {
@@ -111,9 +123,8 @@ export function useIndexChart({
     const fromIndex = timeScale.timeToIndex(from as UTCTimestamp, true);
     const toIndex = timeScale.timeToIndex(last as UTCTimestamp, true);
     if (fromIndex === null || toIndex === null) return;
-    const gutter = labelGutterPixels(chart.options().width);
     timeScale.setVisibleLogicalRange(
-      presetLogicalRange(fromIndex, toIndex, timeScale.width(), gutter),
+      presetLogicalRange(fromIndex, toIndex, timeScale.width(), gutterRef.current),
     );
   }, []);
 
@@ -211,19 +222,21 @@ export function useIndexChart({
     let disposed = false;
     let ro: ResizeObserver | null = null;
     let chartInitialized = false;
+    let onPlotResize: SizeChangeEventHandler | null = null;
+    let onRangeChange: LogicalRangeChangeEventHandler | null = null;
 
     const initChart = async (container: HTMLDivElement) => {
       const lwc = await import("lightweight-charts");
       if (disposed) return;
       lwcRef.current = lwc;
       const palette = paletteRef.current;
-      const width = container.clientWidth;
 
       const chart = lwc.createChart(
         container,
-        chartOptions(palette, width, container.clientHeight, labelGutterPixels(width)),
+        chartOptions(palette, container.clientWidth, container.clientHeight),
       );
       chartRef.current = chart;
+      const timeScale = chart.timeScale();
 
       const indexSeries = chart.addSeries(lwc.LineSeries, INDEX_SERIES_OPTIONS);
       indexSeriesRef.current = indexSeries;
@@ -235,14 +248,40 @@ export function useIndexChart({
       primitiveRef.current = primitive;
       indexSeries.attachPrimitive(primitive);
 
-      // The plot narrows when the left price scale appears or the chart resizes.
-      chart.timeScale().subscribeSizeChange(applyZoomLimit);
+      // Fires on the first layout too, so the label column is decided from the real plot width.
+      onPlotResize = (plotWidth) => {
+        const gutter = labelGutterPixels(plotWidth);
+        if (gutter !== gutterRef.current) {
+          gutterRef.current = gutter;
+          primitive.setLabelsVisible(gutter > 0);
+          timeScale.applyOptions({ rightOffsetPixels: gutter });
+          applyZoomLimit();
+          applyVisibleRange();
+          return;
+        }
+        applyZoomLimit();
+      };
+      timeScale.subscribeSizeChange(onPlotResize);
 
-      // Thin the index line when days are packed tighter than its stroke.
-      chart.timeScale().subscribeVisibleLogicalRangeChange(() => {
-        const lineWidth = chart.timeScale().options().barSpacing < DENSE_BAR_SPACING ? 1 : 2;
+      let clamping = false;
+      onRangeChange = (range) => {
+        // Thin the index line when days are packed tighter than its stroke.
+        const barSpacing = timeScale.options().barSpacing;
+        const lineWidth = barSpacing < DENSE_BAR_SPACING ? 1 : 2;
         if (indexSeries.options().lineWidth !== lineWidth) indexSeries.applyOptions({ lineWidth });
-      });
+
+        // Without fixRightEdge, panning is bounded here: never past the label column.
+        const points = indexLineRef.current;
+        if (!range || clamping || points.length === 0) return;
+        const lastIndex = timeScale.timeToIndex(points[points.length - 1].time, true);
+        if (lastIndex === null) return;
+        const clamped = clampLogicalRange(range, lastIndex + 1, gutterRef.current / barSpacing);
+        if (clamped === range) return;
+        clamping = true;
+        timeScale.setVisibleLogicalRange(clamped as LogicalRange);
+        clamping = false;
+      };
+      timeScale.subscribeVisibleLogicalRangeChange(onRangeChange);
 
       syncLayers();
       applyLatestData();
@@ -265,11 +304,7 @@ export function useIndexChart({
             if (!disposed) setFailed(true);
           });
         } else if (chartInitialized && chartRef.current) {
-          chartRef.current.applyOptions({
-            width: rect.width,
-            height: rect.height,
-            timeScale: { rightOffsetPixels: labelGutterPixels(rect.width) },
-          });
+          chartRef.current.applyOptions({ width: rect.width, height: rect.height });
         }
       });
       ro.observe(containerRef.current);
@@ -281,6 +316,9 @@ export function useIndexChart({
       tooltipRef.current?.dispose();
       tooltipRef.current = null;
       if (chartRef.current) {
+        const timeScale = chartRef.current.timeScale();
+        if (onPlotResize) timeScale.unsubscribeSizeChange(onPlotResize);
+        if (onRangeChange) timeScale.unsubscribeVisibleLogicalRangeChange(onRangeChange);
         chartRef.current.remove();
         chartRef.current = null;
       }
@@ -289,8 +327,9 @@ export function useIndexChart({
       volumeSeriesRef.current = null;
       primitiveRef.current = null;
       rangeKeyRef.current = null;
+      gutterRef.current = 0;
     };
-  }, [applyLatestData, applyZoomLimit, syncLayers, hasIndex]);
+  }, [applyLatestData, applyVisibleRange, applyZoomLimit, syncLayers, hasIndex]);
 
   return { containerRef, failed };
 }

@@ -113,16 +113,19 @@ class FearGreedLabelsPaneView implements IPrimitivePaneView {
   }
 
   renderer(): IPrimitivePaneRenderer | null {
-    const { series, labelColor, haloColor } = this.primitive;
+    const { series, labelColor, haloColor, labelsVisible } = this.primitive;
+    if (!labelsVisible) return null;
     return new FearGreedLabelsRenderer(series, labelColor, haloColor);
   }
 }
 
-/** Series primitive painting the fear (0-25) and greed (75-100) tints plus band labels. */
+/** Series primitive painting the fear (0-25) and greed (75-100) tints plus optional band labels. */
 export class FearGreedZonesPrimitive implements ISeriesPrimitive<Time> {
   series: ISeriesApi<SeriesType, Time> | null = null;
   labelColor: string;
   haloColor: string;
+  /** Off until the chart reserves a label column; narrow plots never show the labels. */
+  labelsVisible = false;
 
   private paneViewsList: readonly IPrimitivePaneView[];
   private requestChartUpdate: (() => void) | null = null;
@@ -136,6 +139,11 @@ export class FearGreedZonesPrimitive implements ISeriesPrimitive<Time> {
   setColors(labelColor: string, haloColor: string): void {
     this.labelColor = labelColor;
     this.haloColor = haloColor;
+    this.requestUpdate();
+  }
+
+  setLabelsVisible(visible: boolean): void {
+    this.labelsVisible = visible;
     this.requestUpdate();
   }
 

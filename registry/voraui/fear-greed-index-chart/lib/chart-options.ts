@@ -66,7 +66,6 @@ export function chartOptions(
   palette: ChartPalette,
   width: number,
   height: number,
-  rightOffsetPixels: number,
 ): DeepPartial<ChartOptions> {
   return {
     width,
@@ -88,7 +87,8 @@ export function chartOptions(
       borderVisible: false,
       timeVisible: false,
       secondsVisible: false,
-      rightOffsetPixels,
+      // The label column is reserved once the plot width is known.
+      rightOffsetPixels: 0,
       barSpacing: 4,
       // No fixRightEdge: it would force the right offset, and with it the label gutter, to 0.
       fixLeftEdge: true,
