@@ -12,6 +12,11 @@ export const VOLUME_SCALE_ID = "volume";
 export const SCALE_MARGIN = 0.05;
 /** Volume bars stay in the bottom ~15% and share the index zero line. */
 export const VOLUME_SCALE_MARGINS = { top: 0.8, bottom: SCALE_MARGIN };
+
+/** Left price scale margins: the line's low sits clear of the zone floor, or above the volume bars. */
+export function priceScaleMargins(withVolume: boolean): { top: number; bottom: number } {
+  return { top: SCALE_MARGIN, bottom: withVolume ? 0.26 : 0.12 };
+}
 // Fits "$120K" ticks, so the reserved scale rarely changes width once prices arrive.
 export const PRICE_SCALE_MIN_WIDTH = 60;
 // Below this many pixels per day the index line drops to 1px so it stays readable.
@@ -81,7 +86,7 @@ export function chartOptions(
       // 0 = PriceScaleMode.Normal.
       mode: 0 as PriceScaleMode.Normal,
       borderVisible: false,
-      scaleMargins: { top: SCALE_MARGIN, bottom: SCALE_MARGIN },
+      scaleMargins: priceScaleMargins(false),
     },
     timeScale: {
       borderVisible: false,

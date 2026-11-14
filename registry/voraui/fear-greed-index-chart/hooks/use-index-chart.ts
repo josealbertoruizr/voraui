@@ -20,6 +20,7 @@ import {
   VOLUME_SCALE_MARGINS,
   chartOptions,
   chartPalette,
+  priceScaleMargins,
   priceSeriesOptions,
   themeOptions,
   volumeSeriesOptions,
@@ -182,6 +183,7 @@ export function useIndexChart({
       leftPriceScale: {
         visible: reservePriceScaleRef.current,
         minimumWidth: PRICE_SCALE_MIN_WIDTH,
+        scaleMargins: priceScaleMargins(drawVolumeRef.current),
       },
     });
   }, []);

@@ -16,6 +16,11 @@ describe("formatters", () => {
     expect(compactUsdTick(NaN)).toBe("-");
   });
 
+  it("leaves ticks below zero blank, since the bottom margin can reach under $0", () => {
+    expect(compactUsdTick(-20_000)).toBe("");
+    expect(compactUsdTick(-0.5)).toBe("");
+  });
+
   it("labels the zero tick of the linear price axis as $0", () => {
     expect(compactUsdTick(0)).toBe("$0");
   });
