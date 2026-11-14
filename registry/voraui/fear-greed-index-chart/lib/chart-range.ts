@@ -36,6 +36,13 @@ export function minBarSpacingFor(plotWidth: number, gutter: number, bars: number
   return usable / bars;
 }
 
+/** Number of distinct times across all series: the bars the time scale actually lays out. */
+export function distinctTimeCount(series: ReadonlyArray<ReadonlyArray<{ time: number }>>): number {
+  const times = new Set<number>();
+  for (const points of series) for (const p of points) times.add(p.time);
+  return times.size;
+}
+
 type LogicalSpan = { from: number; to: number };
 
 // Half a bar either side of the first and last bar centers.

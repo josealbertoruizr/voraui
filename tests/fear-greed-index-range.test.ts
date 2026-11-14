@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   LABEL_GUTTER_MIN_PLOT_WIDTH,
   clampLogicalRange,
+  distinctTimeCount,
   labelGutterPixels,
   minBarSpacingFor,
   presetLogicalRange,
@@ -65,5 +66,19 @@ describe("clampLogicalRange", () => {
 
   it("returns the range as is when there are no bars", () => {
     expect(clampLogicalRange({ from: 3, to: 9 }, 0, 5)).toEqual({ from: 3, to: 9 });
+  });
+});
+
+describe("distinctTimeCount", () => {
+  it("counts the union of times across series, not the longest one", () => {
+    const index = [{ time: 1 }, { time: 2 }, { time: 3 }];
+    const btc = [{ time: 1.5 }, { time: 2 }, { time: 2.5 }];
+    expect(distinctTimeCount([index, btc, btc])).toBe(5);
+  });
+
+  it("matches the series length when the times align", () => {
+    const index = [{ time: 1 }, { time: 2 }];
+    expect(distinctTimeCount([index, index, []])).toBe(2);
+    expect(distinctTimeCount([[], []])).toBe(0);
   });
 });

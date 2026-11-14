@@ -29,6 +29,7 @@ import {
   DAY_SECONDS,
   PRESET_DAYS,
   clampLogicalRange,
+  distinctTimeCount,
   labelGutterPixels,
   minBarSpacingFor,
   presetLogicalRange,
@@ -96,11 +97,11 @@ export function useIndexChart({
     const chart = chartRef.current;
     if (!chart) return;
     const timeScale = chart.timeScale();
-    const bars = Math.max(
-      indexLineRef.current.length,
-      priceLineRef.current.length,
-      volumeBarsRef.current.length,
-    );
+    const bars = distinctTimeCount([
+      indexLineRef.current,
+      priceLineRef.current,
+      volumeBarsRef.current,
+    ]);
     timeScale.applyOptions({
       minBarSpacing: minBarSpacingFor(timeScale.width(), gutterRef.current, bars),
     });
