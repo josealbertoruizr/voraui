@@ -15,7 +15,12 @@ import {
   type BtcDailyPoint,
   type FearGreedPoint,
 } from "./lib/fear-greed-bands";
-import { FearGreedZonesPrimitive } from "./lib/zones-primitive";
+import {
+  FearGreedZonesPrimitive,
+  labelGutterPixels,
+  minBarSpacingFor,
+  presetLogicalRange,
+} from "./lib/zones-primitive";
 import { compactUsdTick, createIndexTooltip, type IndexTooltip } from "./lib/index-tooltip";
 
 export interface FearGreedIndexChartProps {
@@ -39,6 +44,42 @@ const VOLUME_SCALE_ID = "volume";
 
 type IndexPoint = { time: UTCTimestamp; value: number; color: string };
 type ValuePoint = { time: UTCTimestamp; value: number };
+type LightweightCharts = typeof import("lightweight-charts");
+
+const SCALE_MARGIN = 0.05;
+// Fits "$120K" ticks, so the reserved scale rarely changes width once prices arrive.
+const PRICE_SCALE_MIN_WIDTH = 60;
+// Below this many pixels per day the index line drops to 1px so it stays readable.
+const DENSE_BAR_SPACING = 1;
+
+interface ChartPalette {
+  text: string;
+  grid: string;
+  label: string;
+  halo: string;
+  price: string;
+  volume: string;
+}
+
+function chartPalette(theme: string | undefined): ChartPalette {
+  return theme === "dark"
+    ? {
+        text: "#9CA3AF",
+        grid: "rgba(148,163,184,0.10)",
+        label: "rgba(156,163,175,0.85)",
+        halo: "rgba(10,10,10,0.85)",
+        price: "rgba(161,161,170,0.85)",
+        volume: "rgba(161,161,170,0.22)",
+      }
+    : {
+        text: "#52525b",
+        grid: "rgba(0,0,0,0.05)",
+        label: "rgba(82,82,91,0.85)",
+        halo: "rgba(255,255,255,0.85)",
+        price: "rgba(82,82,91,0.8)",
+        volume: "rgba(82,82,91,0.16)",
+      };
+}
 
 /** Crypto Fear & Greed index history as a band-colored line with optional BTC price and volume. */
 export function FearGreedIndexChart({
@@ -89,9 +130,12 @@ export function FearGreedIndexChart({
   const hasIndex = indexLine.length > 0;
   const drawPrice = showPrice && priceLine.length > 0;
   const drawVolume = showVolume && volumeBars.length > 0;
+  // Holding the price scale open while BTC loads keeps the plot from narrowing when it lands.
+  const reservePriceScale = drawPrice || (showPrice && fetchedBtc.loading);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const tooltipRef = useRef<IndexTooltip | null>(null);
+  const lwcRef = useRef<LightweightCharts | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const indexSeriesRef = useRef<ISeriesApi<"Line", Time> | null>(null);
   const priceSeriesRef = useRef<ISeriesApi<"Line", Time> | null>(null);
@@ -99,31 +143,54 @@ export function FearGreedIndexChart({
   const primitiveRef = useRef<FearGreedZonesPrimitive | null>(null);
 
   const [preset, setPreset] = useState<Preset>("ALL");
+  const [chartFailed, setChartFailed] = useState(false);
 
   const indexLineRef = useRef<IndexPoint[]>(indexLine);
   const priceLineRef = useRef<ValuePoint[]>(priceLine);
   const volumeBarsRef = useRef<ValuePoint[]>(volumeBars);
+  const drawPriceRef = useRef(drawPrice);
+  const reservePriceScaleRef = useRef(reservePriceScale);
+  const drawVolumeRef = useRef(drawVolume);
+  const paletteRef = useRef<ChartPalette>(chartPalette(resolvedTheme));
   const presetRef = useRef<Preset>(preset);
   // Time bounds the visible range was last fitted to; unchanged bounds keep the user's zoom.
   const rangeKeyRef = useRef<string | null>(null);
+
+  // Zoom-out stops where every day plus the label gutter fits, like fixed edges would.
+  const applyZoomLimit = useCallback(() => {
+    const chart = chartRef.current;
+    if (!chart) return;
+    const timeScale = chart.timeScale();
+    const bars = Math.max(
+      indexLineRef.current.length,
+      priceLineRef.current.length,
+      volumeBarsRef.current.length,
+    );
+    const gutter = labelGutterPixels(chart.options().width);
+    timeScale.applyOptions({ minBarSpacing: minBarSpacingFor(timeScale.width(), gutter, bars) });
+  }, []);
 
   const applyVisibleRange = useCallback(() => {
     const chart = chartRef.current;
     const points = indexLineRef.current;
     if (!chart || points.length === 0) return;
+    const timeScale = chart.timeScale();
 
     if (presetRef.current === "ALL") {
-      chart.timeScale().fitContent();
+      timeScale.fitContent();
       return;
     }
 
     const first = points[0].time as number;
     const last = points[points.length - 1].time as number;
     const from = Math.max(first, last - PRESET_DAYS[presetRef.current] * DAY_SECONDS);
-    chart.timeScale().setVisibleRange({
-      from: from as UTCTimestamp,
-      to: last as UTCTimestamp,
-    });
+    const fromIndex = timeScale.timeToIndex(from as UTCTimestamp, true);
+    const toIndex = timeScale.timeToIndex(last as UTCTimestamp, true);
+    if (fromIndex === null || toIndex === null) return;
+    const gutter = labelGutterPixels(chart.options().width);
+    timeScale.setVisibleLogicalRange(
+      presetLogicalRange(fromIndex, toIndex, timeScale.width(), gutter),
+    );
   }, []);
 
   const applyLatestData = useCallback(() => {
@@ -137,13 +204,67 @@ export function FearGreedIndexChart({
     priceSeriesRef.current?.setData(priceLineRef.current);
     volumeSeriesRef.current?.setData(volumeBarsRef.current);
 
+    applyZoomLimit();
     const rangeKey = `${points[0].time}:${points[points.length - 1].time}`;
     if (rangeKeyRef.current !== rangeKey) {
       rangeKeyRef.current = rangeKey;
       applyVisibleRange();
     }
     primitiveRef.current?.requestUpdate();
-  }, [applyVisibleRange]);
+  }, [applyVisibleRange, applyZoomLimit]);
+
+  // Adds or removes the BTC layers on the live chart so the index view and zoom survive.
+  const syncLayers = useCallback(() => {
+    const lwc = lwcRef.current;
+    const chart = chartRef.current;
+    if (!lwc || !chart) return;
+    const palette = paletteRef.current;
+
+    if (drawVolumeRef.current && !volumeSeriesRef.current) {
+      const volumeSeries = chart.addSeries(lwc.HistogramSeries, {
+        color: palette.volume,
+        priceScaleId: VOLUME_SCALE_ID,
+        priceFormat: { type: "volume" },
+        priceLineVisible: false,
+        lastValueVisible: false,
+      });
+      chart.priceScale(VOLUME_SCALE_ID).applyOptions({
+        scaleMargins: { top: 0.8, bottom: SCALE_MARGIN },
+      });
+      volumeSeries.setData(volumeBarsRef.current);
+      volumeSeriesRef.current = volumeSeries;
+    } else if (!drawVolumeRef.current && volumeSeriesRef.current) {
+      chart.removeSeries(volumeSeriesRef.current);
+      volumeSeriesRef.current = null;
+    }
+
+    if (drawPriceRef.current && !priceSeriesRef.current) {
+      const priceSeries = chart.addSeries(lwc.LineSeries, {
+        color: palette.price,
+        lineWidth: 1,
+        priceScaleId: "left",
+        priceLineVisible: false,
+        lastValueVisible: false,
+        crosshairMarkerVisible: false,
+        priceFormat: { type: "custom", formatter: compactUsdTick },
+      });
+      priceSeries.setData(priceLineRef.current);
+      priceSeriesRef.current = priceSeries;
+    } else if (!drawPriceRef.current && priceSeriesRef.current) {
+      chart.removeSeries(priceSeriesRef.current);
+      priceSeriesRef.current = null;
+    }
+
+    // Paint order: volume, then price, then the index on top.
+    volumeSeriesRef.current?.setSeriesOrder(0);
+    priceSeriesRef.current?.setSeriesOrder(volumeSeriesRef.current ? 1 : 0);
+    chart.applyOptions({
+      leftPriceScale: {
+        visible: reservePriceScaleRef.current,
+        minimumWidth: PRICE_SCALE_MIN_WIDTH,
+      },
+    });
+  }, []);
 
   useEffect(() => {
     indexLineRef.current = indexLine;
@@ -153,11 +274,32 @@ export function FearGreedIndexChart({
   }, [indexLine, priceLine, volumeBars, applyLatestData]);
 
   useEffect(() => {
+    drawPriceRef.current = drawPrice;
+    reservePriceScaleRef.current = reservePriceScale;
+    drawVolumeRef.current = drawVolume;
+    syncLayers();
+  }, [drawPrice, drawVolume, reservePriceScale, syncLayers]);
+
+  useEffect(() => {
+    const palette = chartPalette(resolvedTheme);
+    paletteRef.current = palette;
+    const chart = chartRef.current;
+    if (!chart) return;
+    chart.applyOptions({
+      layout: { textColor: palette.text },
+      grid: { vertLines: { color: palette.grid }, horzLines: { color: palette.grid } },
+    });
+    priceSeriesRef.current?.applyOptions({ color: palette.price });
+    volumeSeriesRef.current?.applyOptions({ color: palette.volume });
+    primitiveRef.current?.setColors(palette.label, palette.halo);
+  }, [resolvedTheme]);
+
+  useEffect(() => {
     presetRef.current = preset;
     applyVisibleRange();
   }, [preset, applyVisibleRange]);
 
-  // Mount once per theme and layer set; data updates live in a separate effect.
+  // Mount once; theme, layers, and data are applied in place by the effects above.
   useEffect(() => {
     if (!hasIndex) return;
 
@@ -168,13 +310,8 @@ export function FearGreedIndexChart({
     const initChart = async (container: HTMLDivElement) => {
       const lwc = await import("lightweight-charts");
       if (disposed) return;
-
-      const isDark = resolvedTheme === "dark";
-      const textColor = isDark ? "#9CA3AF" : "#52525b";
-      const gridColor = isDark ? "rgba(148,163,184,0.10)" : "rgba(0,0,0,0.05)";
-      const labelColor = isDark ? "rgba(156,163,175,0.7)" : "rgba(82,82,91,0.7)";
-      const priceColor = isDark ? "rgba(161,161,170,0.85)" : "rgba(82,82,91,0.8)";
-      const volumeColor = isDark ? "rgba(161,161,170,0.22)" : "rgba(82,82,91,0.16)";
+      lwcRef.current = lwc;
+      const palette = paletteRef.current;
 
       const chart = lwc.createChart(container, {
         width: container.clientWidth,
@@ -182,33 +319,34 @@ export function FearGreedIndexChart({
         autoSize: false,
         layout: {
           background: { type: lwc.ColorType.Solid, color: "rgba(0,0,0,0)" },
-          textColor,
+          textColor: palette.text,
         },
         grid: {
-          vertLines: { color: gridColor },
-          horzLines: { color: gridColor },
+          vertLines: { color: palette.grid },
+          horzLines: { color: palette.grid },
         },
         rightPriceScale: {
           borderVisible: false,
-          scaleMargins: { top: 0.05, bottom: 0.05 },
+          scaleMargins: { top: SCALE_MARGIN, bottom: SCALE_MARGIN },
         },
         leftPriceScale: {
-          visible: drawPrice,
+          visible: false,
           mode: lwc.PriceScaleMode.Normal,
           borderVisible: false,
-          scaleMargins: { top: 0.05, bottom: 0.05 },
+          scaleMargins: { top: SCALE_MARGIN, bottom: SCALE_MARGIN },
         },
         timeScale: {
           borderVisible: false,
           timeVisible: false,
           secondsVisible: false,
-          rightOffset: 2,
+          rightOffsetPixels: labelGutterPixels(container.clientWidth),
           barSpacing: 4,
+          // No fixRightEdge: it would force the right offset, and with it the label gutter, to 0.
           fixLeftEdge: true,
-          fixRightEdge: true,
           lockVisibleTimeRangeOnResize: true,
         },
-        crosshair: { mode: 0 },
+        // The tooltip carries the values; a horizontal crosshair label would read past 0-100.
+        crosshair: { mode: 0, horzLine: { visible: false, labelVisible: false } },
         handleScroll: {
           mouseWheel: true,
           pressedMouseMove: true,
@@ -222,32 +360,7 @@ export function FearGreedIndexChart({
           axisDoubleClickReset: true,
         },
       });
-
-      // Creation order is paint order: volume, then price, then the index on top.
-      if (drawVolume) {
-        volumeSeriesRef.current = chart.addSeries(lwc.HistogramSeries, {
-          color: volumeColor,
-          priceScaleId: VOLUME_SCALE_ID,
-          priceFormat: { type: "volume" },
-          priceLineVisible: false,
-          lastValueVisible: false,
-        });
-        chart.priceScale(VOLUME_SCALE_ID).applyOptions({
-          scaleMargins: { top: 0.82, bottom: 0 },
-        });
-      }
-
-      if (drawPrice) {
-        priceSeriesRef.current = chart.addSeries(lwc.LineSeries, {
-          color: priceColor,
-          lineWidth: 1,
-          priceScaleId: "left",
-          priceLineVisible: false,
-          lastValueVisible: false,
-          crosshairMarkerVisible: false,
-          priceFormat: { type: "custom", formatter: compactUsdTick },
-        });
-      }
+      chartRef.current = chart;
 
       const indexSeries = chart.addSeries(lwc.LineSeries, {
         lineWidth: 2,
@@ -259,13 +372,25 @@ export function FearGreedIndexChart({
         priceFormat: { type: "price", precision: 0, minMove: 1 },
         autoscaleInfoProvider: () => ({ priceRange: { minValue: 0, maxValue: 100 } }),
       });
+      indexSeriesRef.current = indexSeries;
 
-      const primitive = new FearGreedZonesPrimitive({ labelColor });
+      const primitive = new FearGreedZonesPrimitive({
+        labelColor: palette.label,
+        haloColor: palette.halo,
+      });
       primitiveRef.current = primitive;
       indexSeries.attachPrimitive(primitive);
 
-      chartRef.current = chart;
-      indexSeriesRef.current = indexSeries;
+      // The plot narrows when the left price scale appears or the chart resizes.
+      chart.timeScale().subscribeSizeChange(applyZoomLimit);
+
+      // Thin the index line when days are packed tighter than its stroke.
+      chart.timeScale().subscribeVisibleLogicalRangeChange(() => {
+        const width = chart.timeScale().options().barSpacing < DENSE_BAR_SPACING ? 1 : 2;
+        if (indexSeries.options().lineWidth !== width) indexSeries.applyOptions({ lineWidth: width });
+      });
+
+      syncLayers();
       applyLatestData();
 
       const tooltip = createIndexTooltip(container, () => ({
@@ -282,11 +407,14 @@ export function FearGreedIndexChart({
         const rect = entries[0].contentRect;
         if (rect.width > 0 && rect.height > 0 && !chartInitialized) {
           chartInitialized = true;
-          initChart(containerRef.current!);
+          initChart(containerRef.current!).catch(() => {
+            if (!disposed) setChartFailed(true);
+          });
         } else if (chartInitialized && chartRef.current) {
           chartRef.current.applyOptions({
             width: rect.width,
             height: rect.height,
+            timeScale: { rightOffsetPixels: labelGutterPixels(rect.width) },
           });
         }
       });
@@ -308,13 +436,13 @@ export function FearGreedIndexChart({
       primitiveRef.current = null;
       rangeKeyRef.current = null;
     };
-  }, [applyLatestData, hasIndex, drawPrice, drawVolume, resolvedTheme]);
+  }, [applyLatestData, applyZoomLimit, syncLayers, hasIndex]);
 
   if (loading) {
     return <FearGreedIndexChartSkeleton className={className} />;
   }
 
-  if (!hasIndex) {
+  if (!hasIndex || chartFailed) {
     return (
       <div
         role="alert"
@@ -329,8 +457,8 @@ export function FearGreedIndexChart({
   }
 
   return (
-    <div className={cn("space-y-2", className)}>
-      <div className="flex flex-wrap items-center justify-between gap-2">
+    <div className={cn("@container space-y-2", className)}>
+      <div className="flex flex-col items-start gap-2 @lg:flex-row @lg:items-center @lg:justify-between">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <LegendEntry label="Fear & Greed Index" dotStyle={{ backgroundColor: INDEX_LEGEND_COLOR }} />
           {drawPrice && <LegendEntry label="Bitcoin Price" dotClassName="bg-muted-foreground" />}
@@ -368,7 +496,7 @@ function LegendEntry({
   dotStyle?: { backgroundColor: string };
 }) {
   return (
-    <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+    <div className="flex h-4 items-center gap-1.5 text-[11px] text-muted-foreground">
       <span className={cn("size-2 shrink-0 rounded-full", dotClassName)} style={dotStyle} aria-hidden />
       <span>{label}</span>
     </div>
