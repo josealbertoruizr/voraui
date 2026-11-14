@@ -36,6 +36,23 @@ describe("getRegistryItem", () => {
     ]);
   });
 
+  it("returns the fear-greed-index-chart item", () => {
+    const item = getRegistryItem("fear-greed-index-chart");
+    expect(item.title).toBe("Fear & Greed Index Chart");
+    expect(item.dependencies).toEqual(["lightweight-charts", "next-themes"]);
+    expect(item.registryDependencies).toEqual(["button", "utils"]);
+    expect(item.files.map((f) => f.target)).toEqual([
+      "components/voraui/fear-greed-index-chart/index.ts",
+      "components/voraui/fear-greed-index-chart/fear-greed-index-chart.tsx",
+      "components/voraui/fear-greed-index-chart/components/skeleton.tsx",
+      "components/voraui/fear-greed-index-chart/hooks/use-fear-greed-history.ts",
+      "components/voraui/fear-greed-index-chart/hooks/use-btc-daily.ts",
+      "components/voraui/fear-greed-index-chart/lib/fear-greed-bands.ts",
+      "components/voraui/fear-greed-index-chart/lib/zones-primitive.ts",
+      "components/voraui/fear-greed-index-chart/lib/index-tooltip.ts",
+    ]);
+  });
+
   it("throws for an unknown item name", () => {
     expect(() => getRegistryItem("does-not-exist")).toThrow(
       'No registry item named "does-not-exist"',

@@ -223,6 +223,62 @@
           "target": "components/voraui/trading-chart/lib/signal-tooltip.ts"
         }
       ]
+    },
+    {
+      "name": "fear-greed-index-chart",
+      "type": "registry:block",
+      "title": "Fear & Greed Index Chart",
+      "description": "Crypto Fear & Greed index history as a band-colored line with optional BTC price and volume.",
+      "dependencies": [
+        "lightweight-charts",
+        "next-themes"
+      ],
+      "registryDependencies": [
+        "button",
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "registry/voraui/fear-greed-index-chart/index.ts",
+          "type": "registry:lib",
+          "target": "components/voraui/fear-greed-index-chart/index.ts"
+        },
+        {
+          "path": "registry/voraui/fear-greed-index-chart/fear-greed-index-chart.tsx",
+          "type": "registry:component",
+          "target": "components/voraui/fear-greed-index-chart/fear-greed-index-chart.tsx"
+        },
+        {
+          "path": "registry/voraui/fear-greed-index-chart/components/skeleton.tsx",
+          "type": "registry:component",
+          "target": "components/voraui/fear-greed-index-chart/components/skeleton.tsx"
+        },
+        {
+          "path": "registry/voraui/fear-greed-index-chart/hooks/use-fear-greed-history.ts",
+          "type": "registry:hook",
+          "target": "components/voraui/fear-greed-index-chart/hooks/use-fear-greed-history.ts"
+        },
+        {
+          "path": "registry/voraui/fear-greed-index-chart/hooks/use-btc-daily.ts",
+          "type": "registry:hook",
+          "target": "components/voraui/fear-greed-index-chart/hooks/use-btc-daily.ts"
+        },
+        {
+          "path": "registry/voraui/fear-greed-index-chart/lib/fear-greed-bands.ts",
+          "type": "registry:lib",
+          "target": "components/voraui/fear-greed-index-chart/lib/fear-greed-bands.ts"
+        },
+        {
+          "path": "registry/voraui/fear-greed-index-chart/lib/zones-primitive.ts",
+          "type": "registry:lib",
+          "target": "components/voraui/fear-greed-index-chart/lib/zones-primitive.ts"
+        },
+        {
+          "path": "registry/voraui/fear-greed-index-chart/lib/index-tooltip.ts",
+          "type": "registry:lib",
+          "target": "components/voraui/fear-greed-index-chart/lib/index-tooltip.ts"
+        }
+      ]
     }
   ]
 }
