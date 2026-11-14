@@ -50,4 +50,16 @@ describe("FearGreedIndexChart states", () => {
     expect(html).not.toContain("Bitcoin Price");
     expect(html).not.toContain("Bitcoin Volume");
   });
+
+  it("lists price and volume in the legend when both BTC layers are drawn", () => {
+    const html = renderToStaticMarkup(
+      React.createElement(FearGreedIndexChart, {
+        data: [{ time: 1_794_614_400, value: 26 }],
+        btcData: [{ time: 1_794_614_400, price: 90000, volume: 1 }],
+        showVolume: true,
+      }),
+    );
+    expect(html).toContain("Bitcoin Price");
+    expect(html).toContain("Bitcoin Volume");
+  });
 });
