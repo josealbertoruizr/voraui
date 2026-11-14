@@ -17,8 +17,8 @@ export const VOLUME_SCALE_MARGINS = { top: 0.8, bottom: SCALE_MARGIN };
 export function priceScaleMargins(withVolume: boolean): { top: number; bottom: number } {
   return { top: SCALE_MARGIN, bottom: withVolume ? 0.26 : 0.12 };
 }
-// Fits "$120K" ticks, so the reserved scale rarely changes width once prices arrive.
-export const PRICE_SCALE_MIN_WIDTH = 60;
+// Fits half-step ticks like "$112.5K", so the plot keeps its left edge across presets.
+export const PRICE_SCALE_MIN_WIDTH = 68;
 // Below this many pixels per day the index line drops to 1px so it stays readable.
 export const DENSE_BAR_SPACING = 1;
 
