@@ -17,11 +17,14 @@ export interface GhostCandle {
 
 const GHOST_CANDLE_COUNT = 48;
 
+// Two decimals: Safari rewrites longer style percentages, which then mismatch on hydration.
+const roundPct = (value: number) => Math.round(value * 100) / 100;
+
 /** Deterministic heights; Math.random would cause a hydration mismatch. */
 export function generateGhostCandles(count: number): GhostCandle[] {
   return Array.from({ length: count }, (_, i) => {
-    const bodyHeightPct = 25 + 35 * Math.abs(Math.sin(i * 0.7));
-    const wickHeightPct = Math.min(bodyHeightPct + 12 + (i % 3) * 4, 100);
+    const bodyHeightPct = roundPct(25 + 35 * Math.abs(Math.sin(i * 0.7)));
+    const wickHeightPct = roundPct(Math.min(bodyHeightPct + 12 + (i % 3) * 4, 100));
     return { up: i % 2 === 0, bodyHeightPct, wickHeightPct };
   });
 }
@@ -65,7 +68,7 @@ export function TradingChartSkeleton({ className, height = 500 }: TradingChartSk
               )}
               style={{
                 height: `${candle.bodyHeightPct}%`,
-                top: `${(candle.wickHeightPct - candle.bodyHeightPct) / 2}%`,
+                top: `${roundPct((candle.wickHeightPct - candle.bodyHeightPct) / 2)}%`,
               }}
             />
           </div>

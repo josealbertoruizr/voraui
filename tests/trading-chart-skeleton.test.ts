@@ -26,6 +26,16 @@ describe("TradingChartSkeleton", () => {
     expect(html).toContain("Loading market data");
   });
 
+  it("writes percentages short enough that no browser reserializes them", () => {
+    // Safari rounds style percentages to 6 decimals, which then mismatch on hydration.
+    const html = renderToStaticMarkup(React.createElement(TradingChartSkeleton, {}));
+    const percentages = html.match(/[\d.]+%/g) ?? [];
+    expect(percentages.length).toBeGreaterThan(0);
+    for (const percentage of percentages) {
+      expect(percentage).toMatch(/^\d+(\.\d{1,2})?%$/);
+    }
+  });
+
   it("sizes the root to the height prop", () => {
     const html = renderToStaticMarkup(React.createElement(TradingChartSkeleton, { height: 640 }));
     expect(html).toContain("height:640px");
