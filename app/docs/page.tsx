@@ -53,6 +53,11 @@ export default function IntroductionPage() {
             crypto Fear &amp; Greed index as a live SVG dial.
           </li>
           <li>
+            <span className="font-medium text-foreground">Fear &amp; Greed Index Chart</span>: the
+            full Fear &amp; Greed history as a band-colored line, with optional Bitcoin price and
+            volume layers.
+          </li>
+          <li>
             <span className="font-medium text-foreground">Altseason Gauge</span>: the Altcoin
             Season index computed client-side from CoinPaprika data.
           </li>
@@ -130,16 +135,18 @@ export default function IntroductionPage() {
               Lightweight Charts
             </Link>{" "}
             from TradingView is the charting engine behind{" "}
-            <span className="text-foreground">Trading Chart</span> and{" "}
-            <span className="text-foreground">BTC Rainbow Chart</span>.
+            <span className="text-foreground">Trading Chart</span>,{" "}
+            <span className="text-foreground">BTC Rainbow Chart</span> and{" "}
+            <span className="text-foreground">Fear &amp; Greed Index Chart</span>.
           </li>
           <li>
             <Link href="https://github.com/pacocoursey/next-themes" className="font-medium text-foreground underline hover:no-underline">
               next-themes
             </Link>{" "}
-            drives dark mode site-wide, and keeps <span className="text-foreground">Trading Chart</span> and{" "}
-            <span className="text-foreground">BTC Rainbow Chart</span> in sync with it since their
-            canvases are painted outside the DOM.
+            drives dark mode site-wide, and keeps <span className="text-foreground">Trading Chart</span>,{" "}
+            <span className="text-foreground">BTC Rainbow Chart</span> and{" "}
+            <span className="text-foreground">Fear &amp; Greed Index Chart</span> in sync with it
+            since their canvases are painted outside the DOM.
           </li>
           <li>
             <Link href="https://motion.dev" className="font-medium text-foreground underline hover:no-underline">

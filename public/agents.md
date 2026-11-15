@@ -71,6 +71,7 @@ export function MarketPanel() {
 | Trading Chart | `trading-chart` | `TradingChart` | Binance spot klines | `lightweight-charts`, `next-themes` |
 | BTC Rainbow Chart | `btc-rainbow-chart` | `BtcRainbowChart`, `BtcRainbowLegend` | bundled 2010-2017 seed + Binance daily klines | `lightweight-charts`, `next-themes` |
 | Fear & Greed Gauge | `fear-greed-gauge` | `FearGreedGauge` | alternative.me Fear & Greed API | `@number-flow/react`, `framer-motion` |
+| Fear & Greed Index Chart | `fear-greed-index-chart` | `FearGreedIndexChart` | alternative.me Fear & Greed history + Binance daily klines | `lightweight-charts`, `next-themes` |
 | Altseason Gauge | `altseason-gauge` | `AltseasonGauge` | CoinPaprika tickers | `@number-flow/react`, `framer-motion` |
 
 The shadcn CLI installs declared npm dependencies and registry dependencies.
@@ -210,6 +211,43 @@ type FearGreedData = {
 };
 ```
 
+## Fear & Greed Index Chart
+
+Use for the crypto Fear & Greed index over time as a band-colored line, with optional Bitcoin price and volume layers and range presets.
+
+```tsx
+import { FearGreedIndexChart } from "@/components/voraui/fear-greed-index-chart";
+
+export function SentimentHistory() {
+  return <FearGreedIndexChart showVolume />;
+}
+```
+
+Props:
+
+| Prop | Type | Default | Notes |
+| --- | --- | --- | --- |
+| `showPrice` | `boolean` | `true` | Draws the BTC price line on the left scale. |
+| `showVolume` | `boolean` | `false` | Draws the BTC volume histogram along the bottom. |
+| `data` | `FearGreedPoint[]` | - | Passing data skips the bundled alternative.me fetcher. |
+| `btcData` | `BtcDailyPoint[]` | - | Passing data skips the bundled Binance fetcher. |
+| `className` | `string` | - | Extra wrapper classes. |
+
+Data shape:
+
+```ts
+type FearGreedPoint = {
+  time: number; // Unix seconds, 00:00 UTC
+  value: number; // 0-100
+};
+
+type BtcDailyPoint = {
+  time: number; // Unix seconds
+  price: number; // close, USD
+  volume: number; // quote volume, USDT
+};
+```
+
 ## Altseason Gauge
 
 Use for an Altcoin Season score: the percentage of top clean altcoins
@@ -254,6 +292,7 @@ Each component exports its skeleton for Suspense fallbacks or SSR placeholders:
 import { TradingChartSkeleton } from "@/components/voraui/trading-chart";
 import { BtcRainbowChartSkeleton } from "@/components/voraui/btc-rainbow-chart";
 import { FearGreedGaugeSkeleton } from "@/components/voraui/fear-greed-gauge";
+import { FearGreedIndexChartSkeleton } from "@/components/voraui/fear-greed-index-chart";
 import { AltseasonGaugeSkeleton } from "@/components/voraui/altseason-gauge";
 ```
 
@@ -263,6 +302,9 @@ import { AltseasonGaugeSkeleton } from "@/components/voraui/altseason-gauge";
 - `BtcRainbowChart` uses a bundled 2010-2017 BTC daily seed and Binance daily
   klines from 2017-08-17 onward.
 - `FearGreedGauge` fetches `https://api.alternative.me/fng/?limit=1`.
+- `FearGreedIndexChart` fetches `https://api.alternative.me/fng/?limit=0` (daily since February 2018).
+  BTC closes and quote volume come from Binance daily klines, requested only when `showPrice` or `showVolume` is on.
+  If Binance is unreachable the chart renders the index alone.
 - `AltseasonGauge` fetches `https://api.coinpaprika.com/v1/tickers?quotes=USD`
   and computes the score client-side.
 - Public fetchers are free and keyless, but production apps should pass owned
@@ -275,13 +317,14 @@ import { AltseasonGaugeSkeleton } from "@/components/voraui/altseason-gauge";
 - For Next.js App Router, import them directly from Server Components only when
   props are serializable. Put callbacks or browser-only surrounding logic in a
   client wrapper.
-- `TradingChart` and `BtcRainbowChart` render with `lightweight-charts`; give
-  them stable visible dimensions and avoid placing them in initially hidden
-  zero-width containers.
+- `TradingChart`, `BtcRainbowChart` and `FearGreedIndexChart` render with
+  `lightweight-charts`; give them stable visible dimensions and avoid placing
+  them in initially hidden zero-width containers.
 - Dark mode for chart canvases follows `next-themes`. Without a provider, chart
   canvases render in their light theme.
-- `TradeSignal.ts` times use epoch milliseconds; `OhlcvCandle.time` and
-  `RainbowPoint.time` use Unix seconds.
+- `TradeSignal.ts` times use epoch milliseconds; `OhlcvCandle.time`,
+  `RainbowPoint.time`, `FearGreedPoint.time` and `BtcDailyPoint.time` use Unix
+  seconds.
 - Keep installed files editable. If the user asks for custom behavior, modify
   the copied component source in `components/voraui/<component>/`.
 
@@ -293,6 +336,7 @@ If the shadcn CLI cannot be used, download a component zip:
 https://voraui.vercel.app/d/trading-chart.zip
 https://voraui.vercel.app/d/btc-rainbow-chart.zip
 https://voraui.vercel.app/d/fear-greed-gauge.zip
+https://voraui.vercel.app/d/fear-greed-index-chart.zip
 https://voraui.vercel.app/d/altseason-gauge.zip
 ```
 

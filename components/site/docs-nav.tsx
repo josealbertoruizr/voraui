@@ -21,6 +21,7 @@ const navGroups = [
       { href: "/docs/trading-chart", label: "Trading Chart" },
       { href: "/docs/btc-rainbow-chart", label: "BTC Rainbow Chart" },
       { href: "/docs/fear-greed-gauge", label: "Fear & Greed Gauge" },
+      { href: "/docs/fear-greed-index-chart", label: "Fear & Greed Index Chart" },
       { href: "/docs/altseason-gauge", label: "Altseason Gauge" },
     ],
   },
