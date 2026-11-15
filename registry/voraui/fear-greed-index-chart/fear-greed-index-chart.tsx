@@ -43,17 +43,21 @@ export function FearGreedIndexChart({
 }: FearGreedIndexChartProps) {
   const { resolvedTheme } = useTheme();
   const fetched = useFearGreedHistory({ enabled: data === undefined });
-  const index = useMemo(() => normalizeByTime(data ?? fetched.data ?? []), [data, fetched.data]);
+  // Fetched history is already normalized by its parser.
+  const index = useMemo(
+    () => (data ? normalizeByTime(data) : (fetched.data ?? [])),
+    [data, fetched.data],
+  );
   const loading = data === undefined && fetched.loading;
   const error = data === undefined ? fetched.error : null;
 
   const btcWanted = showPrice || showVolume;
-  const fetchedBtc = useBtcDaily({
-    enabled: btcWanted && btcData === undefined,
-    from: index[0]?.time ?? null,
-  });
   const firstIndexTime = index[0]?.time;
   const lastIndexTime = index[index.length - 1]?.time;
+  const fetchedBtc = useBtcDaily({
+    enabled: btcWanted && btcData === undefined,
+    from: firstIndexTime ?? null,
+  });
   const btc = useMemo(() => {
     if (!btcWanted || firstIndexTime === undefined || lastIndexTime === undefined) return [];
     const source = btcData ?? fetchedBtc.data ?? [];
@@ -86,7 +90,11 @@ export function FearGreedIndexChart({
   const reservePriceScale = drawPrice || (showPrice && fetchedBtc.loading);
 
   const [preset, setPreset] = useState<Preset>("ALL");
-  const { containerRef, failed: chartFailed } = useIndexChart({
+  const {
+    containerRef,
+    failed: chartFailed,
+    refit,
+  } = useIndexChart({
     indexLine,
     priceLine,
     volumeBars,
@@ -130,7 +138,11 @@ export function FearGreedIndexChart({
               size="sm"
               variant={preset === p ? "default" : "outline"}
               className="h-7 px-2.5 text-[11px] font-medium"
-              onClick={() => setPreset(p)}
+              // Clicking the active preset snaps a zoomed or panned view back to it.
+              onClick={() => {
+                if (p === preset) refit();
+                else setPreset(p);
+              }}
             >
               {p}
             </Button>

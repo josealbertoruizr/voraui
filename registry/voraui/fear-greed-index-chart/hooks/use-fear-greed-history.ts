@@ -1,13 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { normalizeByTime, type FearGreedPoint } from "../lib/fear-greed-bands";
+import { isPresent, normalizeByTime, type FearGreedPoint } from "../lib/fear-greed-bands";
 
 export type { FearGreedPoint };
 
 const FNG_HISTORY_URL = "https://api.alternative.me/fng/?limit=0";
-
-const isPresent = (value: unknown) => value !== null && value !== undefined && value !== "";
 
 type FngRow = { value?: unknown; timestamp?: unknown } | null;
 
@@ -44,9 +42,7 @@ export function useFearGreedHistory(options: { enabled?: boolean } = {}) {
         if (controller.signal.aborted) return;
         setResult({ data: parseFngHistory(json), error: null });
       } catch (err) {
-        if (controller.signal.aborted || (err instanceof Error && err.name === "AbortError")) {
-          return;
-        }
+        if (controller.signal.aborted) return;
         setResult({
           data: null,
           error: err instanceof Error ? err.message : "Fear & Greed request failed",

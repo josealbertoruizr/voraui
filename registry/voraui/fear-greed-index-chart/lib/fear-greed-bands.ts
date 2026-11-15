@@ -38,6 +38,9 @@ export function findFearGreedBand(value: number): FearGreedBand {
   );
 }
 
+/** False for the null, undefined and "" fields that `Number()` would otherwise turn into 0. */
+export const isPresent = (value: unknown) => value !== null && value !== undefined && value !== "";
+
 /** Sorts ascending by time, keeps the last duplicate, and drops non-positive or non-finite times. */
 export function normalizeByTime<T extends { time: number }>(points: readonly T[]): T[] {
   const byTime = new Map<number, T>();

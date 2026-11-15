@@ -1,12 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {
   IChartApi,
   ISeriesApi,
   LogicalRange,
-  LogicalRangeChangeEventHandler,
-  SizeChangeEventHandler,
   Time,
   UTCTimestamp,
 } from "lightweight-charts";
@@ -24,7 +22,6 @@ import {
   priceSeriesOptions,
   themeOptions,
   volumeSeriesOptions,
-  type ChartPalette,
 } from "../lib/chart-options";
 import {
   DAY_SECONDS,
@@ -73,7 +70,6 @@ export function useIndexChart({
   const hasIndex = indexLine.length > 0;
 
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const tooltipRef = useRef<IndexTooltip | null>(null);
   const lwcRef = useRef<LightweightCharts | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const indexSeriesRef = useRef<ISeriesApi<"Line", Time> | null>(null);
@@ -83,14 +79,24 @@ export function useIndexChart({
 
   const [failed, setFailed] = useState(false);
 
-  const indexLineRef = useRef<IndexPoint[]>(indexLine);
-  const priceLineRef = useRef<ValuePoint[]>(priceLine);
-  const volumeBarsRef = useRef<ValuePoint[]>(volumeBars);
-  const drawPriceRef = useRef(drawPrice);
-  const drawVolumeRef = useRef(drawVolume);
-  const reservePriceScaleRef = useRef(reservePriceScale);
-  const paletteRef = useRef<ChartPalette>(chartPalette(theme));
-  const presetRef = useRef<Preset>(preset);
+  const palette = useMemo(() => chartPalette(theme), [theme]);
+  // Latest props for the chart callbacks, which outlive the render that created them.
+  const latestProps = {
+    indexLine,
+    priceLine,
+    volumeBars,
+    drawPrice,
+    drawVolume,
+    reservePriceScale,
+    preset,
+    palette,
+  };
+  const latest = useRef(latestProps);
+  // Declared first so every effect below reads this render's props.
+  useEffect(() => {
+    latest.current = latestProps;
+  });
+
   // Time bounds the visible range was last fitted to; unchanged bounds keep the user's zoom.
   const rangeKeyRef = useRef<string | null>(null);
   // Pixels reserved right of the latest day for the band labels; 0 while they are hidden.
@@ -102,9 +108,9 @@ export function useIndexChart({
     if (!chart) return;
     const timeScale = chart.timeScale();
     const bars = distinctTimeCount([
-      indexLineRef.current,
-      priceLineRef.current,
-      volumeBarsRef.current,
+      latest.current.indexLine,
+      latest.current.priceLine,
+      latest.current.volumeBars,
     ]);
     timeScale.applyOptions({
       minBarSpacing: minBarSpacingFor(timeScale.width(), gutterRef.current, bars),
@@ -113,18 +119,18 @@ export function useIndexChart({
 
   const applyVisibleRange = useCallback(() => {
     const chart = chartRef.current;
-    const points = indexLineRef.current;
+    const points = latest.current.indexLine;
     if (!chart || points.length === 0) return;
     const timeScale = chart.timeScale();
 
-    if (presetRef.current === "ALL") {
+    if (latest.current.preset === "ALL") {
       timeScale.fitContent();
       return;
     }
 
     const first = points[0].time as number;
     const last = points[points.length - 1].time as number;
-    const from = Math.max(first, last - PRESET_DAYS[presetRef.current] * DAY_SECONDS);
+    const from = Math.max(first, last - PRESET_DAYS[latest.current.preset] * DAY_SECONDS);
     const fromIndex = timeScale.timeToIndex(from as UTCTimestamp, true);
     const toIndex = timeScale.timeToIndex(last as UTCTimestamp, true);
     if (fromIndex === null || toIndex === null) return;
@@ -135,14 +141,14 @@ export function useIndexChart({
 
   const applyLatestData = useCallback(() => {
     const indexSeries = indexSeriesRef.current;
-    const points = indexLineRef.current;
+    const points = latest.current.indexLine;
     if (!chartRef.current || !indexSeries || points.length === 0) return;
 
     indexSeries.setData(points);
     // The series color drives the last-value label, so it follows the latest band.
     indexSeries.applyOptions({ color: points[points.length - 1].color });
-    priceSeriesRef.current?.setData(priceLineRef.current);
-    volumeSeriesRef.current?.setData(volumeBarsRef.current);
+    priceSeriesRef.current?.setData(latest.current.priceLine);
+    volumeSeriesRef.current?.setData(latest.current.volumeBars);
 
     applyZoomLimit();
     const rangeKey = `${points[0].time}:${points[points.length - 1].time}`;
@@ -158,23 +164,23 @@ export function useIndexChart({
     const lwc = lwcRef.current;
     const chart = chartRef.current;
     if (!lwc || !chart) return;
-    const palette = paletteRef.current;
+    const palette = latest.current.palette;
 
-    if (drawVolumeRef.current && !volumeSeriesRef.current) {
+    if (latest.current.drawVolume && !volumeSeriesRef.current) {
       const volumeSeries = chart.addSeries(lwc.HistogramSeries, volumeSeriesOptions(palette));
       chart.priceScale(VOLUME_SCALE_ID).applyOptions({ scaleMargins: VOLUME_SCALE_MARGINS });
-      volumeSeries.setData(volumeBarsRef.current);
+      volumeSeries.setData(latest.current.volumeBars);
       volumeSeriesRef.current = volumeSeries;
-    } else if (!drawVolumeRef.current && volumeSeriesRef.current) {
+    } else if (!latest.current.drawVolume && volumeSeriesRef.current) {
       chart.removeSeries(volumeSeriesRef.current);
       volumeSeriesRef.current = null;
     }
 
-    if (drawPriceRef.current && !priceSeriesRef.current) {
+    if (latest.current.drawPrice && !priceSeriesRef.current) {
       const priceSeries = chart.addSeries(lwc.LineSeries, priceSeriesOptions(palette));
-      priceSeries.setData(priceLineRef.current);
+      priceSeries.setData(latest.current.priceLine);
       priceSeriesRef.current = priceSeries;
-    } else if (!drawPriceRef.current && priceSeriesRef.current) {
+    } else if (!latest.current.drawPrice && priceSeriesRef.current) {
       chart.removeSeries(priceSeriesRef.current);
       priceSeriesRef.current = null;
     }
@@ -184,42 +190,27 @@ export function useIndexChart({
     priceSeriesRef.current?.setSeriesOrder(volumeSeriesRef.current ? 1 : 0);
     chart.applyOptions({
       leftPriceScale: {
-        visible: reservePriceScaleRef.current,
+        visible: latest.current.reservePriceScale,
         minimumWidth: PRICE_SCALE_MIN_WIDTH,
-        scaleMargins: priceScaleMargins(drawVolumeRef.current),
+        scaleMargins: priceScaleMargins(latest.current.drawVolume),
       },
     });
   }, []);
 
-  useEffect(() => {
-    indexLineRef.current = indexLine;
-    priceLineRef.current = priceLine;
-    volumeBarsRef.current = volumeBars;
-    applyLatestData();
-  }, [indexLine, priceLine, volumeBars, applyLatestData]);
+  useEffect(() => applyLatestData(), [indexLine, priceLine, volumeBars, applyLatestData]);
+
+  useEffect(() => syncLayers(), [drawPrice, drawVolume, reservePriceScale, syncLayers]);
 
   useEffect(() => {
-    drawPriceRef.current = drawPrice;
-    drawVolumeRef.current = drawVolume;
-    reservePriceScaleRef.current = reservePriceScale;
-    syncLayers();
-  }, [drawPrice, drawVolume, reservePriceScale, syncLayers]);
-
-  useEffect(() => {
-    const palette = chartPalette(theme);
-    paletteRef.current = palette;
     const chart = chartRef.current;
     if (!chart) return;
     chart.applyOptions(themeOptions(palette));
     priceSeriesRef.current?.applyOptions({ color: palette.price });
     volumeSeriesRef.current?.applyOptions({ color: palette.volume });
     primitiveRef.current?.setColors(palette.label, palette.halo);
-  }, [theme]);
+  }, [palette]);
 
-  useEffect(() => {
-    presetRef.current = preset;
-    applyVisibleRange();
-  }, [preset, applyVisibleRange]);
+  useEffect(() => applyVisibleRange(), [preset, applyVisibleRange]);
 
   // Mount once; theme, layers, and data are applied in place by the effects above.
   useEffect(() => {
@@ -228,14 +219,13 @@ export function useIndexChart({
     let disposed = false;
     let ro: ResizeObserver | null = null;
     let chartInitialized = false;
-    let onPlotResize: SizeChangeEventHandler | null = null;
-    let onRangeChange: LogicalRangeChangeEventHandler | null = null;
+    let tooltip: IndexTooltip | null = null;
 
     const initChart = async (container: HTMLDivElement) => {
       const lwc = await import("lightweight-charts");
       if (disposed) return;
       lwcRef.current = lwc;
-      const palette = paletteRef.current;
+      const palette = latest.current.palette;
 
       const chart = lwc.createChart(
         container,
@@ -255,7 +245,7 @@ export function useIndexChart({
       indexSeries.attachPrimitive(primitive);
 
       // Fires on the first layout too, so the label column is decided from the real plot width.
-      onPlotResize = (plotWidth) => {
+      timeScale.subscribeSizeChange((plotWidth) => {
         const gutter = labelGutterPixels(plotWidth);
         if (gutter !== gutterRef.current) {
           gutterRef.current = gutter;
@@ -266,12 +256,10 @@ export function useIndexChart({
           return;
         }
         applyZoomLimit();
-      };
-      timeScale.subscribeSizeChange(onPlotResize);
+      });
 
-      let clamping = false;
       let tickDetail: TickDetail | null = null;
-      onRangeChange = (range) => {
+      timeScale.subscribeVisibleLogicalRangeChange((range) => {
         const barSpacing = timeScale.options().barSpacing;
         // Setting the formatter also drops the library's cached labels for the old zoom level.
         const detail = tickDetailFor(barSpacing);
@@ -287,22 +275,19 @@ export function useIndexChart({
         if (indexSeries.options().lineWidth !== lineWidth) indexSeries.applyOptions({ lineWidth });
 
         // Without fixRightEdge, panning is bounded here: never past the label column.
-        const points = indexLineRef.current;
-        if (!range || clamping || points.length === 0) return;
+        const points = latest.current.indexLine;
+        if (!range || points.length === 0) return;
         const lastIndex = timeScale.timeToIndex(points[points.length - 1].time, true);
         if (lastIndex === null) return;
         const clamped = clampLogicalRange(range, lastIndex + 1, gutterRef.current / barSpacing);
-        if (clamped === range) return;
-        clamping = true;
-        timeScale.setVisibleLogicalRange(clamped as LogicalRange);
-        clamping = false;
-      };
-      timeScale.subscribeVisibleLogicalRangeChange(onRangeChange);
+        // The clamp's tolerance, not a guard here, is what stops this from re-triggering itself.
+        if (clamped !== range) timeScale.setVisibleLogicalRange(clamped as LogicalRange);
+      });
 
       syncLayers();
       applyLatestData();
 
-      const tooltip = createIndexTooltip(
+      tooltip = createIndexTooltip(
         container,
         () => ({
           index: indexSeriesRef.current,
@@ -312,7 +297,6 @@ export function useIndexChart({
         // 0 while the left scale is hidden (index only).
         () => chart.priceScale("left").width(),
       );
-      tooltipRef.current = tooltip;
       chart.subscribeCrosshairMove(tooltip.onCrosshairMove);
     };
 
@@ -334,15 +318,10 @@ export function useIndexChart({
     return () => {
       disposed = true;
       if (ro) ro.disconnect();
-      tooltipRef.current?.dispose();
-      tooltipRef.current = null;
-      if (chartRef.current) {
-        const timeScale = chartRef.current.timeScale();
-        if (onPlotResize) timeScale.unsubscribeSizeChange(onPlotResize);
-        if (onRangeChange) timeScale.unsubscribeVisibleLogicalRangeChange(onRangeChange);
-        chartRef.current.remove();
-        chartRef.current = null;
-      }
+      tooltip?.dispose();
+      // remove() also drops the time scale subscriptions made above.
+      chartRef.current?.remove();
+      chartRef.current = null;
       indexSeriesRef.current = null;
       priceSeriesRef.current = null;
       volumeSeriesRef.current = null;
@@ -352,5 +331,5 @@ export function useIndexChart({
     };
   }, [applyLatestData, applyVisibleRange, applyZoomLimit, syncLayers, hasIndex]);
 
-  return { containerRef, failed };
+  return { containerRef, failed, refit: applyVisibleRange };
 }
