@@ -69,3 +69,26 @@ export function clampLogicalRange(
   }
   return range;
 }
+
+/** Finest calendar unit the time axis labels at the current zoom. */
+export type TickDetail = "year" | "month" | "day";
+
+// Pixels a year (or month) must span before the unit below it gets its own labels.
+const MIN_UNIT_WIDTH = 180;
+
+export function tickDetailFor(barSpacing: number): TickDetail {
+  if (barSpacing * 30 >= MIN_UNIT_WIDTH) return "day";
+  if (barSpacing * 365 >= MIN_UNIT_WIDTH) return "month";
+  return "year";
+}
+
+// lightweight-charts' TickMarkType: 0 = Year, 1 = Month, 2 = DayOfMonth.
+const TICK_DETAIL_RANK: Record<TickDetail, number> = { year: 0, month: 1, day: 2 };
+
+/**
+ * Blanks marks finer than `detail`: the library drops one into any leftover gap, which reads as
+ * a lone "11" or "jun" in a row of years. `null` keeps the library's default label.
+ */
+export function tickLabelFor(tickMarkType: number, detail: TickDetail): "" | null {
+  return tickMarkType > TICK_DETAIL_RANK[detail] ? "" : null;
+}

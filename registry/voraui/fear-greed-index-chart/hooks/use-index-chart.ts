@@ -34,7 +34,10 @@ import {
   labelGutterPixels,
   minBarSpacingFor,
   presetLogicalRange,
+  tickDetailFor,
+  tickLabelFor,
   type Preset,
+  type TickDetail,
 } from "../lib/chart-range";
 
 export type IndexPoint = { time: UTCTimestamp; value: number; color: string };
@@ -267,9 +270,19 @@ export function useIndexChart({
       timeScale.subscribeSizeChange(onPlotResize);
 
       let clamping = false;
+      let tickDetail: TickDetail | null = null;
       onRangeChange = (range) => {
-        // Thin the index line when days are packed tighter than its stroke.
         const barSpacing = timeScale.options().barSpacing;
+        // Setting the formatter also drops the library's cached labels for the old zoom level.
+        const detail = tickDetailFor(barSpacing);
+        if (detail !== tickDetail) {
+          tickDetail = detail;
+          chart.applyOptions({
+            timeScale: { tickMarkFormatter: (_time: Time, type: number) => tickLabelFor(type, detail) },
+          });
+        }
+
+        // Thin the index line when days are packed tighter than its stroke.
         const lineWidth = barSpacing < DENSE_BAR_SPACING ? 1 : 2;
         if (indexSeries.options().lineWidth !== lineWidth) indexSeries.applyOptions({ lineWidth });
 

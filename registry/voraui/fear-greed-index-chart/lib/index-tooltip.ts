@@ -14,9 +14,8 @@ export function compactUsd(n: number): string {
 /** Compact USD for axis ticks: drops trailing ".00" so the price scale stays narrow; blank below 0. */
 export function compactUsdTick(n: number): string {
   if (!Number.isFinite(n)) return "-";
-  // The scale's bottom margin can reach under $0; prices never do.
-  if (n < 0) return "";
-  if (n === 0) return "$0";
+  // The scale's bottom margin reaches $0 and under, below the index floor; prices never do.
+  if (n <= 0) return "";
   const trim = (v: number) => v.toFixed(2).replace(/\.?0+$/, "");
   if (n >= 1e9) return `$${trim(n / 1e9)}B`;
   if (n >= 1e6) return `$${trim(n / 1e6)}M`;

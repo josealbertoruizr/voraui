@@ -21,8 +21,8 @@ describe("formatters", () => {
     expect(compactUsdTick(-0.5)).toBe("");
   });
 
-  it("labels the zero tick of the linear price axis as $0", () => {
-    expect(compactUsdTick(0)).toBe("$0");
+  it("leaves the zero tick blank: it sits under the index floor, where no price is drawn", () => {
+    expect(compactUsdTick(0)).toBe("");
   });
 });
 

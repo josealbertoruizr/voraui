@@ -142,6 +142,19 @@ export default function Page() {
           renders the index alone. Dark mode styling requires a next-themes ThemeProvider; without
           one the chart renders with its light theme.
         </p>
+        <p className="text-sm text-muted-foreground">
+          The chart is drawn with{" "}
+          <a
+            href="https://www.tradingview.com/lightweight-charts/"
+            target="_blank"
+            rel="noreferrer"
+            className="font-medium text-foreground underline hover:no-underline"
+          >
+            Lightweight Charts
+          </a>{" "}
+          by TradingView with its logo turned off. Its license asks for that credit in return, so
+          keep a link to tradingview.com somewhere in your app.
+        </p>
       </section>
     </main>
   );

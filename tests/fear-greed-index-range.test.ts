@@ -6,6 +6,8 @@ import {
   labelGutterPixels,
   minBarSpacingFor,
   presetLogicalRange,
+  tickDetailFor,
+  tickLabelFor,
 } from "@/registry/voraui/fear-greed-index-chart/lib/chart-range";
 
 describe("labelGutterPixels", () => {
@@ -80,5 +82,35 @@ describe("distinctTimeCount", () => {
     const index = [{ time: 1 }, { time: 2 }];
     expect(distinctTimeCount([index, index, []])).toBe(2);
     expect(distinctTimeCount([[], []])).toBe(0);
+  });
+});
+
+describe("tickDetailFor", () => {
+  it("labels only years while a year is too narrow to fit month labels", () => {
+    expect(tickDetailFor(0.16)).toBe("year");
+    expect(tickDetailFor(0.38)).toBe("year");
+  });
+
+  it("adds months once a year is wide enough, and days once a month is", () => {
+    expect(tickDetailFor(0.5)).toBe("month");
+    expect(tickDetailFor(2.25)).toBe("month");
+    expect(tickDetailFor(6)).toBe("day");
+    expect(tickDetailFor(27)).toBe("day");
+  });
+});
+
+describe("tickLabelFor", () => {
+  // 0 = Year, 1 = Month, 2 = DayOfMonth in lightweight-charts' TickMarkType.
+  it("blanks the stray month and day marks that fill gaps between coarser ones", () => {
+    expect(tickLabelFor(1, "year")).toBe("");
+    expect(tickLabelFor(2, "year")).toBe("");
+    expect(tickLabelFor(2, "month")).toBe("");
+  });
+
+  it("defers to the default label for marks at or above the current detail", () => {
+    expect(tickLabelFor(0, "year")).toBeNull();
+    expect(tickLabelFor(0, "month")).toBeNull();
+    expect(tickLabelFor(1, "month")).toBeNull();
+    expect(tickLabelFor(2, "day")).toBeNull();
   });
 });

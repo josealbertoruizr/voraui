@@ -58,6 +58,8 @@ export function themeOptions(palette: ChartPalette): DeepPartial<ChartOptions> {
       // "solid" = ColorType.Solid; importing the enum would eagerly bundle the library.
       background: { type: "solid" as ColorType.Solid, color: "rgba(0,0,0,0)" },
       textColor: palette.text,
+      // The library's license then asks for a TradingView credit with a link elsewhere in the app.
+      attributionLogo: false,
     },
     grid: {
       vertLines: { color: palette.grid },
