@@ -68,17 +68,20 @@ export function themeOptions(palette: ChartPalette): DeepPartial<ChartOptions> {
   };
 }
 
-/** Full options for createChart. */
+/** Full options for createChart; `fontFamily` is the host app's font, for the axis labels. */
 export function chartOptions(
   palette: ChartPalette,
   width: number,
   height: number,
+  fontFamily?: string,
 ): DeepPartial<ChartOptions> {
+  const theme = themeOptions(palette);
   return {
     width,
     height,
     autoSize: false,
-    ...themeOptions(palette),
+    ...theme,
+    layout: fontFamily ? { ...theme.layout, fontFamily } : theme.layout,
     rightPriceScale: {
       borderVisible: false,
       scaleMargins: { top: SCALE_MARGIN, bottom: SCALE_MARGIN },
@@ -115,6 +118,21 @@ export function chartOptions(
       axisPressedMouseMove: false,
       axisDoubleClickReset: true,
     },
+  };
+}
+
+// Index points within which an axis tick would sit half under the latest-value label.
+const LATEST_LABEL_CLEARANCE = 5;
+
+/** Index scale format: whole numbers, minus any tick the latest-value label would half cover. */
+export function indexPriceFormat(latest: number) {
+  return {
+    type: "custom" as const,
+    minMove: 1,
+    formatter: (value: number) =>
+      value !== latest && Math.abs(value - latest) < LATEST_LABEL_CLEARANCE
+        ? ""
+        : String(Math.round(value)),
   };
 }
 

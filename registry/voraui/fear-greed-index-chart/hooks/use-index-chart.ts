@@ -18,6 +18,7 @@ import {
   VOLUME_SCALE_MARGINS,
   chartOptions,
   chartPalette,
+  indexPriceFormat,
   priceScaleMargins,
   priceSeriesOptions,
   themeOptions,
@@ -146,7 +147,11 @@ export function useIndexChart({
 
     indexSeries.setData(points);
     // The series color drives the last-value label, so it follows the latest band.
-    indexSeries.applyOptions({ color: points[points.length - 1].color });
+    const latestPoint = points[points.length - 1];
+    indexSeries.applyOptions({
+      color: latestPoint.color,
+      priceFormat: indexPriceFormat(latestPoint.value),
+    });
     priceSeriesRef.current?.setData(latest.current.priceLine);
     volumeSeriesRef.current?.setData(latest.current.volumeBars);
 
@@ -229,7 +234,13 @@ export function useIndexChart({
 
       const chart = lwc.createChart(
         container,
-        chartOptions(palette, container.clientWidth, container.clientHeight),
+        chartOptions(
+          palette,
+          container.clientWidth,
+          container.clientHeight,
+          // The canvas does not inherit CSS, so the axis labels are handed the app's font.
+          getComputedStyle(container).fontFamily,
+        ),
       );
       chartRef.current = chart;
       const timeScale = chart.timeScale();
@@ -294,8 +305,15 @@ export function useIndexChart({
           price: priceSeriesRef.current,
           volume: volumeSeriesRef.current,
         }),
-        // 0 while the left scale is hidden (index only).
-        () => chart.priceScale("left").width(),
+        // 0 while the left scale is hidden (index only), or shown but not laid out yet: the
+        // library throws for that one frame instead of reporting 0.
+        () => {
+          try {
+            return chart.priceScale("left").width();
+          } catch {
+            return 0;
+          }
+        },
       );
       chart.subscribeCrosshairMove(tooltip.onCrosshairMove);
     };

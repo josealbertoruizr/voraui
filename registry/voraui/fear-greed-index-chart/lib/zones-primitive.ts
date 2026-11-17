@@ -23,8 +23,7 @@ const ZONES = [
   { from: 75, to: 100, color: "#2e7d32" },
 ];
 const ZONE_OPACITY = 0.1;
-const LABEL_FONT =
-  "11px -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif";
+const LABEL_FONT_SIZE = 11;
 const LABEL_INSET = 8;
 const LABEL_HALO_WIDTH = 3;
 
@@ -64,6 +63,7 @@ class FearGreedLabelsRenderer implements IPrimitivePaneRenderer {
     private series: ISeriesApi<SeriesType, Time> | null,
     private labelColor: string,
     private haloColor: string,
+    private fontFamily: string,
   ) {}
 
   draw(target: CanvasRenderingTarget2D): void {
@@ -75,7 +75,7 @@ class FearGreedLabelsRenderer implements IPrimitivePaneRenderer {
       if (width <= 0) return;
 
       ctx.save();
-      ctx.font = LABEL_FONT;
+      ctx.font = `${LABEL_FONT_SIZE}px ${this.fontFamily}`;
       ctx.textAlign = "right";
       ctx.textBaseline = "middle";
       ctx.lineJoin = "round";
@@ -113,9 +113,9 @@ class FearGreedLabelsPaneView implements IPrimitivePaneView {
   }
 
   renderer(): IPrimitivePaneRenderer | null {
-    const { series, labelColor, haloColor, labelsVisible } = this.primitive;
+    const { series, labelColor, haloColor, labelsVisible, fontFamily } = this.primitive;
     if (!labelsVisible) return null;
-    return new FearGreedLabelsRenderer(series, labelColor, haloColor);
+    return new FearGreedLabelsRenderer(series, labelColor, haloColor, fontFamily);
   }
 }
 
@@ -126,6 +126,8 @@ export class FearGreedZonesPrimitive implements ISeriesPrimitive<Time> {
   haloColor: string;
   /** Off until the chart reserves a label column; narrow plots never show the labels. */
   labelsVisible = false;
+  /** The chart's own font, so the band labels match the axis labels. */
+  fontFamily = "sans-serif";
 
   private paneViewsList: readonly IPrimitivePaneView[];
   private requestChartUpdate: (() => void) | null = null;
@@ -153,6 +155,7 @@ export class FearGreedZonesPrimitive implements ISeriesPrimitive<Time> {
 
   attached(param: SeriesAttachedParameter<Time, SeriesType>): void {
     this.series = param.series;
+    this.fontFamily = param.chart.options().layout.fontFamily;
     this.requestChartUpdate = param.requestUpdate;
   }
 
