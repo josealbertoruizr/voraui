@@ -1,7 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   compactUsd,
   compactUsdTick,
+  createIndexTooltip,
   getIndexTooltipPosition,
   renderIndexTooltipHtml,
 } from "@/registry/voraui/fear-greed-index-chart/lib/index-tooltip";
@@ -101,5 +102,31 @@ describe("getIndexTooltipPosition", () => {
     const pos = getIndexTooltipPosition({ x: 700, y: 410 }, 0, tooltip, container);
     expect(pos.left + tooltip.width).toBeLessThanOrEqual(container.width);
     expect(pos.top + tooltip.height).toBeLessThanOrEqual(container.height);
+  });
+});
+
+describe("createIndexTooltip", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("hides on crosshair events without a point, without measuring the price scale", () => {
+    // The library throws when asked for the left scale's width before it has built that scale.
+    const element = { style: {} as Record<string, string>, className: "" };
+    vi.stubGlobal("document", { createElement: () => element });
+    const container = { appendChild: () => undefined, clientWidth: 720, clientHeight: 420 };
+    const getPaneLeft = vi.fn(() => {
+      throw new Error("Value is null");
+    });
+
+    const tooltip = createIndexTooltip(
+      container as unknown as HTMLElement,
+      () => ({ index: null, price: null, volume: null }),
+      getPaneLeft,
+    );
+    element.style.display = "block";
+    const leave = { point: undefined, time: undefined, seriesData: new Map() };
+    expect(() => tooltip.onCrosshairMove(leave as never)).not.toThrow();
+
+    expect(getPaneLeft).not.toHaveBeenCalled();
+    expect(element.style.display).toBe("none");
   });
 });

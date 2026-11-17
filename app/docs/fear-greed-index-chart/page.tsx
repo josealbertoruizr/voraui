@@ -134,6 +134,16 @@ export default function Page() {
       </section>
 
       <section className="space-y-2">
+        <h2 className="text-xl font-semibold">Layout</h2>
+        <p className="text-sm text-muted-foreground">
+          The chart fills the width of its parent and has no width of its own. Make sure the parent
+          has a definite width: inside a parent that shrinks to its content, such as a centered flex
+          item, the chart collapses to the width of its legend until that parent gets w-full. Text
+          and axis labels use the font of the element the chart is rendered in.
+        </p>
+      </section>
+
+      <section className="space-y-2">
         <h2 className="text-xl font-semibold">Data source</h2>
         <p className="text-sm text-muted-foreground">
           The index comes from api.alternative.me/fng/?limit=0: daily values since February 2018,

@@ -223,6 +223,9 @@ export function SentimentHistory() {
 }
 ```
 
+The chart fills the width of its parent and has no width of its own.
+Render it in a parent with a definite width: inside a parent that shrinks to its content, such as a centered flex item, add `w-full` to that parent or the chart collapses to the width of its legend.
+
 Props:
 
 | Prop | Type | Default | Notes |

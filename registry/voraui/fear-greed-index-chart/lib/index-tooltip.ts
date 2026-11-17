@@ -139,16 +139,13 @@ export function createIndexTooltip(
 
   const onCrosshairMove = (param: MouseEventParams<Time>) => {
     const { index, price, volume } = getSeries();
+    // Pointless events (the cursor left the pane) end here, before the price scale is measured.
+    if (!index || !param.point || !param.time || param.point.x < 0 || param.point.y < 0) {
+      hide();
+      return;
+    }
     const paneLeft = getPaneLeft();
-    if (
-      !index ||
-      !param.point ||
-      !param.time ||
-      param.point.x < 0 ||
-      param.point.y < 0 ||
-      paneLeft + param.point.x > container.clientWidth ||
-      param.point.y > container.clientHeight
-    ) {
+    if (paneLeft + param.point.x > container.clientWidth || param.point.y > container.clientHeight) {
       hide();
       return;
     }
